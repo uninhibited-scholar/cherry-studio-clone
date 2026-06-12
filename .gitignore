@@ -1,0 +1,22 @@
+node_modules/
+out/
+dist/
+.DS_Store
+*.local
+
+# Electron
+*.dmg
+*.exe
+*.AppImage
+
+# Database
+*.db
+*.sqlite
+
+# Env
+.env
+.env.*
+
+# Cache
+.eslintcache
+.turbo
