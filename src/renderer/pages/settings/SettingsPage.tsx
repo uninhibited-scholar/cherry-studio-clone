@@ -1,31 +1,29 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { ProvidersSettings } from './sections/ProvidersSettings'
 
-const SETTING_SECTIONS = [
+const SECTIONS = [
   { key: 'providers', label: 'AI Providers', icon: '🔌' },
-  { key: 'models', label: 'Models', icon: '🧠' },
   { key: 'appearance', label: 'Appearance', icon: '🎨' },
-  { key: 'shortcuts', label: 'Shortcuts', icon: '⌨️' },
-  { key: 'data', label: 'Data & Backup', icon: '💾' },
-  { key: 'about', label: 'About', icon: 'ℹ️' },
+  { key: 'about', label: 'About', icon: 'ℹ️' }
 ]
 
-/**
- * Settings page.
- * Sections (to implement):
- *   Providers → add/edit API keys, host URLs
- *   Models    → enable/disable, custom endpoints
- *   Appearance → theme, font, window chrome
- *   Shortcuts  → global hotkeys
- *   Data       → export, import, WebDAV sync
- *   About      → version, changelog
- */
 export function SettingsPage(): React.ReactElement {
-  const [active, setActive] = React.useState('providers')
+  const [active, setActive] = useState('providers')
 
   return (
     <div style={{ display: 'flex', height: '100%', background: '#09090b', color: '#fafafa' }}>
-      <aside style={{ width: 200, borderRight: '1px solid #27272a', padding: '16px 8px' }}>
-        {SETTING_SECTIONS.map(({ key, label, icon }) => (
+      <aside
+        style={{
+          width: 200,
+          borderRight: '1px solid #27272a',
+          padding: '16px 8px',
+          flexShrink: 0
+        }}
+      >
+        <p style={{ fontSize: 11, color: '#71717a', fontWeight: 600, letterSpacing: 1, padding: '0 8px', marginBottom: 8 }}>
+          SETTINGS
+        </p>
+        {SECTIONS.map(({ key, label, icon }) => (
           <button
             key={key}
             onClick={() => setActive(key)}
@@ -41,7 +39,8 @@ export function SettingsPage(): React.ReactElement {
               background: active === key ? 'rgba(255,255,255,0.08)' : 'transparent',
               color: active === key ? '#fafafa' : '#71717a',
               fontSize: 13,
-              textAlign: 'left'
+              textAlign: 'left',
+              marginBottom: 2
             }}
           >
             <span>{icon}</span>
@@ -50,12 +49,27 @@ export function SettingsPage(): React.ReactElement {
         ))}
       </aside>
 
-      <div style={{ flex: 1, padding: 32, color: '#71717a' }}>
-        <p style={{ fontSize: 16, color: '#fafafa', marginBottom: 8 }}>
-          {SETTING_SECTIONS.find((s) => s.key === active)?.label}
-        </p>
-        <p style={{ fontSize: 13 }}>Implementation coming — scaffold only.</p>
+      <div style={{ flex: 1, overflow: 'auto', padding: 32 }}>
+        {active === 'providers' && <ProvidersSettings />}
+        {active === 'appearance' && <PlaceholderSection title="Appearance" />}
+        {active === 'about' && <AboutSection />}
       </div>
+    </div>
+  )
+}
+
+function PlaceholderSection({ title }: { title: string }) {
+  return <p style={{ color: '#71717a', fontSize: 14 }}>{title} — coming soon</p>
+}
+
+function AboutSection() {
+  return (
+    <div>
+      <h2 style={{ color: '#fafafa', fontSize: 18, marginBottom: 8 }}>Cherry Studio Clone</h2>
+      <p style={{ color: '#71717a', fontSize: 13 }}>Version 0.1.0 · Electron + React + TypeScript</p>
+      <p style={{ color: '#52525b', fontSize: 12, marginTop: 8 }}>
+        A from-scratch replication of Cherry Studio — an AI desktop client.
+      </p>
     </div>
   )
 }

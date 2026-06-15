@@ -14,6 +14,7 @@ export const AssistantSchema = z.object({
   maxTokens: z.number().positive().optional(),
   temperature: z.number().min(0).max(2).default(1),
   isBuiltin: z.boolean().default(false),
+  sortOrder: z.number().default(0),
   createdAt: z.number(),
   updatedAt: z.number()
 })

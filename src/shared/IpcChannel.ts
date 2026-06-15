@@ -14,6 +14,8 @@ export const IpcChannel = {
   PROVIDERS_UPSERT: 'providers:upsert',
   PROVIDERS_DELETE: 'providers:delete',
   MODELS_LIST: 'models:list',
+  MODELS_UPSERT: 'models:upsert',
+  MODELS_DELETE: 'models:delete',
 
   // Assistants
   ASSISTANTS_LIST: 'assistants:list',

@@ -1,48 +1,173 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
+import { useAssistants } from '../../hooks/useAssistants'
+import { useTopics } from '../../hooks/useTopics'
+import { useChat } from '../../hooks/useChat'
+import { AssistantSidebar } from './components/AssistantSidebar'
+import { MessageThread } from './components/MessageThread'
+import { InputBar } from './components/InputBar'
+import { CreateAssistantModal } from './components/CreateAssistantModal'
+import type { Assistant } from '@shared/data/types/assistant'
+import type { Topic } from '@shared/data/types/message'
 
-/**
- * Main chat page.
- *
- * Structure (to be built):
- *   ├── AssistantSidebar   — assistant list + topic list
- *   ├── ChatContent        — message thread + streaming
- *   └── InputBar           — user input, file attach, model picker
- */
 export function HomePage(): React.ReactElement {
-  return (
-    <div style={{ display: 'flex', height: '100%' }}>
-      {/* Assistant + topic sidebar */}
-      <aside
-        style={{
-          width: 220,
-          borderRight: '1px solid #27272a',
-          padding: 16,
-          background: '#09090b',
-          color: '#fafafa'
-        }}
-      >
-        <p style={{ fontSize: 12, color: '#71717a', marginBottom: 8 }}>ASSISTANTS</p>
-        <div style={{ color: '#71717a', fontSize: 13 }}>No assistants yet</div>
-      </aside>
+  const { assistants, createAssistant } = useAssistants()
+  const [selectedAssistant, setSelectedAssistant] = useState<Assistant | null>(null)
+  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
-      {/* Chat area */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#09090b',
-          color: '#71717a'
-        }}
-      >
-        <div style={{ fontSize: 40, marginBottom: 16 }}>💬</div>
-        <p style={{ fontSize: 16 }}>Select an assistant to start chatting</p>
-        <p style={{ fontSize: 13, marginTop: 8 }}>
-          Chat · Multi-model · Streaming — <em>coming soon</em>
-        </p>
+  const { topics, createTopic, deleteTopic } = useTopics(selectedAssistant?.id ?? null)
+  const { messages, streaming, streamingText, sendMessage, abort } = useChat(
+    selectedTopic?.id ?? null,
+    selectedAssistant
+  )
+
+  const handleSelectAssistant = useCallback(
+    (a: Assistant) => {
+      setSelectedAssistant(a)
+      setSelectedTopic(null)
+    },
+    []
+  )
+
+  const handleSelectTopic = useCallback((t: Topic) => {
+    setSelectedTopic(t)
+  }, [])
+
+  const handleNewTopic = useCallback(async () => {
+    const t = await createTopic()
+    if (t) setSelectedTopic(t)
+  }, [createTopic])
+
+  const handleDeleteTopic = useCallback(
+    async (id: string) => {
+      await deleteTopic(id)
+      if (selectedTopic?.id === id) setSelectedTopic(null)
+    },
+    [deleteTopic, selectedTopic]
+  )
+
+  const handleCreateAssistant = useCallback(
+    async (data: { name: string; emoji: string; prompt: string; providerId: string; modelId: string }) => {
+      const a = await createAssistant({ ...data, temperature: 1 })
+      setSelectedAssistant(a)
+    },
+    [createAssistant]
+  )
+
+  const canChat = Boolean(selectedTopic && selectedAssistant?.providerId && selectedAssistant?.modelId)
+
+  return (
+    <div style={{ display: 'flex', height: '100%', background: '#09090b' }}>
+      <AssistantSidebar
+        assistants={assistants}
+        selectedAssistantId={selectedAssistant?.id ?? null}
+        topics={topics}
+        selectedTopicId={selectedTopic?.id ?? null}
+        onSelectAssistant={handleSelectAssistant}
+        onSelectTopic={handleSelectTopic}
+        onNewTopic={handleNewTopic}
+        onDeleteTopic={handleDeleteTopic}
+        onCreateAssistant={() => setShowCreateModal(true)}
+      />
+
+      {/* Chat panel */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* Top bar */}
+        <div
+          style={{
+            height: 48,
+            borderBottom: '1px solid #27272a',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '0 16px',
+            gap: 10,
+            flexShrink: 0
+          }}
+        >
+          {selectedAssistant ? (
+            <>
+              <span style={{ fontSize: 18 }}>{selectedAssistant.emoji ?? '🤖'}</span>
+              <span style={{ color: '#fafafa', fontSize: 14, fontWeight: 500 }}>{selectedAssistant.name}</span>
+              {selectedTopic && (
+                <>
+                  <span style={{ color: '#52525b' }}>›</span>
+                  <span style={{ color: '#71717a', fontSize: 13 }}>{selectedTopic.title}</span>
+                </>
+              )}
+            </>
+          ) : (
+            <span style={{ color: '#52525b', fontSize: 13 }}>Select an assistant to start</span>
+          )}
+        </div>
+
+        {selectedTopic ? (
+          <>
+            <MessageThread messages={messages} streamingText={streamingText} streaming={streaming} />
+            <InputBar
+              onSend={sendMessage}
+              onAbort={abort}
+              streaming={streaming}
+              disabled={!canChat}
+            />
+          </>
+        ) : (
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#52525b'
+            }}
+          >
+            <div style={{ fontSize: 56, marginBottom: 16 }}>🍒</div>
+            <p style={{ fontSize: 16, color: '#71717a' }}>
+              {selectedAssistant ? 'Create a new topic →' : 'Choose an assistant from the sidebar'}
+            </p>
+            {!selectedAssistant && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                style={{
+                  marginTop: 16,
+                  padding: '10px 20px',
+                  borderRadius: 8,
+                  border: 'none',
+                  background: '#2563eb',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: 13
+                }}
+              >
+                + New Assistant
+              </button>
+            )}
+            {selectedAssistant && (
+              <button
+                onClick={handleNewTopic}
+                style={{
+                  marginTop: 16,
+                  padding: '10px 20px',
+                  borderRadius: 8,
+                  border: 'none',
+                  background: '#2563eb',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: 13
+                }}
+              >
+                + New Topic
+              </button>
+            )}
+          </div>
+        )}
       </div>
+
+      <CreateAssistantModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreated={handleCreateAssistant}
+      />
     </div>
   )
 }
