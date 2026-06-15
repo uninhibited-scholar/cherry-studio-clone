@@ -39,6 +39,21 @@ export const IpcChannel = {
   KNOWLEDGE_DELETE: 'knowledge:delete',
   KNOWLEDGE_SEARCH: 'knowledge:search',
 
+  // Notes
+  NOTES_LIST: 'notes:list',
+  NOTES_CREATE: 'notes:create',
+  NOTES_UPDATE: 'notes:update',
+  NOTES_DELETE: 'notes:delete',
+
+  // Translate
+  TRANSLATE_RUN: 'translate:run',
+  TRANSLATE_CHUNK: 'translate:chunk',
+  TRANSLATE_HISTORY_LIST: 'translate:history:list',
+  TRANSLATE_HISTORY_CLEAR: 'translate:history:clear',
+
+  // Web Search
+  WEB_SEARCH: 'web:search',
+
   // Settings
   SETTINGS_GET: 'settings:get',
   SETTINGS_SET: 'settings:set',

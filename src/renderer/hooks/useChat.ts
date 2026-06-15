@@ -8,11 +8,17 @@ type StreamChunk =
   | { type: 'done'; usage?: { inputTokens: number; outputTokens: number } }
   | { type: 'error'; error: string }
 
+type SearchResult = { title: string; url: string; snippet: string }
+
 export function useChat(topicId: string | null, assistant: Assistant | null) {
   const [messages, setMessages] = useState<Message[]>([])
   const [streaming, setStreaming] = useState(false)
   const [streamingText, setStreamingText] = useState('')
+  const [searching, setSearching] = useState(false)
   const requestIdRef = useRef<string | null>(null)
+  const streamingTextRef = useRef('')
+
+  useEffect(() => { streamingTextRef.current = streamingText }, [streamingText])
 
   // Load messages when topic changes
   useEffect(() => {
@@ -38,9 +44,6 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
     })
     return unsub
   }, [topicId, assistant]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const streamingTextRef = useRef('')
-  useEffect(() => { streamingTextRef.current = streamingText }, [streamingText])
 
   const finalizeStream = useCallback(
     (usage?: { inputTokens: number; outputTokens: number }, error?: string) => {
@@ -69,28 +72,42 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
   )
 
   const sendMessage = useCallback(
-    async (userText: string) => {
+    async (userText: string, options: { webSearch?: boolean } = {}) => {
       if (!topicId || !assistant || streaming) return
       if (!assistant.providerId || !assistant.modelId) {
         alert('Configure a provider and model in the assistant settings first.')
         return
       }
 
-      // Save user message
+      // Optional web search
+      let contextPrefix = ''
+      if (options.webSearch) {
+        setSearching(true)
+        try {
+          const results = await window.api.invoke(IpcChannel.WEB_SEARCH, { query: userText, maxResults: 5 }) as SearchResult[]
+          if (results.length > 0) {
+            contextPrefix = [
+              `[Web search results for "${userText}"]:`,
+              ...results.map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}\n   Source: ${r.url}`)
+            ].join('\n\n') + '\n\n---\nUser question: '
+          }
+        } finally {
+          setSearching(false)
+        }
+      }
+
+      // Save user message (display text only, without the injected context)
       const userMsg = (await window.api.invoke(IpcChannel.MESSAGES_CREATE, {
-        topicId,
-        role: 'user',
-        content: userText
+        topicId, role: 'user', content: userText
       })) as Message
       setMessages((prev) => [...prev, userMsg])
 
-      // Build chat history for context
-      const history = [...messages, userMsg].map((m) => ({
-        role: m.role,
-        content: m.content
+      // Build history for the model (inject search context into last user turn)
+      const history = [...messages, userMsg].map((m, i, arr) => ({
+        role: m.role as 'user' | 'assistant' | 'system',
+        content: i === arr.length - 1 && contextPrefix ? contextPrefix + m.content : m.content
       }))
 
-      // Start streaming
       const requestId = `req-${Date.now()}-${Math.random().toString(36).slice(2)}`
       requestIdRef.current = requestId
       setStreaming(true)
@@ -114,5 +131,5 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
     }
   }, [])
 
-  return { messages, streaming, streamingText, sendMessage, abort }
+  return { messages, streaming, streamingText, searching, sendMessage, abort }
 }

@@ -16,7 +16,7 @@ export function HomePage(): React.ReactElement {
   const [showCreateModal, setShowCreateModal] = useState(false)
 
   const { topics, createTopic, deleteTopic } = useTopics(selectedAssistant?.id ?? null)
-  const { messages, streaming, streamingText, sendMessage, abort } = useChat(
+  const { messages, streaming, streamingText, searching, sendMessage, abort } = useChat(
     selectedTopic?.id ?? null,
     selectedAssistant
   )
@@ -97,6 +97,9 @@ export function HomePage(): React.ReactElement {
             </>
           ) : (
             <span style={{ color: '#52525b', fontSize: 13 }}>Select an assistant to start</span>
+          )}
+          {searching && (
+            <span style={{ color: '#60a5fa', fontSize: 12, marginLeft: 'auto', marginRight: 16 }}>🔍 Searching…</span>
           )}
         </div>
 

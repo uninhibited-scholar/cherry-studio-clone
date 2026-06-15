@@ -6,6 +6,9 @@ import { assistantService } from './data/services/AssistantService'
 import { topicService } from './data/services/TopicService'
 import { messageService } from './data/services/MessageService'
 import { providerService } from './data/services/ProviderService'
+import { noteService } from './data/services/NoteService'
+import { translateService } from './data/services/TranslateService'
+import { webSearch } from './services/webSearch/WebSearchService'
 
 const logger = loggerService.withContext('IPC')
 
@@ -106,6 +109,48 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannel.MESSAGES_DELETE, async (_event, id: string) => {
     return messageService.delete(id)
   })
+
+  // ── Notes ───────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.NOTES_LIST, async () => noteService.list())
+
+  ipcMain.handle(IpcChannel.NOTES_CREATE, async (_event, data) => noteService.create(data))
+
+  ipcMain.handle(IpcChannel.NOTES_UPDATE, async (_event, { id, ...data }) => {
+    await noteService.update(id, data)
+  })
+
+  ipcMain.handle(IpcChannel.NOTES_DELETE, async (_event, id: string) => noteService.delete(id))
+
+  // ── Web Search ──────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.WEB_SEARCH, async (_event, { query, maxResults }) => {
+    return webSearch(query, maxResults ?? 5)
+  })
+
+  // ── Translate ────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.TRANSLATE_RUN, async (event, params) => {
+    const { requestId, sourceText, sourceLang, targetLang, providerId, modelId } = params
+    let full = ''
+    await translateService.translate({
+      sourceText,
+      sourceLang,
+      targetLang,
+      providerId,
+      modelId,
+      onChunk: (text) => {
+        full += text
+        if (!event.sender.isDestroyed()) {
+          event.sender.send(IpcChannel.TRANSLATE_CHUNK, { requestId, text })
+        }
+      }
+    })
+    // Persist to history
+    await translateService.saveHistory({ sourceText, targetText: full, sourceLang, targetLang, providerId, modelId })
+    return full
+  })
+
+  ipcMain.handle(IpcChannel.TRANSLATE_HISTORY_LIST, async () => translateService.listHistory())
+
+  ipcMain.handle(IpcChannel.TRANSLATE_HISTORY_CLEAR, async () => translateService.clearHistory())
 
   // ── App ─────────────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.APP_VERSION, () => {

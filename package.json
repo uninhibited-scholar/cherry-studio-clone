@@ -21,7 +21,11 @@
     "@libsql/client": "^0.14.0",
     "drizzle-orm": "^0.44.2",
     "electron-updater": "^6.3.9",
+    "highlight.js": "^11.11.1",
     "nanoid": "^5.1.11",
+    "react-markdown": "^10.1.0",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1",
     "ws": "^8.18.2"
   },
   "devDependencies": {
