@@ -51,6 +51,11 @@ export const IpcChannel = {
   TRANSLATE_HISTORY_LIST: 'translate:history:list',
   TRANSLATE_HISTORY_CLEAR: 'translate:history:clear',
 
+  // Paintings
+  PAINTINGS_LIST: 'paintings:list',
+  PAINTINGS_GENERATE: 'paintings:generate',
+  PAINTINGS_DELETE: 'paintings:delete',
+
   // Web Search
   WEB_SEARCH: 'web:search',
 

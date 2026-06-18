@@ -10,6 +10,7 @@ import { noteService } from './data/services/NoteService'
 import { translateService } from './data/services/TranslateService'
 import { webSearch } from './services/webSearch/WebSearchService'
 import { knowledgeService } from './data/services/KnowledgeService'
+import { paintingService } from './data/services/PaintingService'
 
 const logger = loggerService.withContext('IPC')
 
@@ -166,6 +167,17 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannel.KNOWLEDGE_SEARCH, async (_event, { knowledgeBaseId, query, limit }) => {
     return knowledgeService.search(knowledgeBaseId, query, limit)
+  })
+
+  // ── Paintings ───────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.PAINTINGS_LIST, async () => paintingService.list())
+
+  ipcMain.handle(IpcChannel.PAINTINGS_GENERATE, async (_event, params) => {
+    return paintingService.generate(params)
+  })
+
+  ipcMain.handle(IpcChannel.PAINTINGS_DELETE, async (_event, id: string) => {
+    return paintingService.delete(id)
   })
 
   // ── App ─────────────────────────────────────────────────────────────────
