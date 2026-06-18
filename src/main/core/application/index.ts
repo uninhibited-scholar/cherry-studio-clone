@@ -25,9 +25,8 @@ class Application {
   }
 
   private async createMainWindow(): Promise<void> {
-    const preloadPath = app.isPackaged
-      ? `${__dirname}/../preload/index.js`
-      : `${__dirname}/../../preload/index.js`
+    // out/main/index.js and out/preload/index.js are always siblings under out/
+    const preloadPath = `${__dirname}/../preload/index.js`
 
     this.mainWindow = new BrowserWindow({
       width: 1200,
@@ -43,8 +42,8 @@ class Application {
       }
     })
 
-    if (process.env.NODE_ENV === 'development' || !app.isPackaged) {
-      await this.mainWindow.loadURL('http://localhost:5173')
+    if (process.env.ELECTRON_RENDERER_URL) {
+      await this.mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
       this.mainWindow.webContents.openDevTools({ mode: 'detach' })
     } else {
       await this.mainWindow.loadFile(`${__dirname}/../renderer/index.html`)

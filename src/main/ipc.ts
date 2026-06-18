@@ -9,6 +9,7 @@ import { providerService } from './data/services/ProviderService'
 import { noteService } from './data/services/NoteService'
 import { translateService } from './data/services/TranslateService'
 import { webSearch } from './services/webSearch/WebSearchService'
+import { knowledgeService } from './data/services/KnowledgeService'
 
 const logger = loggerService.withContext('IPC')
 
@@ -60,11 +61,6 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannel.MODELS_DELETE, async (_event, id: string) => {
     return providerService.deleteModel(id)
-  })
-
-  // Legacy string channel (used in ProvidersSettings quick-add path)
-  ipcMain.handle('models:upsert', async (_event, data) => {
-    return providerService.upsertModel(data)
   })
 
   // ── Assistants ──────────────────────────────────────────────────────────
@@ -151,6 +147,26 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannel.TRANSLATE_HISTORY_LIST, async () => translateService.listHistory())
 
   ipcMain.handle(IpcChannel.TRANSLATE_HISTORY_CLEAR, async () => translateService.clearHistory())
+
+  // ── Knowledge ───────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.KNOWLEDGE_LIST, async (_event, knowledgeBaseId?: string) => {
+    if (knowledgeBaseId) return knowledgeService.listDocuments(knowledgeBaseId)
+    return knowledgeService.listBases()
+  })
+
+  ipcMain.handle(IpcChannel.KNOWLEDGE_CREATE, async (_event, data) => {
+    if (data.knowledgeBaseId) return knowledgeService.addDocument(data)
+    return knowledgeService.createBase(data)
+  })
+
+  ipcMain.handle(IpcChannel.KNOWLEDGE_DELETE, async (_event, data: { id: string; type: 'base' | 'document' }) => {
+    if (data.type === 'document') return knowledgeService.deleteDocument(data.id)
+    return knowledgeService.deleteBase(data.id)
+  })
+
+  ipcMain.handle(IpcChannel.KNOWLEDGE_SEARCH, async (_event, { knowledgeBaseId, query, limit }) => {
+    return knowledgeService.search(knowledgeBaseId, query, limit)
+  })
 
   // ── App ─────────────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.APP_VERSION, () => {
