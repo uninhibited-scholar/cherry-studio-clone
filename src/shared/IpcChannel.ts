@@ -56,6 +56,9 @@ export const IpcChannel = {
   PAINTINGS_GENERATE: 'paintings:generate',
   PAINTINGS_DELETE: 'paintings:delete',
 
+  // Mini Apps
+  MINI_APPS_OPEN: 'mini-apps:open',
+
   // Web Search
   WEB_SEARCH: 'web:search',
 

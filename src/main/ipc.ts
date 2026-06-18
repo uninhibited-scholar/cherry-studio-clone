@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { ipcMain, BrowserWindow, shell } from 'electron'
 import { IpcChannel } from '@shared/IpcChannel'
 import { loggerService } from '@logger'
 import { aiService } from './ai/AiService'
@@ -178,6 +178,21 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannel.PAINTINGS_DELETE, async (_event, id: string) => {
     return paintingService.delete(id)
+  })
+
+  // ── Mini Apps ───────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.MINI_APPS_OPEN, (_event, { url, title }: { url: string; title: string }) => {
+    const win = new BrowserWindow({
+      width: 1100,
+      height: 760,
+      title,
+      webPreferences: { contextIsolation: true, nodeIntegration: false }
+    })
+    win.loadURL(url)
+    win.webContents.setWindowOpenHandler(({ url: u }) => {
+      shell.openExternal(u)
+      return { action: 'deny' }
+    })
   })
 
   // ── App ─────────────────────────────────────────────────────────────────
