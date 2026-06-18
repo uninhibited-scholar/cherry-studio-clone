@@ -6,9 +6,11 @@ type Props = {
   messages: Message[]
   streamingText: string
   streaming: boolean
+  onDelete?: (id: string) => void
+  showTimestamps?: boolean
 }
 
-export function MessageThread({ messages, streamingText, streaming }: Props) {
+export function MessageThread({ messages, streamingText, streaming, onDelete, showTimestamps = false }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -28,12 +30,13 @@ export function MessageThread({ messages, streamingText, streaming }: Props) {
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: '16px 0', display: 'flex', flexDirection: 'column' }}>
       {messages.map((msg) => (
-        <MessageBubble key={msg.id} message={msg} />
+        <MessageBubble key={msg.id} message={msg} onDelete={onDelete} showTimestamp={showTimestamps} />
       ))}
       {streaming && (
         <MessageBubble
           message={{ id: '__streaming__', topicId: '', role: 'assistant', content: streamingText, fileIds: [], createdAt: Date.now(), updatedAt: Date.now() }}
           isStreaming
+          showTimestamp={false}
         />
       )}
       <div ref={bottomRef} />
@@ -41,9 +44,24 @@ export function MessageThread({ messages, streamingText, streaming }: Props) {
   )
 }
 
-function MessageBubble({ message, isStreaming }: { message: Message; isStreaming?: boolean }) {
+function formatTime(ts: number) {
+  return new Date(ts).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+}
+
+function MessageBubble({
+  message,
+  isStreaming,
+  onDelete,
+  showTimestamp
+}: {
+  message: Message
+  isStreaming?: boolean
+  onDelete?: (id: string) => void
+  showTimestamp: boolean
+}) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
+  const [hovered, setHovered] = useState(false)
 
   const copy = () => {
     navigator.clipboard.writeText(message.content)
@@ -52,7 +70,11 @@ function MessageBubble({ message, isStreaming }: { message: Message; isStreaming
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', padding: '4px 20px', alignItems: isUser ? 'flex-end' : 'flex-start' }}>
+    <div
+      style={{ display: 'flex', flexDirection: 'column', padding: '4px 20px', alignItems: isUser ? 'flex-end' : 'flex-start' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, maxWidth: '80%', width: isUser ? 'auto' : '100%' }}>
         {!isUser && (
           <div style={{ width: 28, height: 28, borderRadius: 6, background: '#3f3f46', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, marginTop: 2 }}>
@@ -64,12 +86,9 @@ function MessageBubble({ message, isStreaming }: { message: Message; isStreaming
             <div style={{
               padding: '10px 14px',
               borderRadius: '16px 16px 4px 16px',
-              background: '#2563eb',
-              color: '#fafafa',
-              fontSize: 14,
-              lineHeight: 1.6,
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word'
+              background: '#2563eb', color: '#fafafa',
+              fontSize: 14, lineHeight: 1.6,
+              whiteSpace: 'pre-wrap', wordBreak: 'break-word'
             }}>
               {message.content}
             </div>
@@ -81,14 +100,31 @@ function MessageBubble({ message, isStreaming }: { message: Message; isStreaming
               )}
             </div>
           )}
-          {/* Copy button for assistant messages */}
-          {!isUser && !isStreaming && message.content && (
-            <button
-              onClick={copy}
-              style={{ marginTop: 4, background: 'none', border: 'none', color: copied ? '#4ade80' : '#52525b', cursor: 'pointer', fontSize: 11, padding: '2px 4px' }}
-            >
-              {copied ? '✓ Copied' : 'Copy'}
-            </button>
+
+          {/* Action bar */}
+          {!isStreaming && hovered && (
+            <div style={{ display: 'flex', gap: 4, marginTop: 4, justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
+              <button
+                onClick={copy}
+                style={{ background: 'none', border: '1px solid #3f3f46', color: copied ? '#4ade80' : '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+              >
+                {copied ? '✓' : '⎘ Copy'}
+              </button>
+              {onDelete && message.id !== '__streaming__' && (
+                <button
+                  onClick={() => onDelete(message.id)}
+                  style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                >
+                  ✕ Delete
+                </button>
+              )}
+            </div>
+          )}
+
+          {showTimestamp && message.createdAt && (
+            <p style={{ fontSize: 10, color: '#52525b', margin: '3px 0 0', textAlign: isUser ? 'right' : 'left' }}>
+              {formatTime(message.createdAt)}
+            </p>
           )}
         </div>
       </div>

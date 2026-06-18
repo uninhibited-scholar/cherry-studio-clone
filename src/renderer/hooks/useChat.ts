@@ -169,9 +169,14 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
     }
   }, [])
 
+  const deleteMessage = useCallback(async (id: string) => {
+    await window.api.invoke(IpcChannel.MESSAGES_DELETE, id)
+    setMessages((prev) => prev.filter((m) => m.id !== id))
+  }, [])
+
   return {
     messages, streaming, streamingText, searching,
-    sendMessage, abort,
+    sendMessage, abort, deleteMessage,
     selectedKnowledgeBaseId, setSelectedKnowledgeBaseId,
     mcpTools, setMcpTools
   }

@@ -7,6 +7,7 @@ import { MessageThread } from './components/MessageThread'
 import { InputBar } from './components/InputBar'
 import { CreateAssistantModal } from './components/CreateAssistantModal'
 import { IpcChannel } from '@shared/IpcChannel'
+import { loadGeneralPrefs } from '../settings/sections/GeneralSettings'
 import type { Assistant } from '@shared/data/types/assistant'
 import type { Topic } from '@shared/data/types/message'
 
@@ -17,7 +18,7 @@ export function HomePage(): React.ReactElement {
   const [showCreateModal, setShowCreateModal] = useState(false)
 
   const { topics, createTopic, deleteTopic, renameTopic } = useTopics(selectedAssistant?.id ?? null)
-  const { messages, streaming, streamingText, searching, sendMessage, abort, selectedKnowledgeBaseId, setSelectedKnowledgeBaseId } = useChat(
+  const { messages, streaming, streamingText, searching, sendMessage, abort, deleteMessage, selectedKnowledgeBaseId, setSelectedKnowledgeBaseId } = useChat(
     selectedTopic?.id ?? null,
     selectedAssistant
   )
@@ -56,6 +57,7 @@ export function HomePage(): React.ReactElement {
   )
 
   const canChat = Boolean(selectedTopic && selectedAssistant?.providerId && selectedAssistant?.modelId)
+  const prefs = loadGeneralPrefs()
 
   // Handle menu events from main process
   useEffect(() => {
@@ -132,7 +134,13 @@ export function HomePage(): React.ReactElement {
 
         {selectedTopic ? (
           <>
-            <MessageThread messages={messages} streamingText={streamingText} streaming={streaming} />
+            <MessageThread
+              messages={messages}
+              streamingText={streamingText}
+              streaming={streaming}
+              onDelete={deleteMessage}
+              showTimestamps={prefs.showTimestamps}
+            />
             <InputBar
               onSend={sendMessage}
               onAbort={abort}

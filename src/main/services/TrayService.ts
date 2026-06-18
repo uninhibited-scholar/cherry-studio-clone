@@ -1,4 +1,4 @@
-import { Tray, Menu, nativeImage, app } from 'electron'
+import { Tray, Menu, nativeImage, app, globalShortcut } from 'electron'
 import path from 'path'
 import { loggerService } from '@logger'
 
@@ -72,10 +72,26 @@ export function createTray(): void {
     win.isVisible() ? win.hide() : win.show()
   })
 
+  // Global shortcut: Ctrl+Shift+Space (or Cmd+Shift+Space on macOS) to focus main window
+  const shortcut = process.platform === 'darwin' ? 'Command+Shift+Space' : 'Ctrl+Shift+Space'
+  const registered = globalShortcut.register(shortcut, () => {
+    const win = getMainWindow()
+    if (!win) return
+    if (win.isVisible() && win.isFocused()) {
+      win.hide()
+    } else {
+      win.show()
+      win.focus()
+    }
+  })
+  if (!registered) logger.warn(`Failed to register global shortcut: ${shortcut}`)
+  else logger.info(`Global shortcut registered: ${shortcut}`)
+
   logger.info('Tray created')
 }
 
 export function destroyTray(): void {
+  globalShortcut.unregisterAll()
   if (tray) {
     tray.destroy()
     tray = null
