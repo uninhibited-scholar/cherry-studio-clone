@@ -1,6 +1,7 @@
-import { streamText } from 'ai'
+import { streamText, jsonSchema, tool } from 'ai'
 import { buildLanguageModel } from './provider/factory'
 import { providerService } from '../data/services/ProviderService'
+import { mcpService } from '../services/McpService'
 import { loggerService } from '@logger'
 
 const logger = loggerService.withContext('AiService')
@@ -15,6 +16,8 @@ export type StreamChunk =
   | { type: 'done'; usage?: { inputTokens: number; outputTokens: number } }
   | { type: 'error'; error: string }
 
+export type McpToolDefs = Record<string, { description: string; inputSchema: Record<string, unknown> }>
+
 export type StreamParams = {
   requestId: string
   providerId: string
@@ -23,6 +26,7 @@ export type StreamParams = {
   systemPrompt?: string
   temperature?: number
   maxTokens?: number
+  mcpTools?: McpToolDefs
   onChunk: (chunk: StreamChunk) => void
 }
 
@@ -30,9 +34,8 @@ export class AiService {
   private activeStreams = new Map<string, AbortController>()
 
   async streamChat(params: StreamParams): Promise<void> {
-    const { requestId, providerId, modelId, messages, systemPrompt, temperature, maxTokens, onChunk } = params
+    const { requestId, providerId, modelId, messages, systemPrompt, temperature, maxTokens, mcpTools, onChunk } = params
 
-    // Resolve provider + model from DB
     const providers = await providerService.listProviders()
     const provider = providers.find((p) => p.id === providerId)
     if (!provider) {
@@ -55,12 +58,34 @@ export class AiService {
     try {
       const languageModel = buildLanguageModel(provider, model)
 
+      // Build tool definitions with MCP executors when tools are provided
+      const tools = mcpTools && Object.keys(mcpTools).length > 0
+        ? Object.entries(mcpTools).reduce<Record<string, ReturnType<typeof tool>>>((acc, [toolKey, def]) => {
+            const [serverId, toolName] = toolKey.split('__')
+            acc[toolKey] = tool({
+              description: def.description,
+              parameters: jsonSchema(def.inputSchema as Parameters<typeof jsonSchema>[0]),
+              execute: async (args) => {
+                logger.info(`Tool call: ${toolKey}`, args)
+                try {
+                  return await mcpService.callTool(serverId, toolName, args as Record<string, unknown>)
+                } catch (err) {
+                  return { error: String(err) }
+                }
+              }
+            })
+            return acc
+          }, {})
+        : undefined
+
       const result = streamText({
         model: languageModel,
         system: systemPrompt,
         messages: messages.map((m) => ({ role: m.role, content: m.content })),
         temperature: temperature ?? 1,
         maxTokens,
+        tools,
+        maxSteps: tools ? 5 : 1,
         abortSignal: abortController.signal
       })
 
