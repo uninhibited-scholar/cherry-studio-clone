@@ -11,6 +11,8 @@ import { MiniAppsPage } from './pages/mini-apps/MiniAppsPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 import { HistoryPage } from './pages/history/HistoryPage'
 import { LibraryPage } from './pages/library/LibraryPage'
+import { LaunchpadPage } from './pages/launchpad/LaunchpadPage'
+import { FilesPage } from './pages/files/FilesPage'
 
 export function App(): React.ReactElement {
   return (
@@ -27,6 +29,8 @@ export function App(): React.ReactElement {
           <Route path="/mini-apps" element={<MiniAppsPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/library" element={<LibraryPage />} />
+          <Route path="/launchpad" element={<LaunchpadPage />} />
+          <Route path="/files" element={<FilesPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Routes>

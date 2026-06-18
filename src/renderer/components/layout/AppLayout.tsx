@@ -10,7 +10,9 @@ const NAV_ITEMS = [
   { to: '/notes',      icon: '📝', label: 'Notes' },
   { to: '/library',    icon: '📖', label: 'Library' },
   { to: '/history',    icon: '🕐', label: 'History' },
+  { to: '/files',      icon: '📁', label: 'Files' },
   { to: '/mini-apps',  icon: '🧩', label: 'Mini Apps' },
+  { to: '/launchpad',  icon: '🚀', label: 'Launchpad' },
 ] as const
 
 export function AppLayout(): React.ReactElement {
