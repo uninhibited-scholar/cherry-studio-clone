@@ -8,7 +8,7 @@ import { messageService } from './data/services/MessageService'
 import { providerService } from './data/services/ProviderService'
 import { noteService } from './data/services/NoteService'
 import { translateService } from './data/services/TranslateService'
-import { webSearch } from './services/webSearch/WebSearchService'
+import { webSearch, setWebSearchConfig, getWebSearchConfig, type WebSearchConfig } from './services/webSearch/WebSearchService'
 import { knowledgeService } from './data/services/KnowledgeService'
 import { paintingService } from './data/services/PaintingService'
 import { mcpService } from './services/McpService'
@@ -230,6 +230,46 @@ export function registerIpcHandlers(): void {
       shell.openExternal(u)
       return { action: 'deny' }
     })
+  })
+
+  // ── Web Search Config ────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.WEB_SEARCH_CONFIG_GET, () => getWebSearchConfig())
+
+  ipcMain.handle(IpcChannel.WEB_SEARCH_CONFIG_SET, (_event, config: WebSearchConfig) => {
+    setWebSearchConfig(config)
+  })
+
+  // ── Export ───────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.EXPORT_TOPIC, async (_event, topicId: string) => {
+    const { messageService: ms } = await import('./data/services/MessageService')
+    const { topicService: ts } = await import('./data/services/TopicService')
+    const [msgs, tp] = await Promise.all([ms.listByTopic(topicId), ts.get(topicId)])
+    if (!tp) return null
+
+    const lines: string[] = [
+      `# ${tp.title}`,
+      `> Exported ${new Date().toLocaleString()}`,
+      ''
+    ]
+    for (const m of msgs) {
+      lines.push(`**${m.role === 'user' ? 'You' : 'Assistant'}**`)
+      lines.push('')
+      lines.push(m.content)
+      lines.push('')
+      lines.push('---')
+      lines.push('')
+    }
+
+    const { dialog } = await import('electron')
+    const { writeFile } = await import('fs/promises')
+    const result = await dialog.showSaveDialog({
+      defaultPath: `${tp.title.replace(/[/\\?%*:|"<>]/g, '-')}.md`,
+      filters: [{ name: 'Markdown', extensions: ['md'] }]
+    })
+    if (result.canceled || !result.filePath) return null
+    await writeFile(result.filePath, lines.join('\n'), 'utf8')
+    shell.showItemInFolder(result.filePath)
+    return result.filePath
   })
 
   // ── App ─────────────────────────────────────────────────────────────────

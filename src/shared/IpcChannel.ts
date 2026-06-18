@@ -81,6 +81,11 @@ export const IpcChannel = {
 
   // Web Search
   WEB_SEARCH: 'web:search',
+  WEB_SEARCH_CONFIG_GET: 'web-search:config:get',
+  WEB_SEARCH_CONFIG_SET: 'web-search:config:set',
+
+  // Export
+  EXPORT_TOPIC: 'export:topic',
 
   // Settings
   SETTINGS_GET: 'settings:get',

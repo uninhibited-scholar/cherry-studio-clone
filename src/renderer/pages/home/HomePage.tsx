@@ -6,6 +6,7 @@ import { AssistantSidebar } from './components/AssistantSidebar'
 import { MessageThread } from './components/MessageThread'
 import { InputBar } from './components/InputBar'
 import { CreateAssistantModal } from './components/CreateAssistantModal'
+import { IpcChannel } from '@shared/IpcChannel'
 import type { Assistant } from '@shared/data/types/assistant'
 import type { Topic } from '@shared/data/types/message'
 
@@ -98,9 +99,23 @@ export function HomePage(): React.ReactElement {
           ) : (
             <span style={{ color: '#52525b', fontSize: 13 }}>Select an assistant to start</span>
           )}
-          {searching && (
-            <span style={{ color: '#60a5fa', fontSize: 12, marginLeft: 'auto', marginRight: 16 }}>🔍 Searching…</span>
-          )}
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+            {searching && (
+              <span style={{ color: '#60a5fa', fontSize: 12 }}>🔍 Searching…</span>
+            )}
+            {selectedTopic && (
+              <button
+                title="Export conversation"
+                onClick={() => window.api.invoke(IpcChannel.EXPORT_TOPIC, selectedTopic.id)}
+                style={{
+                  background: 'transparent', border: '1px solid #3f3f46', borderRadius: 6,
+                  color: '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px'
+                }}
+              >
+                ↓ Export
+              </button>
+            )}
+          </div>
         </div>
 
         {selectedTopic ? (

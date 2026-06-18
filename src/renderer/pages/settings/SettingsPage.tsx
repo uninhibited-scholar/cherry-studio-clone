@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { ProvidersSettings } from './sections/ProvidersSettings'
 import { McpSettings } from './sections/McpSettings'
+import { WebSearchSettings } from './sections/WebSearchSettings'
 
 const SECTIONS = [
   { key: 'providers', label: 'AI Providers', icon: '🔌' },
   { key: 'mcp', label: 'MCP Servers', icon: '🔧' },
+  { key: 'web-search', label: 'Web Search', icon: '🔍' },
   { key: 'about', label: 'About', icon: 'ℹ️' }
 ]
 
@@ -39,6 +41,7 @@ export function SettingsPage(): React.ReactElement {
       <div style={{ flex: 1, overflow: 'auto', padding: 32 }}>
         {active === 'providers' && <ProvidersSettings />}
         {active === 'mcp' && <McpSettings />}
+        {active === 'web-search' && <WebSearchSettings />}
         {active === 'about' && <AboutSection />}
       </div>
     </div>
