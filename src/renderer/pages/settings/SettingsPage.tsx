@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { ProvidersSettings } from './sections/ProvidersSettings'
+import { McpSettings } from './sections/McpSettings'
 
 const SECTIONS = [
   { key: 'providers', label: 'AI Providers', icon: '🔌' },
-  { key: 'appearance', label: 'Appearance', icon: '🎨' },
+  { key: 'mcp', label: 'MCP Servers', icon: '🔧' },
   { key: 'about', label: 'About', icon: 'ℹ️' }
 ]
 
@@ -12,14 +13,7 @@ export function SettingsPage(): React.ReactElement {
 
   return (
     <div style={{ display: 'flex', height: '100%', background: '#09090b', color: '#fafafa' }}>
-      <aside
-        style={{
-          width: 200,
-          borderRight: '1px solid #27272a',
-          padding: '16px 8px',
-          flexShrink: 0
-        }}
-      >
+      <aside style={{ width: 200, borderRight: '1px solid #27272a', padding: '16px 8px', flexShrink: 0 }}>
         <p style={{ fontSize: 11, color: '#71717a', fontWeight: 600, letterSpacing: 1, padding: '0 8px', marginBottom: 8 }}>
           SETTINGS
         </p>
@@ -28,19 +22,12 @@ export function SettingsPage(): React.ReactElement {
             key={key}
             onClick={() => setActive(key)}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              width: '100%',
-              padding: '8px 12px',
-              borderRadius: 8,
-              border: 'none',
+              display: 'flex', alignItems: 'center', gap: 10,
+              width: '100%', padding: '8px 12px', borderRadius: 8, border: 'none',
               cursor: 'pointer',
               background: active === key ? 'rgba(255,255,255,0.08)' : 'transparent',
               color: active === key ? '#fafafa' : '#71717a',
-              fontSize: 13,
-              textAlign: 'left',
-              marginBottom: 2
+              fontSize: 13, textAlign: 'left', marginBottom: 2
             }}
           >
             <span>{icon}</span>
@@ -51,15 +38,11 @@ export function SettingsPage(): React.ReactElement {
 
       <div style={{ flex: 1, overflow: 'auto', padding: 32 }}>
         {active === 'providers' && <ProvidersSettings />}
-        {active === 'appearance' && <PlaceholderSection title="Appearance" />}
+        {active === 'mcp' && <McpSettings />}
         {active === 'about' && <AboutSection />}
       </div>
     </div>
   )
-}
-
-function PlaceholderSection({ title }: { title: string }) {
-  return <p style={{ color: '#71717a', fontSize: 14 }}>{title} — coming soon</p>
 }
 
 function AboutSection() {

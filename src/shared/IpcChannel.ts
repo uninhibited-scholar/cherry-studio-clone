@@ -56,6 +56,15 @@ export const IpcChannel = {
   PAINTINGS_GENERATE: 'paintings:generate',
   PAINTINGS_DELETE: 'paintings:delete',
 
+  // MCP
+  MCP_LIST: 'mcp:list',
+  MCP_UPSERT: 'mcp:upsert',
+  MCP_DELETE: 'mcp:delete',
+  MCP_TOOLS: 'mcp:tools',
+  MCP_CALL_TOOL: 'mcp:call-tool',
+  MCP_CONNECT: 'mcp:connect',
+  MCP_DISCONNECT: 'mcp:disconnect',
+
   // Mini Apps
   MINI_APPS_OPEN: 'mini-apps:open',
 

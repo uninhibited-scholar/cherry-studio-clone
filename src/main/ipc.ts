@@ -11,6 +11,7 @@ import { translateService } from './data/services/TranslateService'
 import { webSearch } from './services/webSearch/WebSearchService'
 import { knowledgeService } from './data/services/KnowledgeService'
 import { paintingService } from './data/services/PaintingService'
+import { mcpService } from './services/McpService'
 
 const logger = loggerService.withContext('IPC')
 
@@ -178,6 +179,23 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannel.PAINTINGS_DELETE, async (_event, id: string) => {
     return paintingService.delete(id)
+  })
+
+  // ── MCP ─────────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.MCP_LIST, async () => mcpService.list())
+
+  ipcMain.handle(IpcChannel.MCP_UPSERT, async (_event, data) => mcpService.upsert(data))
+
+  ipcMain.handle(IpcChannel.MCP_DELETE, async (_event, id: string) => mcpService.delete(id))
+
+  ipcMain.handle(IpcChannel.MCP_CONNECT, async (_event, serverId: string) => mcpService.connect(serverId))
+
+  ipcMain.handle(IpcChannel.MCP_DISCONNECT, async (_event, serverId: string) => mcpService.disconnect(serverId))
+
+  ipcMain.handle(IpcChannel.MCP_TOOLS, async (_event, serverId: string) => mcpService.getTools(serverId))
+
+  ipcMain.handle(IpcChannel.MCP_CALL_TOOL, async (_event, { serverId, toolName, args }) => {
+    return mcpService.callTool(serverId, toolName, args)
   })
 
   // ── Mini Apps ───────────────────────────────────────────────────────────
