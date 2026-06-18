@@ -25,5 +25,9 @@ export function useTopics(assistantId: string | null) {
     setTopics((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
-  return { topics, refresh, createTopic, deleteTopic }
+  const renameTopic = useCallback((id: string, title: string) => {
+    setTopics((prev) => prev.map((t) => (t.id === id ? { ...t, title } : t)))
+  }, [])
+
+  return { topics, refresh, createTopic, deleteTopic, renameTopic }
 }

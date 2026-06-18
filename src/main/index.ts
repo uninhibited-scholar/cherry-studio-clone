@@ -1,6 +1,7 @@
 import { app } from 'electron'
 import { application } from './core/application'
 import { createTray, destroyTray } from './services/TrayService'
+import { buildAndSetAppMenu } from './services/AppMenuService'
 
 // Enforce single instance
 const gotLock = app.requestSingleInstanceLock()
@@ -10,6 +11,7 @@ if (!gotLock) {
 }
 
 app.whenReady().then(async () => {
+  buildAndSetAppMenu()
   await application.bootstrap()
   createTray()
 })

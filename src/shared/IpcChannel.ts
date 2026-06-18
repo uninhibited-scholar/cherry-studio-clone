@@ -91,6 +91,10 @@ export const IpcChannel = {
   SETTINGS_GET: 'settings:get',
   SETTINGS_SET: 'settings:set',
 
+  // Menu events (main → renderer)
+  MENU_NEW_TOPIC: 'menu:new-topic',
+  MENU_EXPORT_TOPIC: 'menu:export-topic',
+
   // App
   APP_VERSION: 'app:version',
   APP_READY: 'app:ready'

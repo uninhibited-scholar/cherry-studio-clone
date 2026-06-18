@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useAssistants } from '../../hooks/useAssistants'
 import { useTopics } from '../../hooks/useTopics'
 import { useChat } from '../../hooks/useChat'
@@ -16,7 +16,7 @@ export function HomePage(): React.ReactElement {
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
 
-  const { topics, createTopic, deleteTopic } = useTopics(selectedAssistant?.id ?? null)
+  const { topics, createTopic, deleteTopic, renameTopic } = useTopics(selectedAssistant?.id ?? null)
   const { messages, streaming, streamingText, searching, sendMessage, abort, selectedKnowledgeBaseId, setSelectedKnowledgeBaseId } = useChat(
     selectedTopic?.id ?? null,
     selectedAssistant
@@ -57,6 +57,17 @@ export function HomePage(): React.ReactElement {
 
   const canChat = Boolean(selectedTopic && selectedAssistant?.providerId && selectedAssistant?.modelId)
 
+  // Handle menu events from main process
+  useEffect(() => {
+    const offNew = window.api.on(IpcChannel.MENU_NEW_TOPIC, () => {
+      if (selectedAssistant) handleNewTopic()
+    })
+    const offExport = window.api.on(IpcChannel.MENU_EXPORT_TOPIC, () => {
+      if (selectedTopic) window.api.invoke(IpcChannel.EXPORT_TOPIC, selectedTopic.id)
+    })
+    return () => { offNew(); offExport() }
+  }, [selectedAssistant, selectedTopic, handleNewTopic])
+
   return (
     <div style={{ display: 'flex', height: '100%', background: '#09090b' }}>
       <AssistantSidebar
@@ -68,6 +79,7 @@ export function HomePage(): React.ReactElement {
         onSelectTopic={handleSelectTopic}
         onNewTopic={handleNewTopic}
         onDeleteTopic={handleDeleteTopic}
+        onRenameTopicLocal={renameTopic}
         onCreateAssistant={() => setShowCreateModal(true)}
       />
 

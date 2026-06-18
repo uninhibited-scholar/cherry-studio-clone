@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
+import { IpcChannel } from '@shared/IpcChannel'
 import type { Assistant } from '@shared/data/types/assistant'
 import type { Topic } from '@shared/data/types/message'
 
@@ -11,6 +12,7 @@ type Props = {
   onSelectTopic: (t: Topic) => void
   onNewTopic: () => void
   onDeleteTopic: (id: string) => void
+  onRenameTopicLocal: (id: string, title: string) => void
   onCreateAssistant: () => void
 }
 
@@ -23,9 +25,38 @@ export function AssistantSidebar({
   onSelectTopic,
   onNewTopic,
   onDeleteTopic,
+  onRenameTopicLocal,
   onCreateAssistant
 }: Props) {
   const [hoveredTopic, setHoveredTopic] = useState<string | null>(null)
+  const [editingTopicId, setEditingTopicId] = useState<string | null>(null)
+  const [editValue, setEditValue] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (editingTopicId && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [editingTopicId])
+
+  function startEdit(t: Topic) {
+    setEditingTopicId(t.id)
+    setEditValue(t.title)
+  }
+
+  async function commitEdit(id: string) {
+    const title = editValue.trim()
+    if (title) {
+      await window.api.invoke(IpcChannel.TOPICS_UPDATE, { id, title })
+      onRenameTopicLocal(id, title)
+    }
+    setEditingTopicId(null)
+  }
+
+  function cancelEdit() {
+    setEditingTopicId(null)
+  }
 
   return (
     <aside
@@ -46,15 +77,7 @@ export function AssistantSidebar({
           <button
             onClick={onCreateAssistant}
             title="New Assistant"
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#71717a',
-              cursor: 'pointer',
-              fontSize: 16,
-              lineHeight: 1,
-              padding: '0 2px'
-            }}
+            style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: '0 2px' }}
           >
             +
           </button>
@@ -68,25 +91,16 @@ export function AssistantSidebar({
                 key={a.id}
                 onClick={() => onSelectAssistant(a)}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  width: '100%',
-                  padding: '6px 8px',
-                  borderRadius: 6,
-                  border: 'none',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  width: '100%', padding: '6px 8px', borderRadius: 6, border: 'none',
                   cursor: 'pointer',
                   background: selectedAssistantId === a.id ? 'rgba(255,255,255,0.08)' : 'transparent',
                   color: selectedAssistantId === a.id ? '#fafafa' : '#a1a1aa',
-                  fontSize: 13,
-                  textAlign: 'left',
-                  overflow: 'hidden'
+                  fontSize: 13, textAlign: 'left', overflow: 'hidden'
                 }}
               >
                 <span style={{ fontSize: 16 }}>{a.emoji ?? '🤖'}</span>
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {a.name}
-                </span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</span>
               </button>
             ))
           )}
@@ -118,27 +132,44 @@ export function AssistantSidebar({
                 key={t.id}
                 onMouseEnter={() => setHoveredTopic(t.id)}
                 onMouseLeave={() => setHoveredTopic(null)}
-                style={{ display: 'flex', alignItems: 'center', borderRadius: 6, background: selectedTopicId === t.id ? 'rgba(255,255,255,0.08)' : 'transparent' }}
+                style={{
+                  display: 'flex', alignItems: 'center', borderRadius: 6,
+                  background: selectedTopicId === t.id ? 'rgba(255,255,255,0.08)' : 'transparent'
+                }}
               >
-                <button
-                  onClick={() => onSelectTopic(t)}
-                  style={{
-                    flex: 1,
-                    padding: '6px 8px',
-                    border: 'none',
-                    background: 'none',
-                    cursor: 'pointer',
-                    color: selectedTopicId === t.id ? '#fafafa' : '#a1a1aa',
-                    fontSize: 12,
-                    textAlign: 'left',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  {t.title}
-                </button>
-                {hoveredTopic === t.id && (
+                {editingTopicId === t.id ? (
+                  <input
+                    ref={inputRef}
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={() => commitEdit(t.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') commitEdit(t.id)
+                      if (e.key === 'Escape') cancelEdit()
+                    }}
+                    style={{
+                      flex: 1, padding: '5px 8px', border: '1px solid #3f3f46',
+                      borderRadius: 4, background: '#18181b', color: '#fafafa',
+                      fontSize: 12, outline: 'none'
+                    }}
+                  />
+                ) : (
+                  <button
+                    onClick={() => onSelectTopic(t)}
+                    onDoubleClick={() => startEdit(t)}
+                    title="Double-click to rename"
+                    style={{
+                      flex: 1, padding: '6px 8px', border: 'none', background: 'none',
+                      cursor: 'pointer',
+                      color: selectedTopicId === t.id ? '#fafafa' : '#a1a1aa',
+                      fontSize: 12, textAlign: 'left',
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {t.title}
+                  </button>
+                )}
+                {hoveredTopic === t.id && editingTopicId !== t.id && (
                   <button
                     onClick={(e) => { e.stopPropagation(); onDeleteTopic(t.id) }}
                     style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', padding: '4px 6px', fontSize: 12 }}
