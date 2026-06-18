@@ -2,8 +2,10 @@ import React, { useState } from 'react'
 import { ProvidersSettings } from './sections/ProvidersSettings'
 import { McpSettings } from './sections/McpSettings'
 import { WebSearchSettings } from './sections/WebSearchSettings'
+import { GeneralSettings } from './sections/GeneralSettings'
 
 const SECTIONS = [
+  { key: 'general', label: 'General', icon: '🛠' },
   { key: 'providers', label: 'AI Providers', icon: '🔌' },
   { key: 'mcp', label: 'MCP Servers', icon: '🔧' },
   { key: 'web-search', label: 'Web Search', icon: '🔍' },
@@ -11,7 +13,7 @@ const SECTIONS = [
 ]
 
 export function SettingsPage(): React.ReactElement {
-  const [active, setActive] = useState('providers')
+  const [active, setActive] = useState('general')
 
   return (
     <div style={{ display: 'flex', height: '100%', background: '#09090b', color: '#fafafa' }}>
@@ -39,6 +41,7 @@ export function SettingsPage(): React.ReactElement {
       </aside>
 
       <div style={{ flex: 1, overflow: 'auto', padding: 32 }}>
+        {active === 'general' && <GeneralSettings />}
         {active === 'providers' && <ProvidersSettings />}
         {active === 'mcp' && <McpSettings />}
         {active === 'web-search' && <WebSearchSettings />}
