@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { IpcChannel } from '@shared/IpcChannel'
+// IpcChannel.PAINTINGS_SAVE used in PaintingCard
 import type { Painting } from '@shared/data/types/painting'
 import type { Provider } from '@shared/data/types/provider'
 import type { Model } from '@shared/data/types/model'
@@ -212,6 +213,11 @@ function PaintingCard({
   const [hovered, setHovered] = useState(false)
   const src = `data:image/png;base64,${painting.imageData}`
 
+  const saveToDisk = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    window.api.invoke(IpcChannel.PAINTINGS_SAVE, { imageData: painting.imageData, prompt: painting.prompt })
+  }
+
   return (
     <div
       onMouseEnter={() => setHovered(true)}
@@ -226,11 +232,17 @@ function PaintingCard({
       />
       {hovered && (
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: 10, gap: 4 }}>
-          <p style={{ margin: 0, fontSize: 11, color: '#e4e4e7', lineClamp: 2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+          <p style={{ margin: 0, fontSize: 11, color: '#e4e4e7', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
             {painting.prompt}
           </p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 10, color: '#71717a' }}>{painting.modelName} · {painting.width}×{painting.height} · {formatDate(painting.createdAt)}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 10, color: '#71717a', flex: 1 }}>{painting.modelName} · {painting.width}×{painting.height} · {formatDate(painting.createdAt)}</span>
+            <button
+              onClick={saveToDisk}
+              style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 4, color: '#93c5fd', cursor: 'pointer', fontSize: 11, padding: '2px 6px' }}
+            >
+              Save
+            </button>
             <button
               onClick={(e) => { e.stopPropagation(); onDelete() }}
               style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 4, color: '#fca5a5', cursor: 'pointer', fontSize: 11, padding: '2px 6px' }}

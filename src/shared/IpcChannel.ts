@@ -98,6 +98,9 @@ export const IpcChannel = {
   BACKUP_EXPORT: 'backup:export',
   BACKUP_IMPORT: 'backup:import',
 
+  // Paintings (additional)
+  PAINTINGS_SAVE: 'paintings:save',
+
   // Menu events (main → renderer)
   MENU_NEW_TOPIC: 'menu:new-topic',
   MENU_EXPORT_TOPIC: 'menu:export-topic',

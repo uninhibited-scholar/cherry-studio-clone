@@ -200,6 +200,21 @@ export function registerIpcHandlers(): void {
     return paintingService.delete(id)
   })
 
+  ipcMain.handle(IpcChannel.PAINTINGS_SAVE, async (_event, { imageData, prompt }: { imageData: string; prompt: string }) => {
+    const { dialog } = await import('electron')
+    const { writeFile } = await import('fs/promises')
+    const safeName = prompt.slice(0, 40).replace(/[/\\?%*:|"<>]/g, '-') || 'painting'
+    const result = await dialog.showSaveDialog({
+      defaultPath: `${safeName}.png`,
+      filters: [{ name: 'PNG Image', extensions: ['png'] }]
+    })
+    if (result.canceled || !result.filePath) return null
+    const buffer = Buffer.from(imageData, 'base64')
+    await writeFile(result.filePath, buffer)
+    shell.showItemInFolder(result.filePath)
+    return result.filePath
+  })
+
   // ── MCP ─────────────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.MCP_LIST, async () => mcpService.list())
 
