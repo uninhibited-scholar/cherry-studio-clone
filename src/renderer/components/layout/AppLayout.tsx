@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Outlet, NavLink } from 'react-router-dom'
 
 const NAV_ITEMS = [
@@ -16,6 +16,18 @@ const NAV_ITEMS = [
 ] as const
 
 export function AppLayout(): React.ReactElement {
+  const [findOpen, setFindOpen] = useState(false)
+  const [findText, setFindText] = useState('')
+  const findInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const handler = () => { setFindOpen(true); setTimeout(() => findInputRef.current?.focus(), 50) }
+    window.addEventListener('app:find-in-page', handler)
+    return () => window.removeEventListener('app:find-in-page', handler)
+  }, [])
+
+  const closeFindBar = () => { setFindOpen(false); setFindText('') }
+
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       {/* Sidebar */}
@@ -77,8 +89,36 @@ export function AppLayout(): React.ReactElement {
       </aside>
 
       {/* Main content */}
-      <main style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <main style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', position: 'relative' }}>
         <Outlet />
+
+        {/* Find in page bar */}
+        {findOpen && (
+          <div style={{
+            position: 'absolute', top: 8, right: 16, zIndex: 100,
+            background: '#18181b', border: '1px solid #3f3f46', borderRadius: 8,
+            display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.4)'
+          }}>
+            <input
+              ref={findInputRef}
+              value={findText}
+              onChange={(e) => {
+                setFindText(e.target.value)
+                // Use browser's built-in find-in-page via window.find (Chrome/Electron)
+                if (e.target.value) (window as unknown as Record<string, unknown>).find?.(e.target.value, false, false, true, false, true, false)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') closeFindBar()
+                if (e.key === 'Enter') (window as unknown as Record<string, unknown>).find?.(findText, e.shiftKey, false, true, false, true, false)
+              }}
+              placeholder="Find in page…"
+              style={{ background: 'transparent', border: 'none', outline: 'none', color: '#fafafa', fontSize: 13, width: 200 }}
+            />
+            <span style={{ fontSize: 10, color: '#52525b' }}>Enter↵ · Esc</span>
+            <button onClick={closeFindBar} style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', padding: 2 }}>✕</button>
+          </div>
+        )}
       </main>
     </div>
   )

@@ -66,6 +66,15 @@ export function buildAndSetAppMenu(): void {
     {
       label: 'View',
       submenu: [
+        {
+          label: 'Find in Page…',
+          accelerator: 'CmdOrCtrl+F',
+          click() {
+            const win = getMainWindow()
+            if (win) win.webContents.executeJavaScript('window.dispatchEvent(new CustomEvent("app:find-in-page"))')
+          }
+        },
+        { type: 'separator' },
         { label: 'Reload', role: 'reload' as const },
         { label: 'Force Reload', role: 'forceReload' as const },
         { label: 'Toggle Developer Tools', role: 'toggleDevTools' as const },
