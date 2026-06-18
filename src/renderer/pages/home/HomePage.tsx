@@ -16,7 +16,7 @@ export function HomePage(): React.ReactElement {
   const [showCreateModal, setShowCreateModal] = useState(false)
 
   const { topics, createTopic, deleteTopic } = useTopics(selectedAssistant?.id ?? null)
-  const { messages, streaming, streamingText, searching, sendMessage, abort } = useChat(
+  const { messages, streaming, streamingText, searching, sendMessage, abort, selectedKnowledgeBaseId, setSelectedKnowledgeBaseId } = useChat(
     selectedTopic?.id ?? null,
     selectedAssistant
   )
@@ -111,6 +111,8 @@ export function HomePage(): React.ReactElement {
               onAbort={abort}
               streaming={streaming}
               disabled={!canChat}
+              selectedKnowledgeBaseId={selectedKnowledgeBaseId}
+              onSelectKnowledgeBase={setSelectedKnowledgeBaseId}
             />
           </>
         ) : (

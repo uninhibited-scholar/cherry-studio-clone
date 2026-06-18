@@ -9,6 +9,8 @@ import { TranslatePage } from './pages/translate/TranslatePage'
 import { NotesPage } from './pages/notes/NotesPage'
 import { MiniAppsPage } from './pages/mini-apps/MiniAppsPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
+import { HistoryPage } from './pages/history/HistoryPage'
+import { LibraryPage } from './pages/library/LibraryPage'
 
 export function App(): React.ReactElement {
   return (
@@ -23,6 +25,8 @@ export function App(): React.ReactElement {
           <Route path="/translate" element={<TranslatePage />} />
           <Route path="/notes" element={<NotesPage />} />
           <Route path="/mini-apps" element={<MiniAppsPage />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/library" element={<LibraryPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Routes>

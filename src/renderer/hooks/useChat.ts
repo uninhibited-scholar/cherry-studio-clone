@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { IpcChannel } from '@shared/IpcChannel'
 import type { Message } from '@shared/data/types/message'
 import type { Assistant } from '@shared/data/types/assistant'
+import type { McpTool } from '@shared/data/types/mcp'
 
 type StreamChunk =
   | { type: 'text'; text: string }
@@ -15,12 +16,14 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
   const [streaming, setStreaming] = useState(false)
   const [streamingText, setStreamingText] = useState('')
   const [searching, setSearching] = useState(false)
+  const [selectedKnowledgeBaseId, setSelectedKnowledgeBaseId] = useState<string | null>(null)
+  const [mcpTools, setMcpTools] = useState<McpTool[]>([])
   const requestIdRef = useRef<string | null>(null)
   const streamingTextRef = useRef('')
+  const firstUserMsgRef = useRef<string>('')
 
   useEffect(() => { streamingTextRef.current = streamingText }, [streamingText])
 
-  // Load messages when topic changes
   useEffect(() => {
     if (!topicId) { setMessages([]); return }
     window.api.invoke(IpcChannel.MESSAGES_LIST, topicId).then((list) => {
@@ -28,7 +31,6 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
     })
   }, [topicId])
 
-  // Subscribe to stream chunks
   useEffect(() => {
     const unsub = window.api.on(IpcChannel.AI_STREAM_CHUNK, (payload: unknown) => {
       const { requestId, chunk } = payload as { requestId: string; chunk: StreamChunk }
@@ -65,7 +67,20 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
           usage
         })
         .then((msg) => {
-          setMessages((prev) => [...prev, msg as Message])
+          setMessages((prev) => {
+            const updated = [...prev, msg as Message]
+            // Auto-name topic after the very first assistant reply
+            if (updated.filter((m) => m.role === 'assistant').length === 1 && assistant?.providerId && assistant?.modelId) {
+              window.api.invoke(IpcChannel.TOPICS_NAME, {
+                topicId,
+                firstUserMessage: firstUserMsgRef.current,
+                firstAssistantReply: content.slice(0, 500),
+                providerId: assistant.providerId,
+                modelId: assistant.modelId
+              })
+            }
+            return updated
+          })
         })
     },
     [topicId, assistant]
@@ -79,30 +94,47 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
         return
       }
 
-      // Optional web search
+      firstUserMsgRef.current = userText
       let contextPrefix = ''
+
+      // Web search injection
       if (options.webSearch) {
         setSearching(true)
         try {
           const results = await window.api.invoke(IpcChannel.WEB_SEARCH, { query: userText, maxResults: 5 }) as SearchResult[]
           if (results.length > 0) {
-            contextPrefix = [
+            contextPrefix += [
               `[Web search results for "${userText}"]:`,
               ...results.map((r, i) => `${i + 1}. **${r.title}**\n   ${r.snippet}\n   Source: ${r.url}`)
-            ].join('\n\n') + '\n\n---\nUser question: '
+            ].join('\n\n') + '\n\n'
           }
         } finally {
           setSearching(false)
         }
       }
 
-      // Save user message (display text only, without the injected context)
+      // Knowledge base injection
+      if (selectedKnowledgeBaseId) {
+        try {
+          const docs = await window.api.invoke(IpcChannel.KNOWLEDGE_SEARCH, {
+            knowledgeBaseId: selectedKnowledgeBaseId, query: userText, limit: 5
+          }) as Array<{ name: string; content: string }>
+          if (docs.length > 0) {
+            contextPrefix += [
+              '[Relevant knowledge base context]:',
+              ...docs.map((d, i) => `${i + 1}. **${d.name}**\n${d.content.slice(0, 500)}`)
+            ].join('\n\n') + '\n\n'
+          }
+        } catch { /* KB search failure is non-fatal */ }
+      }
+
+      if (contextPrefix) contextPrefix += '---\nUser question: '
+
       const userMsg = (await window.api.invoke(IpcChannel.MESSAGES_CREATE, {
         topicId, role: 'user', content: userText
       })) as Message
       setMessages((prev) => [...prev, userMsg])
 
-      // Build history for the model (inject search context into last user turn)
       const history = [...messages, userMsg].map((m, i, arr) => ({
         role: m.role as 'user' | 'assistant' | 'system',
         content: i === arr.length - 1 && contextPrefix ? contextPrefix + m.content : m.content
@@ -119,10 +151,16 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
         modelId: assistant.modelId,
         messages: history,
         systemPrompt: assistant.prompt || undefined,
-        temperature: assistant.temperature
+        temperature: assistant.temperature,
+        mcpTools: mcpTools.length > 0
+          ? mcpTools.reduce<Record<string, { description: string; inputSchema: Record<string, unknown> }>>((acc, t) => {
+              acc[`${t.serverId}__${t.name}`] = { description: t.description, inputSchema: t.inputSchema }
+              return acc
+            }, {})
+          : undefined
       })
     },
-    [topicId, assistant, messages, streaming]
+    [topicId, assistant, messages, streaming, selectedKnowledgeBaseId, mcpTools]
   )
 
   const abort = useCallback(() => {
@@ -131,5 +169,10 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
     }
   }, [])
 
-  return { messages, streaming, streamingText, searching, sendMessage, abort }
+  return {
+    messages, streaming, streamingText, searching,
+    sendMessage, abort,
+    selectedKnowledgeBaseId, setSelectedKnowledgeBaseId,
+    mcpTools, setMcpTools
+  }
 }

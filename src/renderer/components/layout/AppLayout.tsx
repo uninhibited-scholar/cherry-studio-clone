@@ -8,6 +8,8 @@ const NAV_ITEMS = [
   { to: '/paintings',  icon: '🎨', label: 'Paintings' },
   { to: '/translate',  icon: '🌐', label: 'Translate' },
   { to: '/notes',      icon: '📝', label: 'Notes' },
+  { to: '/library',    icon: '📖', label: 'Library' },
+  { to: '/history',    icon: '🕐', label: 'History' },
   { to: '/mini-apps',  icon: '🧩', label: 'Mini Apps' },
 ] as const
 

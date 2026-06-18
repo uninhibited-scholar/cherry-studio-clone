@@ -27,6 +27,17 @@ export const IpcChannel = {
   TOPICS_CREATE: 'topics:create',
   TOPICS_DELETE: 'topics:delete',
   TOPICS_UPDATE: 'topics:update',
+  TOPICS_NAME: 'topics:name',
+  TOPIC_NAMED: 'topic:named',
+
+  // History
+  HISTORY_SEARCH: 'history:search',
+  HISTORY_LIST_ALL: 'history:list-all',
+
+  // Library (prompt templates)
+  LIBRARY_LIST: 'library:list',
+  LIBRARY_CREATE: 'library:create',
+  LIBRARY_DELETE: 'library:delete',
 
   // Messages
   MESSAGES_LIST: 'messages:list',

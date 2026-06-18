@@ -12,6 +12,9 @@ import { webSearch } from './services/webSearch/WebSearchService'
 import { knowledgeService } from './data/services/KnowledgeService'
 import { paintingService } from './data/services/PaintingService'
 import { mcpService } from './services/McpService'
+import { topicNamingService } from './services/TopicNamingService'
+import { historyService } from './data/services/HistoryService'
+import { libraryService } from './data/services/LibraryService'
 
 const logger = loggerService.withContext('IPC')
 
@@ -94,6 +97,22 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannel.TOPICS_DELETE, async (_event, id: string) => {
     return topicService.delete(id)
   })
+
+  ipcMain.handle(IpcChannel.TOPICS_NAME, async (event, { topicId, firstUserMessage, firstAssistantReply, providerId, modelId }) => {
+    return topicNamingService.name(topicId, firstUserMessage, firstAssistantReply, providerId, modelId, event.sender)
+  })
+
+  // ── History ─────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.HISTORY_LIST_ALL, async () => historyService.listAll())
+
+  ipcMain.handle(IpcChannel.HISTORY_SEARCH, async (_event, query: string) => historyService.search(query))
+
+  // ── Library ─────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.LIBRARY_LIST, async () => libraryService.list())
+
+  ipcMain.handle(IpcChannel.LIBRARY_CREATE, async (_event, data) => libraryService.create(data))
+
+  ipcMain.handle(IpcChannel.LIBRARY_DELETE, async (_event, id: string) => libraryService.delete(id))
 
   // ── Messages ────────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.MESSAGES_LIST, async (_event, topicId: string) => {
