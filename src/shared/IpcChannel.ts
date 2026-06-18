@@ -94,6 +94,10 @@ export const IpcChannel = {
   // Notifications
   NOTIFY: 'notify',
 
+  // Backup
+  BACKUP_EXPORT: 'backup:export',
+  BACKUP_IMPORT: 'backup:import',
+
   // Menu events (main → renderer)
   MENU_NEW_TOPIC: 'menu:new-topic',
   MENU_EXPORT_TOPIC: 'menu:export-topic',

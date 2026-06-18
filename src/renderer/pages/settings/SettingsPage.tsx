@@ -3,12 +3,14 @@ import { ProvidersSettings } from './sections/ProvidersSettings'
 import { McpSettings } from './sections/McpSettings'
 import { WebSearchSettings } from './sections/WebSearchSettings'
 import { GeneralSettings } from './sections/GeneralSettings'
+import { BackupSettings } from './sections/BackupSettings'
 
 const SECTIONS = [
   { key: 'general', label: 'General', icon: '🛠' },
   { key: 'providers', label: 'AI Providers', icon: '🔌' },
   { key: 'mcp', label: 'MCP Servers', icon: '🔧' },
   { key: 'web-search', label: 'Web Search', icon: '🔍' },
+  { key: 'backup', label: 'Backup', icon: '💾' },
   { key: 'about', label: 'About', icon: 'ℹ️' }
 ]
 
@@ -45,6 +47,7 @@ export function SettingsPage(): React.ReactElement {
         {active === 'providers' && <ProvidersSettings />}
         {active === 'mcp' && <McpSettings />}
         {active === 'web-search' && <WebSearchSettings />}
+        {active === 'backup' && <BackupSettings />}
         {active === 'about' && <AboutSection />}
       </div>
     </div>

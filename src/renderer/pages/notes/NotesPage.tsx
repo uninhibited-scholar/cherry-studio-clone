@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { IpcChannel } from '@shared/IpcChannel'
+import { MarkdownContent } from '../../components/MarkdownContent'
 import type { Note } from '@shared/data/types/note'
 
 export function NotesPage(): React.ReactElement {
@@ -11,6 +12,7 @@ export function NotesPage(): React.ReactElement {
   const isDirty = useRef(false)
 
   const selectedNote = notes.find((n) => n.id === selectedId) ?? null
+  const [preview, setPreview] = useState(false)
 
   // Load notes
   const refresh = useCallback(async () => {
@@ -128,25 +130,47 @@ export function NotesPage(): React.ReactElement {
               boxSizing: 'border-box'
             }}
           />
+          {/* Toolbar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 24px', borderBottom: '1px solid #18181b' }}>
+            <button
+              onClick={() => setPreview(false)}
+              style={{ background: !preview ? '#27272a' : 'none', border: 'none', color: !preview ? '#fafafa' : '#71717a', borderRadius: 4, padding: '3px 10px', cursor: 'pointer', fontSize: 12 }}
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => setPreview(true)}
+              style={{ background: preview ? '#27272a' : 'none', border: 'none', color: preview ? '#fafafa' : '#71717a', borderRadius: 4, padding: '3px 10px', cursor: 'pointer', fontSize: 12 }}
+            >
+              Preview
+            </button>
+          </div>
+
           {/* Content */}
-          <textarea
-            value={content}
-            onChange={handleContentChange}
-            placeholder="Write something… (Markdown supported)"
-            style={{
-              flex: 1,
-              background: 'transparent',
-              border: 'none',
-              outline: 'none',
-              color: '#e4e4e7',
-              fontSize: 14,
-              lineHeight: 1.8,
-              padding: '16px 24px',
-              resize: 'none',
-              fontFamily: 'ui-monospace, "Cascadia Code", monospace',
-              boxSizing: 'border-box'
-            }}
-          />
+          {preview ? (
+            <div style={{ flex: 1, overflow: 'auto', padding: '16px 24px', color: '#e4e4e7', fontSize: 14 }}>
+              {content ? <MarkdownContent content={content} /> : <p style={{ color: '#52525b' }}>Nothing to preview yet.</p>}
+            </div>
+          ) : (
+            <textarea
+              value={content}
+              onChange={handleContentChange}
+              placeholder="Write something… (Markdown supported)"
+              style={{
+                flex: 1,
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                color: '#e4e4e7',
+                fontSize: 14,
+                lineHeight: 1.8,
+                padding: '16px 24px',
+                resize: 'none',
+                fontFamily: 'ui-monospace, "Cascadia Code", monospace',
+                boxSizing: 'border-box'
+              }}
+            />
+          )}
           {/* Status bar */}
           <div style={{ borderTop: '1px solid #18181b', padding: '6px 24px', display: 'flex', alignItems: 'center', gap: 16 }}>
             <span style={{ fontSize: 11, color: '#52525b' }}>{content.length} chars · {content.split(/\s+/).filter(Boolean).length} words</span>

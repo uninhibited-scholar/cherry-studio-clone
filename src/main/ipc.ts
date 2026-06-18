@@ -272,6 +272,86 @@ export function registerIpcHandlers(): void {
     return result.filePath
   })
 
+  // ── Backup ───────────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.BACKUP_EXPORT, async () => {
+    const [providers, assistants, notes] = await Promise.all([
+      providerService.listProviders(),
+      assistantService.list(),
+      noteService.list()
+    ])
+
+    // Gather all messages for all topics across all assistants
+    const topicsAll: unknown[] = []
+    const messagesAll: unknown[] = []
+    for (const a of assistants) {
+      const topics = await topicService.listByAssistant(a.id)
+      for (const t of topics) {
+        topicsAll.push(t)
+        const msgs = await messageService.listByTopic(t.id)
+        messagesAll.push(...msgs)
+      }
+    }
+
+    const backup = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      providers,
+      assistants,
+      topics: topicsAll,
+      messages: messagesAll,
+      notes
+    }
+
+    const { dialog, writeFile: _wf } = await Promise.all([
+      import('electron').then(m => m.dialog),
+      import('fs/promises')
+    ]).then(([d, fs]) => ({ dialog: d, writeFile: fs.writeFile }))
+
+    const result = await dialog.showSaveDialog({
+      defaultPath: `cherry-studio-backup-${new Date().toISOString().slice(0, 10)}.json`,
+      filters: [{ name: 'JSON Backup', extensions: ['json'] }]
+    })
+    if (result.canceled || !result.filePath) return null
+
+    const { writeFile } = await import('fs/promises')
+    await writeFile(result.filePath, JSON.stringify(backup, null, 2), 'utf8')
+    shell.showItemInFolder(result.filePath)
+    return result.filePath
+  })
+
+  ipcMain.handle(IpcChannel.BACKUP_IMPORT, async () => {
+    const { dialog } = await import('electron')
+    const { readFile } = await import('fs/promises')
+
+    const result = await dialog.showOpenDialog({
+      filters: [{ name: 'JSON Backup', extensions: ['json'] }],
+      properties: ['openFile']
+    })
+    if (result.canceled || !result.filePaths[0]) return { success: false, reason: 'Cancelled' }
+
+    try {
+      const raw = await readFile(result.filePaths[0], 'utf8')
+      const backup = JSON.parse(raw) as {
+        version: number
+        providers?: unknown[]
+        assistants?: unknown[]
+        topics?: unknown[]
+        messages?: unknown[]
+        notes?: unknown[]
+      }
+      if (backup.version !== 1) return { success: false, reason: 'Unsupported backup version' }
+
+      // Import: upsert each entity
+      for (const p of backup.providers ?? []) await providerService.upsertProvider(p as Parameters<typeof providerService.upsertProvider>[0])
+      for (const a of backup.assistants ?? []) await assistantService.upsert(a as Parameters<typeof assistantService.upsert>[0])
+      for (const n of backup.notes ?? []) await noteService.create(n as Parameters<typeof noteService.create>[0])
+
+      return { success: true }
+    } catch (err) {
+      return { success: false, reason: String(err) }
+    }
+  })
+
   // ── Notifications ────────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.NOTIFY, (_event, { title, body }: { title: string; body: string }) => {
     const { Notification } = require('electron') as typeof import('electron')
