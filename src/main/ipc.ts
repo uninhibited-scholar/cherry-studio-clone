@@ -272,6 +272,19 @@ export function registerIpcHandlers(): void {
     return result.filePath
   })
 
+  // ── Notifications ────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.NOTIFY, (_event, { title, body }: { title: string; body: string }) => {
+    const { Notification } = require('electron') as typeof import('electron')
+    if (Notification.isSupported()) {
+      const notif = new Notification({ title, body })
+      notif.on('click', () => {
+        const win = BrowserWindow.getAllWindows()[0]
+        if (win) { win.show(); win.focus() }
+      })
+      notif.show()
+    }
+  })
+
   // ── App ─────────────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.APP_VERSION, () => {
     return process.env.npm_package_version ?? '0.1.0'

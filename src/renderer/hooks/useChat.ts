@@ -56,6 +56,14 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
 
       if (!topicId) return
 
+      // Send system notification if app is backgrounded
+      if (!error && text && document.hidden) {
+        window.api.invoke(IpcChannel.NOTIFY, {
+          title: assistant?.name ?? 'Assistant',
+          body: text.slice(0, 120) + (text.length > 120 ? '…' : '')
+        }).catch(() => {/* non-fatal */})
+      }
+
       const content = error ? `*Error: ${error}*` : text
       window.api
         .invoke(IpcChannel.MESSAGES_CREATE, {
