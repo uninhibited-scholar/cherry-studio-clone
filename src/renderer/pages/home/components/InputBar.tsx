@@ -186,14 +186,31 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
       </div>
 
       {/* Input row */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, background: '#18181b', border: '1px solid #3f3f46', borderRadius: 12, padding: '8px 12px' }}>
+      <div
+        style={{ display: 'flex', alignItems: 'flex-end', gap: 8, background: '#18181b', border: '1px solid #3f3f46', borderRadius: 12, padding: '8px 12px' }}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={async (e) => {
+          e.preventDefault()
+          const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('text/') || f.name.match(/\.(md|txt|json|csv|yaml|yml|html|xml)$/i))
+          if (files.length === 0) return
+          const contents = await Promise.all(files.map((f) => f.text()))
+          const appended = contents.map((c, i) => `[File: ${files[i].name}]\n${c}`).join('\n\n')
+          setText((prev) => prev ? `${prev}\n\n${appended}` : appended)
+          setTimeout(() => {
+            if (textareaRef.current) {
+              textareaRef.current.style.height = 'auto'
+              textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`
+            }
+          }, 0)
+        }}
+      >
         <textarea
           ref={textareaRef}
           value={text}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
           disabled={disabled}
-          placeholder={disabled ? 'Configure an assistant with a provider and model first…' : 'Message… (Enter to send, Shift+Enter for newline)'}
+          placeholder={disabled ? 'Configure an assistant with a provider and model first…' : 'Message… (Enter to send, Shift+Enter for newline, drag .txt/.md to attach)'}
           rows={1}
           style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: '#fafafa', fontSize: 14, lineHeight: 1.6, resize: 'none', fontFamily: 'inherit', overflowY: 'hidden', minHeight: 24, maxHeight: 200 }}
         />

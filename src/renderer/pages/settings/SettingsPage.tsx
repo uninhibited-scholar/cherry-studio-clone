@@ -4,6 +4,7 @@ import { McpSettings } from './sections/McpSettings'
 import { WebSearchSettings } from './sections/WebSearchSettings'
 import { GeneralSettings } from './sections/GeneralSettings'
 import { BackupSettings } from './sections/BackupSettings'
+import { StorageSettings } from './sections/StorageSettings'
 
 const SECTIONS = [
   { key: 'general', label: 'General', icon: '🛠' },
@@ -11,6 +12,7 @@ const SECTIONS = [
   { key: 'mcp', label: 'MCP Servers', icon: '🔧' },
   { key: 'web-search', label: 'Web Search', icon: '🔍' },
   { key: 'backup', label: 'Backup', icon: '💾' },
+  { key: 'storage', label: 'Storage', icon: '🗄️' },
   { key: 'about', label: 'About', icon: 'ℹ️' }
 ]
 
@@ -48,6 +50,7 @@ export function SettingsPage(): React.ReactElement {
         {active === 'mcp' && <McpSettings />}
         {active === 'web-search' && <WebSearchSettings />}
         {active === 'backup' && <BackupSettings />}
+        {active === 'storage' && <StorageSettings />}
         {active === 'about' && <AboutSection />}
       </div>
     </div>

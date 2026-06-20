@@ -288,6 +288,18 @@ export function registerIpcHandlers(): void {
   })
 
   // ── File utilities ────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.STORAGE_INFO, async () => {
+    const { stat } = await import('fs/promises')
+    const { app } = await import('electron')
+    const dbPath = app.getPath('userData') + '/db.sqlite'
+    try {
+      const s = await stat(dbPath)
+      return { dbPath, dbSize: s.size, userData: app.getPath('userData') }
+    } catch {
+      return { dbPath, dbSize: 0, userData: app.getPath('userData') }
+    }
+  })
+
   ipcMain.handle(IpcChannel.FILE_SELECT, async (_event, { multiple = false, filters }: { multiple?: boolean; filters?: Electron.FileFilter[] } = {}) => {
     const { dialog } = await import('electron')
     const result = await dialog.showOpenDialog({

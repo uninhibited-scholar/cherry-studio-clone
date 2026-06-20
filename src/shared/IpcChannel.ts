@@ -111,6 +111,9 @@ export const IpcChannel = {
   MENU_NEW_TOPIC: 'menu:new-topic',
   MENU_EXPORT_TOPIC: 'menu:export-topic',
 
+  // Storage
+  STORAGE_INFO: 'storage:info',
+
   // App
   APP_VERSION: 'app:version',
   APP_READY: 'app:ready'
