@@ -80,9 +80,9 @@ export function MarkdownContent({ content }: Props) {
         a: ({ href, children }) => (
           <a href={href} style={{ color: '#60a5fa', textDecoration: 'underline' }} target="_blank" rel="noreferrer">{children}</a>
         ),
-        p: ({ children }) => <p style={{ margin: '4px 0', lineHeight: 1.7 }}>{children}</p>,
-        ul: ({ children }) => <ul style={{ paddingLeft: 20, margin: '4px 0' }}>{children}</ul>,
-        ol: ({ children }) => <ol style={{ paddingLeft: 20, margin: '4px 0' }}>{children}</ol>,
+        p: ({ children }) => <p style={{ margin: '4px 0', lineHeight: 1.7, fontSize: 'var(--chat-font-size, 14px)' }}>{children}</p>,
+        ul: ({ children }) => <ul style={{ paddingLeft: 20, margin: '4px 0', fontSize: 'var(--chat-font-size, 14px)' }}>{children}</ul>,
+        ol: ({ children }) => <ol style={{ paddingLeft: 20, margin: '4px 0', fontSize: 'var(--chat-font-size, 14px)' }}>{children}</ol>,
         li: ({ children }) => <li style={{ margin: '2px 0' }}>{children}</li>,
         h1: ({ children }) => <h1 style={{ fontSize: 20, fontWeight: 700, margin: '12px 0 6px', color: '#fafafa' }}>{children}</h1>,
         h2: ({ children }) => <h2 style={{ fontSize: 17, fontWeight: 700, margin: '10px 0 4px', color: '#fafafa' }}>{children}</h2>,

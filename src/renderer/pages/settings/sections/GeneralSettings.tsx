@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { IpcChannel } from '@shared/IpcChannel'
 
 type GeneralPrefs = {
   fontSize: number
@@ -28,10 +29,20 @@ export function loadGeneralPrefs(): GeneralPrefs {
 export function GeneralSettings(): React.ReactElement {
   const [prefs, setPrefs] = useState<GeneralPrefs>(loadGeneralPrefs)
   const [saved, setSaved] = useState(false)
+  const [launchOnBoot, setLaunchOnBoot] = useState(false)
 
   useEffect(() => {
     document.documentElement.style.setProperty('--chat-font-size', `${prefs.fontSize}px`)
   }, [prefs.fontSize])
+
+  useEffect(() => {
+    window.api.invoke(IpcChannel.APP_LAUNCH_ON_BOOT_GET).then((v) => setLaunchOnBoot(v as boolean))
+  }, [])
+
+  const toggleLaunchOnBoot = useCallback(async (enabled: boolean) => {
+    await window.api.invoke(IpcChannel.APP_LAUNCH_ON_BOOT_SET, enabled)
+    setLaunchOnBoot(enabled)
+  }, [])
 
   function update<K extends keyof GeneralPrefs>(key: K, value: GeneralPrefs[K]) {
     setPrefs((p) => ({ ...p, [key]: value }))
@@ -95,6 +106,17 @@ export function GeneralSettings(): React.ReactElement {
           />
           Auto-scroll to bottom on new message
         </label>
+      </div>
+
+      <div style={row}>
+        <label style={label}>
+          <input
+            type="checkbox" checked={launchOnBoot}
+            onChange={(e) => toggleLaunchOnBoot(e.target.checked)}
+          />
+          Launch on system startup
+        </label>
+        <p style={sublabel}>Start Cherry Studio automatically when you log in.</p>
       </div>
 
       <button

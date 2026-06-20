@@ -34,6 +34,8 @@ export function AssistantSidebar({
   const [search, setSearch] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
+  useEffect(() => { setSearch('') }, [selectedAssistantId])
+
   const q = search.trim().toLowerCase()
   const filteredAssistants = q ? assistants.filter((a) => a.name.toLowerCase().includes(q)) : assistants
   const filteredTopics = q ? topics.filter((t) => t.title.toLowerCase().includes(q)) : topics

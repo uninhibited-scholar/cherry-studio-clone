@@ -288,6 +288,26 @@ export function registerIpcHandlers(): void {
   })
 
   // ── File utilities ────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.APP_LAUNCH_ON_BOOT_GET, () => {
+    const { app } = require('electron')
+    return app.getLoginItemSettings().openAtLogin
+  })
+
+  ipcMain.handle(IpcChannel.APP_LAUNCH_ON_BOOT_SET, (_event, enabled: boolean) => {
+    const { app } = require('electron')
+    app.setLoginItemSettings({ openAtLogin: enabled })
+  })
+
+  ipcMain.handle(IpcChannel.APP_CACHE_SIZE, async () => {
+    const { session } = await import('electron')
+    return session.defaultSession.getCacheSize()
+  })
+
+  ipcMain.handle(IpcChannel.APP_CACHE_CLEAR, async () => {
+    const { session } = await import('electron')
+    await session.defaultSession.clearCache()
+  })
+
   ipcMain.handle(IpcChannel.PROVIDER_TEST, async (_event, { providerId }: { providerId: string }) => {
     const all = await providerService.listProviders()
     const provider = all.find((p) => p.id === providerId)

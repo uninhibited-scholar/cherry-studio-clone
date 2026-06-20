@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { IpcChannel } from '@shared/IpcChannel'
 
 type StorageInfo = {
@@ -9,10 +9,29 @@ type StorageInfo = {
 
 export function StorageSettings(): React.ReactElement {
   const [info, setInfo] = useState<StorageInfo | null>(null)
+  const [cacheSize, setCacheSize] = useState<number | null>(null)
+  const [clearing, setClearing] = useState(false)
 
-  useEffect(() => {
-    window.api.invoke(IpcChannel.STORAGE_INFO).then((res) => setInfo(res as StorageInfo))
+  const loadInfo = useCallback(async () => {
+    const [storageRes, cacheBytes] = await Promise.all([
+      window.api.invoke(IpcChannel.STORAGE_INFO),
+      window.api.invoke(IpcChannel.APP_CACHE_SIZE)
+    ])
+    setInfo(storageRes as StorageInfo)
+    setCacheSize(cacheBytes as number)
   }, [])
+
+  useEffect(() => { loadInfo() }, [loadInfo])
+
+  const clearCache = async () => {
+    setClearing(true)
+    try {
+      await window.api.invoke(IpcChannel.APP_CACHE_CLEAR)
+      setCacheSize(0)
+    } finally {
+      setClearing(false)
+    }
+  }
 
   const fmt = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`
@@ -39,6 +58,18 @@ export function StorageSettings(): React.ReactElement {
               {info.dbPath.split('/').pop()} — {fmt(info.dbSize)}
             </span>
             <button onClick={() => openFolder(info.userData)} style={btnStyle}>Open Folder</button>
+          </Row>
+          <Row label="Browser Cache">
+            <span style={{ fontSize: 12, color: '#a1a1aa', flex: 1 }}>
+              {cacheSize !== null ? fmt(cacheSize) : '…'}
+            </span>
+            <button
+              onClick={clearCache}
+              disabled={clearing || cacheSize === 0}
+              style={{ ...btnStyle, color: clearing ? '#52525b' : '#f87171', borderColor: clearing ? '#27272a' : '#7f1d1d' }}
+            >
+              {clearing ? 'Clearing…' : 'Clear Cache'}
+            </button>
           </Row>
         </div>
       ) : (

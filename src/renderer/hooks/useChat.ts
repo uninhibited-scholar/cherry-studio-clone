@@ -29,6 +29,7 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
     window.api.invoke(IpcChannel.MESSAGES_LIST, topicId).then((list) => {
       setMessages(list as Message[])
     })
+    setMcpTools([])
   }, [topicId])
 
   useEffect(() => {

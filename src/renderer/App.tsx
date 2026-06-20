@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
+import { loadGeneralPrefs } from './pages/settings/sections/GeneralSettings'
 import { HomePage } from './pages/home/HomePage'
 import { AgentsPage } from './pages/agents/AgentsPage'
 import { KnowledgePage } from './pages/knowledge/KnowledgePage'
@@ -15,6 +16,11 @@ import { LaunchpadPage } from './pages/launchpad/LaunchpadPage'
 import { FilesPage } from './pages/files/FilesPage'
 
 export function App(): React.ReactElement {
+  useEffect(() => {
+    const prefs = loadGeneralPrefs()
+    document.documentElement.style.setProperty('--chat-font-size', `${prefs.fontSize}px`)
+  }, [])
+
   return (
     <HashRouter>
       <Routes>

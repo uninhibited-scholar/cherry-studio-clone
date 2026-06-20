@@ -117,6 +117,12 @@ export const IpcChannel = {
   // Provider test
   PROVIDER_TEST: 'provider:test',
 
+  // App system
+  APP_LAUNCH_ON_BOOT_GET: 'app:launch-on-boot:get',
+  APP_LAUNCH_ON_BOOT_SET: 'app:launch-on-boot:set',
+  APP_CACHE_SIZE: 'app:cache-size',
+  APP_CACHE_CLEAR: 'app:cache-clear',
+
   // App
   APP_VERSION: 'app:version',
   APP_READY: 'app:ready'

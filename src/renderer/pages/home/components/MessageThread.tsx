@@ -170,7 +170,7 @@ function MessageBubble({
               padding: '10px 14px',
               borderRadius: '16px 16px 4px 16px',
               background: '#2563eb', color: '#fafafa',
-              fontSize: 14, lineHeight: 1.6,
+              fontSize: 'var(--chat-font-size, 14px)', lineHeight: 1.6,
               whiteSpace: 'pre-wrap', wordBreak: 'break-word'
             }}>
               {message.content}
