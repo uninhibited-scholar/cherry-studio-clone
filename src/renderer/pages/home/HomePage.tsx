@@ -109,6 +109,11 @@ export function HomePage(): React.ReactElement {
                   <span style={{ color: '#71717a', fontSize: 13 }}>{selectedTopic.title}</span>
                 </>
               )}
+              {selectedAssistant.modelId && (
+                <span style={{ marginLeft: 4, fontSize: 11, color: '#3f3f46', background: '#18181b', border: '1px solid #27272a', borderRadius: 4, padding: '1px 7px' }}>
+                  {selectedAssistant.modelId}
+                </span>
+              )}
             </>
           ) : (
             <span style={{ color: '#52525b', fontSize: 13 }}>Select an assistant to start</span>

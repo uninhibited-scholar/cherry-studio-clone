@@ -18,6 +18,13 @@ export function ProvidersSettings() {
   const [editingKey, setEditingKey] = useState<Record<string, string>>({})
   const [editingHost, setEditingHost] = useState<Record<string, string>>({})
   const [newModelName, setNewModelName] = useState<Record<string, string>>({})
+  const [testStatus, setTestStatus] = useState<Record<string, { ok: boolean; text?: string; error?: string } | 'testing'>>({})
+
+  const testProvider = async (p: Provider) => {
+    setTestStatus((prev) => ({ ...prev, [p.id]: 'testing' }))
+    const res = await window.api.invoke(IpcChannel.PROVIDER_TEST, { providerId: p.id }) as { ok: boolean; text?: string; error?: string }
+    setTestStatus((prev) => ({ ...prev, [p.id]: res }))
+  }
 
   const refresh = useCallback(async () => {
     const ps = (await window.api.invoke(IpcChannel.PROVIDERS_LIST)) as Provider[]
@@ -123,6 +130,18 @@ export function ProvidersSettings() {
             >
               <span style={{ color: '#fafafa', fontSize: 14, fontWeight: 500, flex: 1 }}>{p.name}</span>
               <span style={{ color: '#52525b', fontSize: 12 }}>{(models[p.id] ?? []).length} models</span>
+              {testStatus[p.id] && testStatus[p.id] !== 'testing' && (
+                <span style={{ fontSize: 11, color: (testStatus[p.id] as { ok: boolean }).ok ? '#4ade80' : '#f87171' }}>
+                  {(testStatus[p.id] as { ok: boolean }).ok ? '✓ Connected' : '✗ Failed'}
+                </span>
+              )}
+              <button
+                onClick={(e) => { e.stopPropagation(); testProvider(p) }}
+                disabled={testStatus[p.id] === 'testing'}
+                style={{ background: 'none', border: '1px solid #3f3f46', borderRadius: 4, color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px' }}
+              >
+                {testStatus[p.id] === 'testing' ? '…' : 'Test'}
+              </button>
               <span style={{ color: '#71717a', fontSize: 12 }}>{expanded === p.id ? '▲' : '▼'}</span>
               <button
                 onClick={(e) => { e.stopPropagation(); deleteProvider(p.id) }}

@@ -288,6 +288,39 @@ export function registerIpcHandlers(): void {
   })
 
   // ── File utilities ────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.PROVIDER_TEST, async (_event, { providerId }: { providerId: string }) => {
+    const all = await providerService.listProviders()
+    const provider = all.find((p) => p.id === providerId)
+    if (!provider) return { ok: false, error: 'Provider not found' }
+    if (!provider.apiKey && provider.defaultEndpointType !== 'openai_chat_completions') {
+      return { ok: false, error: 'No API key configured' }
+    }
+    try {
+      const { createOpenAI } = await import('@ai-sdk/openai')
+      const { createAnthropic } = await import('@ai-sdk/anthropic')
+      const { createGoogleGenerativeAI } = await import('@ai-sdk/google')
+      const { generateText } = await import('ai')
+
+      let model
+      if (provider.defaultEndpointType === 'anthropic_messages') {
+        const sdk = createAnthropic({ apiKey: provider.apiKey })
+        model = sdk('claude-haiku-4-5-20251001')
+      } else if (provider.defaultEndpointType === 'google_gemini') {
+        const sdk = createGoogleGenerativeAI({ apiKey: provider.apiKey })
+        model = sdk('gemini-2.0-flash')
+      } else {
+        const cfg: Parameters<typeof createOpenAI>[0] = { apiKey: provider.apiKey || 'no-key' }
+        if (provider.apiHost) cfg.baseURL = provider.apiHost
+        const sdk = createOpenAI(cfg)
+        model = sdk('gpt-4o-mini')
+      }
+      const res = await generateText({ model, messages: [{ role: 'user', content: 'Reply with one word: OK' }], maxTokens: 5 })
+      return { ok: true, text: res.text.trim() }
+    } catch (e) {
+      return { ok: false, error: (e as Error).message?.slice(0, 200) ?? 'Unknown error' }
+    }
+  })
+
   ipcMain.handle(IpcChannel.STORAGE_INFO, async () => {
     const { stat } = await import('fs/promises')
     const { app } = await import('electron')

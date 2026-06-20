@@ -114,6 +114,9 @@ export const IpcChannel = {
   // Storage
   STORAGE_INFO: 'storage:info',
 
+  // Provider test
+  PROVIDER_TEST: 'provider:test',
+
   // App
   APP_VERSION: 'app:version',
   APP_READY: 'app:ready'
