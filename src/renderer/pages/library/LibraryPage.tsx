@@ -68,6 +68,41 @@ export function LibraryPage(): React.ReactElement {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
           <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, flex: 'none' }}>📖 Prompt Library</h2>
           <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter prompts…" style={inputStyle} />
+          <button
+            onClick={() => {
+              const data = JSON.stringify(saved, null, 2)
+              const blob = new Blob([data], { type: 'application/json' })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url; a.download = 'prompts.json'; a.click()
+              URL.revokeObjectURL(url)
+            }}
+            style={{ ...btnPrimaryStyle, background: '#27272a', color: '#a1a1aa' }}
+            title="Export saved prompts as JSON"
+          >
+            ↓ Export
+          </button>
+          <button
+            onClick={() => {
+              const input = document.createElement('input')
+              input.type = 'file'; input.accept = '.json'
+              input.onchange = async () => {
+                const file = input.files?.[0]; if (!file) return
+                const text = await file.text()
+                const arr = JSON.parse(text) as Array<{ name: string; content: string; category?: string }>
+                for (const item of arr) {
+                  if (!item.name || !item.content) continue
+                  const t = await window.api.invoke(IpcChannel.LIBRARY_CREATE, { name: item.name, content: item.content, category: item.category ?? 'General' }) as PromptTemplate
+                  setSaved((prev) => [...prev, t])
+                }
+              }
+              input.click()
+            }}
+            style={{ ...btnPrimaryStyle, background: '#27272a', color: '#a1a1aa' }}
+            title="Import prompts from JSON"
+          >
+            ↑ Import
+          </button>
           <button onClick={() => setShowAdd(true)} style={btnPrimaryStyle}>+ Save Prompt</button>
         </div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
