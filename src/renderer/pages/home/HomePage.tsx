@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { useAssistants } from '../../hooks/useAssistants'
 import { useTopics } from '../../hooks/useTopics'
 import { useChat } from '../../hooks/useChat'
@@ -16,6 +16,28 @@ export function HomePage(): React.ReactElement {
   const [selectedAssistant, setSelectedAssistant] = useState<Assistant | null>(null)
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const saved = localStorage.getItem('cherry-clone:sidebar-width')
+    return saved ? parseInt(saved) : 220
+  })
+  const dragRef = useRef<{ startX: number; startW: number } | null>(null)
+
+  const onDividerMouseDown = useCallback((e: React.MouseEvent) => {
+    dragRef.current = { startX: e.clientX, startW: sidebarWidth }
+    const onMove = (ev: MouseEvent) => {
+      if (!dragRef.current) return
+      const w = Math.max(160, Math.min(400, dragRef.current.startW + ev.clientX - dragRef.current.startX))
+      setSidebarWidth(w)
+      localStorage.setItem('cherry-clone:sidebar-width', String(w))
+    }
+    const onUp = () => {
+      dragRef.current = null
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }, [sidebarWidth])
 
   const { topics, createTopic, deleteTopic, renameTopic } = useTopics(selectedAssistant?.id ?? null)
   const { messages, streaming, streamingText, searching, sendMessage, abort, deleteMessage, regenerate, editResend, selectedKnowledgeBaseId, setSelectedKnowledgeBaseId } = useChat(
@@ -72,17 +94,26 @@ export function HomePage(): React.ReactElement {
 
   return (
     <div style={{ display: 'flex', height: '100%', background: '#09090b' }}>
-      <AssistantSidebar
-        assistants={assistants}
-        selectedAssistantId={selectedAssistant?.id ?? null}
-        topics={topics}
-        selectedTopicId={selectedTopic?.id ?? null}
-        onSelectAssistant={handleSelectAssistant}
-        onSelectTopic={handleSelectTopic}
-        onNewTopic={handleNewTopic}
-        onDeleteTopic={handleDeleteTopic}
-        onRenameTopicLocal={renameTopic}
-        onCreateAssistant={() => setShowCreateModal(true)}
+      <div style={{ width: sidebarWidth, flexShrink: 0, display: 'flex' }}>
+        <AssistantSidebar
+          assistants={assistants}
+          selectedAssistantId={selectedAssistant?.id ?? null}
+          topics={topics}
+          selectedTopicId={selectedTopic?.id ?? null}
+          onSelectAssistant={handleSelectAssistant}
+          onSelectTopic={handleSelectTopic}
+          onNewTopic={handleNewTopic}
+          onDeleteTopic={handleDeleteTopic}
+          onRenameTopicLocal={renameTopic}
+          onCreateAssistant={() => setShowCreateModal(true)}
+        />
+      </div>
+      {/* Drag handle */}
+      <div
+        onMouseDown={onDividerMouseDown}
+        style={{ width: 4, cursor: 'col-resize', background: 'transparent', flexShrink: 0, zIndex: 10 }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = '#3f3f46')}
+        onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
       />
 
       {/* Chat panel */}

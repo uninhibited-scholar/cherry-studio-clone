@@ -66,12 +66,11 @@ export function AssistantSidebar({
   return (
     <aside
       style={{
-        width: 220,
+        width: '100%',
         display: 'flex',
         flexDirection: 'column',
         borderRight: '1px solid #27272a',
         background: '#09090b',
-        flexShrink: 0,
         overflow: 'hidden'
       }}
     >
