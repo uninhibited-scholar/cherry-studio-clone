@@ -1,6 +1,8 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { IpcChannel } from '@shared/IpcChannel'
 import type { KnowledgeBase } from '@shared/data/types/knowledge'
+import type { PromptTemplate } from '@shared/data/types/library'
+import type { McpTool } from '@shared/data/types/mcp'
 
 type Props = {
   onSend: (text: string, options: { webSearch: boolean }) => void
@@ -9,29 +11,48 @@ type Props = {
   disabled: boolean
   selectedKnowledgeBaseId: string | null
   onSelectKnowledgeBase: (id: string | null) => void
+  mcpTools: McpTool[]
+  setMcpTools: (tools: McpTool[]) => void
 }
 
-export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowledgeBaseId, onSelectKnowledgeBase }: Props) {
+export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowledgeBaseId, onSelectKnowledgeBase, mcpTools, setMcpTools }: Props) {
   const [text, setText] = useState('')
   const [webSearchEnabled, setWebSearchEnabled] = useState(false)
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([])
   const [showKbPicker, setShowKbPicker] = useState(false)
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false)
+  const [templates, setTemplates] = useState<PromptTemplate[]>([])
+  const [showMcpPicker, setShowMcpPicker] = useState(false)
+  const [allMcpTools, setAllMcpTools] = useState<McpTool[]>([])
+  const [templateSearch, setTemplateSearch] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const pickerRef = useRef<HTMLDivElement>(null)
+  const kbRef = useRef<HTMLDivElement>(null)
+  const tplRef = useRef<HTMLDivElement>(null)
+  const mcpRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     window.api.invoke(IpcChannel.KNOWLEDGE_LIST).then((list) => setKnowledgeBases(list as KnowledgeBase[]))
+    window.api.invoke(IpcChannel.LIBRARY_LIST).then((list) => setTemplates(list as PromptTemplate[]))
+    window.api.invoke(IpcChannel.MCP_LIST).then(async (servers: unknown) => {
+      const svrs = servers as Array<{ id: string; name: string; isEnabled: boolean }>
+      const connected = svrs.filter((s) => s.isEnabled)
+      const toolLists = await Promise.all(
+        connected.map((s) => window.api.invoke(IpcChannel.MCP_TOOLS, s.id).then((tools) => tools as McpTool[]).catch(() => []))
+      )
+      setAllMcpTools(toolLists.flat())
+    })
   }, [])
 
-  // Close picker on outside click
+  // Close pickers on outside click
   useEffect(() => {
-    if (!showKbPicker) return
     const handler = (e: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) setShowKbPicker(false)
+      if (showKbPicker && kbRef.current && !kbRef.current.contains(e.target as Node)) setShowKbPicker(false)
+      if (showTemplatePicker && tplRef.current && !tplRef.current.contains(e.target as Node)) { setShowTemplatePicker(false); setTemplateSearch('') }
+      if (showMcpPicker && mcpRef.current && !mcpRef.current.contains(e.target as Node)) setShowMcpPicker(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
-  }, [showKbPicker])
+  }, [showKbPicker, showTemplatePicker, showMcpPicker])
 
   const handleSend = useCallback(() => {
     const trimmed = text.trim()
@@ -55,69 +76,113 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
     el.style.height = `${Math.min(el.scrollHeight, 200)}px`
   }
 
+  const insertTemplate = (tpl: PromptTemplate) => {
+    setText(tpl.content)
+    setShowTemplatePicker(false)
+    setTemplateSearch('')
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto'
+        textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`
+        textareaRef.current.focus()
+      }
+    }, 50)
+  }
+
+  const toggleMcpTool = (tool: McpTool) => {
+    const exists = mcpTools.some((t) => t.serverId === tool.serverId && t.name === tool.name)
+    setMcpTools(exists ? mcpTools.filter((t) => !(t.serverId === tool.serverId && t.name === tool.name)) : [...mcpTools, tool])
+  }
+
+  const filteredTemplates = templates.filter(
+    (t) => !templateSearch || t.title.toLowerCase().includes(templateSearch.toLowerCase()) || t.content.toLowerCase().includes(templateSearch.toLowerCase())
+  )
+
   const selectedKb = knowledgeBases.find((kb) => kb.id === selectedKnowledgeBaseId)
+
+  const pickerStyle: React.CSSProperties = {
+    position: 'absolute', bottom: '100%', left: 0, marginBottom: 6,
+    background: '#18181b', border: '1px solid #3f3f46', borderRadius: 8,
+    padding: 6, minWidth: 240, maxWidth: 340, zIndex: 50,
+    boxShadow: '0 4px 20px rgba(0,0,0,0.5)', maxHeight: 320, overflowY: 'auto'
+  }
 
   return (
     <div style={{ borderTop: '1px solid #27272a', padding: '12px 16px', background: '#09090b' }}>
       {/* Toolbar row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, position: 'relative' }}>
-        <ToolToggle
-          active={webSearchEnabled}
-          onClick={() => setWebSearchEnabled((v) => !v)}
-          icon="🔍"
-          label="Web Search"
-          tooltip="Inject search results as context"
-        />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+
+        {/* Web Search */}
+        <ToolToggle active={webSearchEnabled} onClick={() => setWebSearchEnabled((v) => !v)} icon="🔍" label="Web" tooltip="Inject web search results as context" />
 
         {/* Knowledge base picker */}
-        <div style={{ position: 'relative' }}>
-          <ToolToggle
-            active={!!selectedKnowledgeBaseId}
-            onClick={() => setShowKbPicker((v) => !v)}
-            icon="📚"
-            label={selectedKb ? selectedKb.name : 'Knowledge'}
-            tooltip="Attach a knowledge base"
-          />
+        <div style={{ position: 'relative' }} ref={kbRef}>
+          <ToolToggle active={!!selectedKnowledgeBaseId} onClick={() => setShowKbPicker((v) => !v)} icon="📚" label={selectedKb ? selectedKb.name : 'Knowledge'} tooltip="Attach a knowledge base" />
           {showKbPicker && (
-            <div
-              ref={pickerRef}
-              style={{
-                position: 'absolute', bottom: '100%', left: 0, marginBottom: 6,
-                background: '#18181b', border: '1px solid #3f3f46', borderRadius: 8,
-                padding: 6, minWidth: 200, zIndex: 50, boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
-              }}
-            >
-              <button
-                onClick={() => { onSelectKnowledgeBase(null); setShowKbPicker(false) }}
-                style={{
-                  display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px',
-                  background: !selectedKnowledgeBaseId ? 'rgba(255,255,255,0.08)' : 'transparent',
-                  border: 'none', borderRadius: 6, color: '#a1a1aa', cursor: 'pointer', fontSize: 12
-                }}
-              >
-                None
-              </button>
-              {knowledgeBases.length === 0 && (
-                <p style={{ fontSize: 11, color: '#52525b', padding: '4px 10px', margin: 0 }}>No knowledge bases yet</p>
-              )}
+            <div style={pickerStyle}>
+              <p style={{ fontSize: 10, color: '#71717a', padding: '2px 8px 6px', margin: 0 }}>KNOWLEDGE BASE</p>
+              <PickerItem active={!selectedKnowledgeBaseId} onClick={() => { onSelectKnowledgeBase(null); setShowKbPicker(false) }}>None</PickerItem>
+              {knowledgeBases.length === 0 && <p style={{ fontSize: 11, color: '#52525b', padding: '4px 10px', margin: 0 }}>No knowledge bases yet</p>}
               {knowledgeBases.map((kb) => (
-                <button
-                  key={kb.id}
-                  onClick={() => { onSelectKnowledgeBase(kb.id); setShowKbPicker(false) }}
-                  style={{
-                    display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px',
-                    background: selectedKnowledgeBaseId === kb.id ? 'rgba(37,99,235,0.2)' : 'transparent',
-                    border: 'none', borderRadius: 6,
-                    color: selectedKnowledgeBaseId === kb.id ? '#60a5fa' : '#fafafa',
-                    cursor: 'pointer', fontSize: 12
-                  }}
-                >
+                <PickerItem key={kb.id} active={selectedKnowledgeBaseId === kb.id} onClick={() => { onSelectKnowledgeBase(kb.id); setShowKbPicker(false) }}>
                   📚 {kb.name} <span style={{ color: '#52525b' }}>({kb.documentCount})</span>
-                </button>
+                </PickerItem>
               ))}
             </div>
           )}
         </div>
+
+        {/* Prompt template picker */}
+        <div style={{ position: 'relative' }} ref={tplRef}>
+          <ToolToggle active={showTemplatePicker} onClick={() => { setShowTemplatePicker((v) => !v); setTemplateSearch('') }} icon="📋" label="Templates" tooltip="Insert a prompt template" />
+          {showTemplatePicker && (
+            <div style={pickerStyle}>
+              <p style={{ fontSize: 10, color: '#71717a', padding: '2px 8px 4px', margin: 0 }}>PROMPT TEMPLATES</p>
+              <input
+                autoFocus
+                value={templateSearch}
+                onChange={(e) => setTemplateSearch(e.target.value)}
+                placeholder="Search templates…"
+                style={{ width: '100%', background: '#27272a', border: 'none', borderRadius: 6, color: '#fafafa', fontSize: 12, outline: 'none', padding: '5px 8px', boxSizing: 'border-box', marginBottom: 4 }}
+              />
+              {filteredTemplates.length === 0 && <p style={{ fontSize: 11, color: '#52525b', padding: '4px 10px', margin: 0 }}>No templates found</p>}
+              {filteredTemplates.map((t) => (
+                <PickerItem key={t.id} active={false} onClick={() => insertTemplate(t)}>
+                  <span style={{ fontWeight: 500 }}>{t.title}</span>
+                  <span style={{ color: '#52525b', fontSize: 11, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {t.content.slice(0, 60)}…
+                  </span>
+                </PickerItem>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* MCP tools picker */}
+        {allMcpTools.length > 0 && (
+          <div style={{ position: 'relative' }} ref={mcpRef}>
+            <ToolToggle active={mcpTools.length > 0} onClick={() => setShowMcpPicker((v) => !v)} icon="🔧" label={mcpTools.length > 0 ? `${mcpTools.length} tool${mcpTools.length > 1 ? 's' : ''}` : 'MCP Tools'} tooltip="Select MCP tools to include" />
+            {showMcpPicker && (
+              <div style={pickerStyle}>
+                <p style={{ fontSize: 10, color: '#71717a', padding: '2px 8px 6px', margin: 0 }}>MCP TOOLS</p>
+                {allMcpTools.map((tool) => {
+                  const active = mcpTools.some((t) => t.serverId === tool.serverId && t.name === tool.name)
+                  return (
+                    <PickerItem key={`${tool.serverId}:${tool.name}`} active={active} onClick={() => toggleMcpTool(tool)}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 12 }}>{active ? '✓' : '○'}</span>
+                        <span>
+                          <span style={{ fontWeight: 500 }}>{tool.name}</span>
+                          {tool.description && <span style={{ color: '#52525b', fontSize: 11, display: 'block' }}>{tool.description.slice(0, 60)}</span>}
+                        </span>
+                      </span>
+                    </PickerItem>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Input row */}
@@ -149,12 +214,28 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
           {streaming ? '⏹' : '↑'}
         </button>
       </div>
-      <p style={{ fontSize: 11, color: '#52525b', marginTop: 6, textAlign: 'center' }}>
-        Enter to send · Shift+Enter for newline
-        {webSearchEnabled ? ' · 🔍 Web search on' : ''}
-        {selectedKb ? ` · 📚 ${selectedKb.name}` : ''}
+      <p style={{ fontSize: 11, color: '#52525b', marginTop: 6, display: 'flex', justifyContent: 'space-between' }}>
+        <span>Enter to send · Shift+Enter for newline{webSearchEnabled ? ' · 🔍 Web on' : ''}{selectedKb ? ` · 📚 ${selectedKb.name}` : ''}{mcpTools.length > 0 ? ` · 🔧 ${mcpTools.length} tool${mcpTools.length > 1 ? 's' : ''}` : ''}</span>
+        <span style={{ color: '#3f3f46' }}>{text.length > 0 ? `${text.length}` : ''}</span>
       </p>
     </div>
+  )
+}
+
+function PickerItem({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px',
+        background: active ? 'rgba(37,99,235,0.2)' : 'transparent',
+        border: 'none', borderRadius: 6,
+        color: active ? '#60a5fa' : '#fafafa',
+        cursor: 'pointer', fontSize: 12, marginBottom: 2
+      }}
+    >
+      {children}
+    </button>
   )
 }
 

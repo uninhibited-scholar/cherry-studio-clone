@@ -148,6 +148,8 @@ export function HomePage(): React.ReactElement {
               disabled={!canChat}
               selectedKnowledgeBaseId={selectedKnowledgeBaseId}
               onSelectKnowledgeBase={setSelectedKnowledgeBaseId}
+              mcpTools={mcpTools}
+              setMcpTools={setMcpTools}
             />
           </>
         ) : (
