@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { IpcChannel } from '@shared/IpcChannel'
 import { ProvidersSettings } from './sections/ProvidersSettings'
 import { McpSettings } from './sections/McpSettings'
 import { WebSearchSettings } from './sections/WebSearchSettings'
@@ -57,14 +58,43 @@ export function SettingsPage(): React.ReactElement {
   )
 }
 
+const SHORTCUTS = [
+  { keys: '⌘N', label: 'New topic' },
+  { keys: '⌘E', label: 'Export conversation' },
+  { keys: '⌘F', label: 'Find in page' },
+  { keys: '⌘⇧Space', label: 'Show / hide window (tray)' },
+  { keys: 'Enter', label: 'Send message' },
+  { keys: '⇧Enter', label: 'New line in message' },
+  { keys: 'Esc', label: 'Close overlay / cancel edit' },
+  { keys: 'Double-click topic', label: 'Rename topic inline' },
+]
+
 function AboutSection() {
+  const [version, setVersion] = useState('…')
+
+  useEffect(() => {
+    window.api.invoke(IpcChannel.APP_VERSION).then((v) => setVersion(v as string))
+  }, [])
+
   return (
     <div>
       <h2 style={{ color: '#fafafa', fontSize: 18, marginBottom: 8 }}>Cherry Studio Clone</h2>
-      <p style={{ color: '#71717a', fontSize: 13 }}>Version 0.1.0 · Electron + React + TypeScript</p>
-      <p style={{ color: '#52525b', fontSize: 12, marginTop: 8 }}>
+      <p style={{ color: '#71717a', fontSize: 13 }}>Version {version} · Electron + React + TypeScript</p>
+      <p style={{ color: '#52525b', fontSize: 12, marginTop: 8, marginBottom: 24 }}>
         A from-scratch replication of Cherry Studio — an AI desktop client.
       </p>
+
+      <h3 style={{ color: '#a1a1aa', fontSize: 13, fontWeight: 600, letterSpacing: 1, marginBottom: 10 }}>KEYBOARD SHORTCUTS</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {SHORTCUTS.map(({ keys, label }) => (
+          <div key={keys} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <kbd style={{ background: '#27272a', border: '1px solid #3f3f46', borderRadius: 5, color: '#fafafa', fontSize: 12, minWidth: 120, padding: '3px 10px', textAlign: 'center', fontFamily: 'monospace' }}>
+              {keys}
+            </kbd>
+            <span style={{ color: '#71717a', fontSize: 13 }}>{label}</span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
