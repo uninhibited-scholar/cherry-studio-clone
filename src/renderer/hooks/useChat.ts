@@ -182,9 +182,44 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
     setMessages((prev) => prev.filter((m) => m.id !== id))
   }, [])
 
+  const regenerate = useCallback(async () => {
+    if (!topicId || !assistant || streaming) return
+    // Find last assistant message and delete it, then re-send the last user message
+    const lastAssistant = [...messages].reverse().find((m) => m.role === 'assistant')
+    const lastUser = [...messages].reverse().find((m) => m.role === 'user')
+    if (!lastAssistant || !lastUser) return
+    await window.api.invoke(IpcChannel.MESSAGES_DELETE, lastAssistant.id)
+    setMessages((prev) => prev.filter((m) => m.id !== lastAssistant.id))
+
+    const history = messages
+      .filter((m) => m.id !== lastAssistant.id)
+      .map((m) => ({ role: m.role as 'user' | 'assistant' | 'system', content: m.content }))
+
+    const requestId = `req-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    requestIdRef.current = requestId
+    setStreaming(true)
+    setStreamingText('')
+    firstUserMsgRef.current = lastUser.content
+
+    window.api.invoke(IpcChannel.AI_CHAT, {
+      requestId,
+      providerId: assistant.providerId,
+      modelId: assistant.modelId,
+      messages: history,
+      systemPrompt: assistant.prompt || undefined,
+      temperature: assistant.temperature,
+      mcpTools: mcpTools.length > 0
+        ? mcpTools.reduce<Record<string, { description: string; inputSchema: Record<string, unknown> }>>((acc, t) => {
+            acc[`${t.serverId}__${t.name}`] = { description: t.description, inputSchema: t.inputSchema }
+            return acc
+          }, {})
+        : undefined
+    })
+  }, [topicId, assistant, messages, streaming, mcpTools])
+
   return {
     messages, streaming, streamingText, searching,
-    sendMessage, abort, deleteMessage,
+    sendMessage, abort, deleteMessage, regenerate,
     selectedKnowledgeBaseId, setSelectedKnowledgeBaseId,
     mcpTools, setMcpTools
   }

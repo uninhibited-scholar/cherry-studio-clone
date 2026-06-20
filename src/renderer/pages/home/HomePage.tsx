@@ -18,7 +18,7 @@ export function HomePage(): React.ReactElement {
   const [showCreateModal, setShowCreateModal] = useState(false)
 
   const { topics, createTopic, deleteTopic, renameTopic } = useTopics(selectedAssistant?.id ?? null)
-  const { messages, streaming, streamingText, searching, sendMessage, abort, deleteMessage, selectedKnowledgeBaseId, setSelectedKnowledgeBaseId } = useChat(
+  const { messages, streaming, streamingText, searching, sendMessage, abort, deleteMessage, regenerate, selectedKnowledgeBaseId, setSelectedKnowledgeBaseId } = useChat(
     selectedTopic?.id ?? null,
     selectedAssistant
   )
@@ -139,6 +139,7 @@ export function HomePage(): React.ReactElement {
               streamingText={streamingText}
               streaming={streaming}
               onDelete={deleteMessage}
+              onRegenerate={regenerate}
               showTimestamps={prefs.showTimestamps}
             />
             <InputBar

@@ -7,10 +7,11 @@ type Props = {
   streamingText: string
   streaming: boolean
   onDelete?: (id: string) => void
+  onRegenerate?: () => void
   showTimestamps?: boolean
 }
 
-export function MessageThread({ messages, streamingText, streaming, onDelete, showTimestamps = false }: Props) {
+export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, showTimestamps = false }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -29,8 +30,15 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, sh
 
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: '16px 0', display: 'flex', flexDirection: 'column' }}>
-      {messages.map((msg) => (
-        <MessageBubble key={msg.id} message={msg} onDelete={onDelete} showTimestamp={showTimestamps} />
+      {messages.map((msg, idx) => (
+        <MessageBubble
+          key={msg.id}
+          message={msg}
+          onDelete={onDelete}
+          showTimestamp={showTimestamps}
+          isLast={idx === messages.length - 1}
+          onRegenerate={msg.role === 'assistant' && idx === messages.length - 1 && !streaming ? onRegenerate : undefined}
+        />
       ))}
       {streaming && (
         <MessageBubble
@@ -52,16 +60,21 @@ function MessageBubble({
   message,
   isStreaming,
   onDelete,
-  showTimestamp
+  onRegenerate,
+  showTimestamp,
+  isLast
 }: {
   message: Message
   isStreaming?: boolean
   onDelete?: (id: string) => void
+  onRegenerate?: () => void
   showTimestamp: boolean
+  isLast?: boolean
 }) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
   const [hovered, setHovered] = useState(false)
+  void isLast // suppress unused warning if not needed elsewhere
 
   const copy = () => {
     navigator.clipboard.writeText(message.content)
@@ -110,6 +123,14 @@ function MessageBubble({
               >
                 {copied ? '✓' : '⎘ Copy'}
               </button>
+              {onRegenerate && (
+                <button
+                  onClick={onRegenerate}
+                  style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                >
+                  ↺ Regenerate
+                </button>
+              )}
               {onDelete && message.id !== '__streaming__' && (
                 <button
                   onClick={() => onDelete(message.id)}
