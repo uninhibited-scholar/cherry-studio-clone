@@ -124,6 +124,20 @@ function MessageBubble({
           {showTimestamp && message.createdAt && (
             <p style={{ fontSize: 10, color: '#52525b', margin: '3px 0 0', textAlign: isUser ? 'right' : 'left' }}>
               {formatTime(message.createdAt)}
+              {!isUser && message.usage && (message.usage.inputTokens || message.usage.outputTokens) && (
+                <span style={{ marginLeft: 8 }}>
+                  {message.usage.inputTokens ? `↑${message.usage.inputTokens}` : ''}
+                  {message.usage.inputTokens && message.usage.outputTokens ? ' ' : ''}
+                  {message.usage.outputTokens ? `↓${message.usage.outputTokens}` : ''} tokens
+                </span>
+              )}
+            </p>
+          )}
+          {!showTimestamp && !isUser && !isStreaming && hovered && message.usage && (message.usage.inputTokens || message.usage.outputTokens) && (
+            <p style={{ fontSize: 10, color: '#3f3f46', margin: '3px 0 0' }}>
+              {message.usage.inputTokens ? `↑${message.usage.inputTokens}` : ''}
+              {message.usage.inputTokens && message.usage.outputTokens ? ' ' : ''}
+              {message.usage.outputTokens ? `↓${message.usage.outputTokens}` : ''} tokens
             </p>
           )}
         </div>
