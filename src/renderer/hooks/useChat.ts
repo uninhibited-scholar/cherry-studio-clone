@@ -182,6 +182,18 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
     setMessages((prev) => prev.filter((m) => m.id !== id))
   }, [])
 
+  const editResend = useCallback(async (messageId: string, newText: string) => {
+    if (!topicId || !assistant || streaming) return
+    // Delete the old user message and everything after it, then send new text
+    const idx = messages.findIndex((m) => m.id === messageId)
+    if (idx < 0) return
+    const toDelete = messages.slice(idx)
+    await Promise.all(toDelete.map((m) => window.api.invoke(IpcChannel.MESSAGES_DELETE, m.id)))
+    setMessages((prev) => prev.slice(0, idx))
+    // Now send the new text as a fresh user message
+    await sendMessage(newText)
+  }, [topicId, assistant, messages, streaming, sendMessage])
+
   const regenerate = useCallback(async () => {
     if (!topicId || !assistant || streaming) return
     // Find last assistant message and delete it, then re-send the last user message
@@ -219,7 +231,7 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
 
   return {
     messages, streaming, streamingText, searching,
-    sendMessage, abort, deleteMessage, regenerate,
+    sendMessage, abort, deleteMessage, regenerate, editResend,
     selectedKnowledgeBaseId, setSelectedKnowledgeBaseId,
     mcpTools, setMcpTools
   }

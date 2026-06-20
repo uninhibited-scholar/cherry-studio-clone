@@ -8,10 +8,11 @@ type Props = {
   streaming: boolean
   onDelete?: (id: string) => void
   onRegenerate?: () => void
+  onEditResend?: (id: string, newText: string) => void
   showTimestamps?: boolean
 }
 
-export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, showTimestamps = false }: Props) {
+export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, onEditResend, showTimestamps = false }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -38,6 +39,7 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
           showTimestamp={showTimestamps}
           isLast={idx === messages.length - 1}
           onRegenerate={msg.role === 'assistant' && idx === messages.length - 1 && !streaming ? onRegenerate : undefined}
+          onEditResend={msg.role === 'user' && idx === messages.length - 2 && !streaming ? onEditResend : undefined}
         />
       ))}
       {streaming && (
@@ -61,6 +63,7 @@ function MessageBubble({
   isStreaming,
   onDelete,
   onRegenerate,
+  onEditResend,
   showTimestamp,
   isLast
 }: {
@@ -68,13 +71,16 @@ function MessageBubble({
   isStreaming?: boolean
   onDelete?: (id: string) => void
   onRegenerate?: () => void
+  onEditResend?: (id: string, newText: string) => void
   showTimestamp: boolean
   isLast?: boolean
 }) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
   const [hovered, setHovered] = useState(false)
-  void isLast // suppress unused warning if not needed elsewhere
+  const [editing, setEditing] = useState(false)
+  const [editValue, setEditValue] = useState(message.content)
+  void isLast
 
   const copy = () => {
     navigator.clipboard.writeText(message.content)
@@ -96,6 +102,25 @@ function MessageBubble({
         )}
         <div style={{ flex: isUser ? undefined : 1 }}>
           {isUser ? (
+            editing ? (
+              <div>
+                <textarea
+                  autoFocus
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  rows={3}
+                  style={{ width: '100%', background: '#18181b', border: '1px solid #3f3f46', borderRadius: 8, color: '#fafafa', fontSize: 14, lineHeight: 1.6, outline: 'none', padding: '8px 12px', resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onEditResend?.(message.id, editValue.trim()); setEditing(false) }
+                    if (e.key === 'Escape') { setEditing(false); setEditValue(message.content) }
+                  }}
+                />
+                <div style={{ display: 'flex', gap: 6, marginTop: 6, justifyContent: 'flex-end' }}>
+                  <button onClick={() => { setEditing(false); setEditValue(message.content) }} style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 12, padding: '3px 10px', borderRadius: 4 }}>Cancel</button>
+                  <button onClick={() => { onEditResend?.(message.id, editValue.trim()); setEditing(false) }} style={{ background: '#2563eb', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 12, padding: '3px 10px', borderRadius: 4 }}>Resend</button>
+                </div>
+              </div>
+            ) : (
             <div style={{
               padding: '10px 14px',
               borderRadius: '16px 16px 4px 16px',
@@ -105,6 +130,7 @@ function MessageBubble({
             }}>
               {message.content}
             </div>
+            )
           ) : (
             <div style={{ color: '#e4e4e7', fontSize: 14 }}>
               <MarkdownContent content={message.content || (isStreaming ? '…' : '')} />
@@ -123,6 +149,14 @@ function MessageBubble({
               >
                 {copied ? '✓' : '⎘ Copy'}
               </button>
+              {onEditResend && !editing && (
+                <button
+                  onClick={() => { setEditing(true); setEditValue(message.content) }}
+                  style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                >
+                  ✎ Edit
+                </button>
+              )}
               {onRegenerate && (
                 <button
                   onClick={onRegenerate}
