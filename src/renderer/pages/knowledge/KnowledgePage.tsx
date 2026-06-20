@@ -58,6 +58,27 @@ export function KnowledgePage(): React.ReactElement {
     if (selectedBaseId === id) setSelectedBaseId(null)
   }
 
+  const handleImportFile = async () => {
+    if (!selectedBaseId) return
+    const paths = await window.api.invoke(IpcChannel.FILE_SELECT, {
+      multiple: true,
+      filters: [{ name: 'Text Files', extensions: ['txt', 'md', 'markdown', 'json', 'csv', 'html', 'xml', 'yaml', 'yml', 'rst'] }]
+    }) as string[]
+    for (const p of paths) {
+      try {
+        const content = await window.api.invoke(IpcChannel.FILE_READ, p) as string
+        const name = p.split('/').pop() ?? p
+        const doc = await window.api.invoke(IpcChannel.KNOWLEDGE_CREATE, {
+          knowledgeBaseId: selectedBaseId,
+          name, content,
+          type: p.endsWith('.md') || p.endsWith('.markdown') ? 'markdown' : 'text'
+        }) as KnowledgeDocument
+        setDocuments((prev) => [doc, ...prev])
+        setBases((prev) => prev.map((b) => b.id === selectedBaseId ? { ...b, documentCount: b.documentCount + 1 } : b))
+      } catch { /* skip unreadable files */ }
+    }
+  }
+
   const handleAddDoc = async () => {
     if (!selectedBaseId || !addDocName.trim() || !addDocContent.trim()) return
     const doc = await window.api.invoke(IpcChannel.KNOWLEDGE_CREATE, {
@@ -164,7 +185,10 @@ export function KnowledgePage(): React.ReactElement {
                   <p style={{ margin: '4px 0 0', fontSize: 12, color: '#71717a' }}>{selectedBase.description}</p>
                 )}
               </div>
-              <button onClick={() => setShowAddDoc(true)} style={btnPrimaryStyle}>+ Add Document</button>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button onClick={() => setShowAddDoc(true)} style={btnPrimaryStyle}>+ Add Document</button>
+                <button onClick={handleImportFile} style={{ ...btnPrimaryStyle, background: '#18181b', border: '1px solid #3f3f46', color: '#a1a1aa' }}>↑ Import Files</button>
+              </div>
             </div>
 
             <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>

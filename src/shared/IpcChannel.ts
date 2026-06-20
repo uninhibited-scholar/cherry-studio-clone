@@ -101,6 +101,12 @@ export const IpcChannel = {
   // Paintings (additional)
   PAINTINGS_SAVE: 'paintings:save',
 
+  // File utilities
+  FILE_SELECT: 'file:select',
+  FILE_READ: 'file:read',
+  OPEN_PATH: 'open:path',
+  OPEN_WEBSITE: 'open:website',
+
   // Menu events (main → renderer)
   MENU_NEW_TOPIC: 'menu:new-topic',
   MENU_EXPORT_TOPIC: 'menu:export-topic',

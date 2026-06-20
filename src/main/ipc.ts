@@ -287,6 +287,29 @@ export function registerIpcHandlers(): void {
     return result.filePath
   })
 
+  // ── File utilities ────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.FILE_SELECT, async (_event, { multiple = false, filters }: { multiple?: boolean; filters?: Electron.FileFilter[] } = {}) => {
+    const { dialog } = await import('electron')
+    const result = await dialog.showOpenDialog({
+      properties: multiple ? ['openFile', 'multiSelections'] : ['openFile'],
+      filters: filters ?? [{ name: 'All Files', extensions: ['*'] }]
+    })
+    return result.canceled ? [] : result.filePaths
+  })
+
+  ipcMain.handle(IpcChannel.FILE_READ, async (_event, filePath: string) => {
+    const { readFile } = await import('fs/promises')
+    return readFile(filePath, 'utf8')
+  })
+
+  ipcMain.handle(IpcChannel.OPEN_PATH, (_event, p: string) => {
+    shell.openPath(p)
+  })
+
+  ipcMain.handle(IpcChannel.OPEN_WEBSITE, (_event, url: string) => {
+    shell.openExternal(url)
+  })
+
   // ── Backup ───────────────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.BACKUP_EXPORT, async () => {
     const [providers, assistants, notes] = await Promise.all([
