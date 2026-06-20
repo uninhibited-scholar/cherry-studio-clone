@@ -31,7 +31,12 @@ export function AssistantSidebar({
   const [hoveredTopic, setHoveredTopic] = useState<string | null>(null)
   const [editingTopicId, setEditingTopicId] = useState<string | null>(null)
   const [editValue, setEditValue] = useState('')
+  const [search, setSearch] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const q = search.trim().toLowerCase()
+  const filteredAssistants = q ? assistants.filter((a) => a.name.toLowerCase().includes(q)) : assistants
+  const filteredTopics = q ? topics.filter((t) => t.title.toLowerCase().includes(q)) : topics
 
   useEffect(() => {
     if (editingTopicId && inputRef.current) {
@@ -70,8 +75,18 @@ export function AssistantSidebar({
         overflow: 'hidden'
       }}
     >
+      {/* Search */}
+      <div style={{ padding: '8px 8px 0' }}>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search…"
+          style={{ width: '100%', boxSizing: 'border-box', background: '#18181b', border: '1px solid #27272a', borderRadius: 6, color: '#fafafa', fontSize: 12, outline: 'none', padding: '5px 10px' }}
+        />
+      </div>
+
       {/* Assistants */}
-      <div style={{ padding: '12px 8px 4px', borderBottom: '1px solid #27272a' }}>
+      <div style={{ padding: '8px 8px 4px', borderBottom: '1px solid #27272a' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
           <span style={{ fontSize: 11, color: '#71717a', fontWeight: 600, letterSpacing: 1 }}>ASSISTANTS</span>
           <button
@@ -83,10 +98,10 @@ export function AssistantSidebar({
           </button>
         </div>
         <div style={{ maxHeight: 200, overflowY: 'auto' }}>
-          {assistants.length === 0 ? (
-            <p style={{ color: '#52525b', fontSize: 12, padding: '4px 8px' }}>No assistants yet</p>
+          {filteredAssistants.length === 0 ? (
+            <p style={{ color: '#52525b', fontSize: 12, padding: '4px 8px' }}>{assistants.length === 0 ? 'No assistants yet' : 'No match'}</p>
           ) : (
-            assistants.map((a) => (
+            filteredAssistants.map((a) => (
               <button
                 key={a.id}
                 onClick={() => onSelectAssistant(a)}
@@ -122,12 +137,12 @@ export function AssistantSidebar({
           )}
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 8px' }}>
-          {topics.length === 0 ? (
+          {filteredTopics.length === 0 ? (
             <p style={{ color: '#52525b', fontSize: 12, padding: '4px 0' }}>
-              {selectedAssistantId ? 'No topics yet' : 'Select an assistant'}
+              {!selectedAssistantId ? 'Select an assistant' : topics.length === 0 ? 'No topics yet' : 'No match'}
             </p>
           ) : (
-            topics.map((t) => (
+            filteredTopics.map((t) => (
               <div
                 key={t.id}
                 onMouseEnter={() => setHoveredTopic(t.id)}
