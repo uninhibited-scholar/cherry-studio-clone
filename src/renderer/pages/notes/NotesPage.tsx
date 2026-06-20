@@ -8,11 +8,16 @@ export function NotesPage(): React.ReactElement {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [noteSearch, setNoteSearch] = useState('')
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isDirty = useRef(false)
 
   const selectedNote = notes.find((n) => n.id === selectedId) ?? null
   const [preview, setPreview] = useState(false)
+
+  const filteredNotes = noteSearch.trim()
+    ? notes.filter((n) => n.title.toLowerCase().includes(noteSearch.toLowerCase()) || n.content.toLowerCase().includes(noteSearch.toLowerCase()))
+    : notes
 
   // Load notes
   const refresh = useCallback(async () => {
@@ -86,6 +91,15 @@ export function NotesPage(): React.ReactElement {
           </button>
         </div>
 
+        <div style={{ padding: '6px 8px', borderBottom: '1px solid #27272a' }}>
+          <input
+            value={noteSearch}
+            onChange={(e) => setNoteSearch(e.target.value)}
+            placeholder="Search notes…"
+            style={{ width: '100%', boxSizing: 'border-box', background: '#18181b', border: '1px solid #27272a', borderRadius: 6, color: '#fafafa', fontSize: 12, outline: 'none', padding: '5px 10px' }}
+          />
+        </div>
+
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {notes.length === 0 ? (
             <div style={{ padding: 24, textAlign: 'center', color: '#52525b' }}>
@@ -94,8 +108,10 @@ export function NotesPage(): React.ReactElement {
                 + New Note
               </button>
             </div>
+          ) : filteredNotes.length === 0 ? (
+            <p style={{ padding: 16, color: '#52525b', fontSize: 12 }}>No match</p>
           ) : (
-            notes.map((n) => (
+            filteredNotes.map((n) => (
               <NoteListItem
                 key={n.id}
                 note={n}
