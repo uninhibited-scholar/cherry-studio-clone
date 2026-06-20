@@ -10,10 +10,29 @@ type Props = {
   onRegenerate?: () => void
   onEditResend?: (id: string, newText: string) => void
   showTimestamps?: boolean
+  searchQuery?: string
 }
 
-export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, onEditResend, showTimestamps = false }: Props) {
+export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, onEditResend, showTimestamps = false, searchQuery = '' }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
+  const matchRefs = useRef<Array<HTMLDivElement | null>>([])
+  const [matchIdx, setMatchIdx] = useState(0)
+
+  const q = searchQuery.trim().toLowerCase()
+  const matchedIds = q
+    ? messages.filter((m) => m.content.toLowerCase().includes(q)).map((m) => m.id)
+    : []
+
+  useEffect(() => {
+    if (!q) { setMatchIdx(0); return }
+    setMatchIdx(0)
+  }, [q])
+
+  useEffect(() => {
+    if (matchedIds.length === 0) return
+    const el = matchRefs.current[matchIdx]
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [matchIdx, matchedIds.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -30,18 +49,36 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
   }
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: '16px 0', display: 'flex', flexDirection: 'column' }}>
-      {messages.map((msg, idx) => (
-        <MessageBubble
-          key={msg.id}
-          message={msg}
-          onDelete={onDelete}
-          showTimestamp={showTimestamps}
-          isLast={idx === messages.length - 1}
-          onRegenerate={msg.role === 'assistant' && idx === messages.length - 1 && !streaming ? onRegenerate : undefined}
-          onEditResend={msg.role === 'user' && idx === messages.length - 2 && !streaming ? onEditResend : undefined}
-        />
-      ))}
+    <div style={{ flex: 1, overflowY: 'auto', padding: '16px 0', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      {/* In-thread search nav */}
+      {q && matchedIds.length > 0 && (
+        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(9,9,11,0.9)', padding: '4px 16px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid #27272a' }}>
+          <span style={{ fontSize: 12, color: '#71717a' }}>{matchedIds.length} result{matchedIds.length > 1 ? 's' : ''}</span>
+          <button onClick={() => setMatchIdx((i) => Math.max(0, i - 1))} disabled={matchIdx === 0} style={navBtn}>↑</button>
+          <span style={{ fontSize: 12, color: '#a1a1aa' }}>{matchIdx + 1} / {matchedIds.length}</span>
+          <button onClick={() => setMatchIdx((i) => Math.min(matchedIds.length - 1, i + 1))} disabled={matchIdx === matchedIds.length - 1} style={navBtn}>↓</button>
+        </div>
+      )}
+      {q && matchedIds.length === 0 && (
+        <div style={{ padding: '6px 16px', fontSize: 12, color: '#71717a', background: 'rgba(9,9,11,0.9)', borderBottom: '1px solid #27272a' }}>No results</div>
+      )}
+      {messages.map((msg, idx) => {
+        const matchPos = matchedIds.indexOf(msg.id)
+        const isCurrentMatch = matchPos === matchIdx
+        return (
+          <div key={msg.id} ref={(el) => { if (matchPos >= 0) matchRefs.current[matchPos] = el }} style={isCurrentMatch ? { outline: '2px solid #2563eb', outlineOffset: -2, borderRadius: 8 } : undefined}>
+            <MessageBubble
+              message={msg}
+              onDelete={onDelete}
+              showTimestamp={showTimestamps}
+              isLast={idx === messages.length - 1}
+              onRegenerate={msg.role === 'assistant' && idx === messages.length - 1 && !streaming ? onRegenerate : undefined}
+              onEditResend={msg.role === 'user' && idx === messages.length - 2 && !streaming ? onEditResend : undefined}
+              highlightQuery={q}
+            />
+          </div>
+        )
+      })}
       {streaming && (
         <MessageBubble
           message={{ id: '__streaming__', topicId: '', role: 'assistant', content: streamingText, fileIds: [], createdAt: Date.now(), updatedAt: Date.now() }}
@@ -58,6 +95,11 @@ function formatTime(ts: number) {
   return new Date(ts).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
 }
 
+const navBtn: React.CSSProperties = {
+  background: 'none', border: '1px solid #3f3f46', borderRadius: 4, color: '#a1a1aa',
+  cursor: 'pointer', fontSize: 12, padding: '1px 7px'
+}
+
 function MessageBubble({
   message,
   isStreaming,
@@ -65,7 +107,8 @@ function MessageBubble({
   onRegenerate,
   onEditResend,
   showTimestamp,
-  isLast
+  isLast,
+  highlightQuery
 }: {
   message: Message
   isStreaming?: boolean
@@ -74,6 +117,7 @@ function MessageBubble({
   onEditResend?: (id: string, newText: string) => void
   showTimestamp: boolean
   isLast?: boolean
+  highlightQuery?: string
 }) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
@@ -81,6 +125,7 @@ function MessageBubble({
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState(message.content)
   void isLast
+  void highlightQuery
 
   const copy = () => {
     navigator.clipboard.writeText(message.content)

@@ -16,6 +16,8 @@ export function HomePage(): React.ReactElement {
   const [selectedAssistant, setSelectedAssistant] = useState<Assistant | null>(null)
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [msgSearch, setMsgSearch] = useState('')
+  const [showMsgSearch, setShowMsgSearch] = useState(false)
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     const saved = localStorage.getItem('cherry-clone:sidebar-width')
     return saved ? parseInt(saved) : 220
@@ -150,6 +152,25 @@ export function HomePage(): React.ReactElement {
             <span style={{ color: '#52525b', fontSize: 13 }}>Select an assistant to start</span>
           )}
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+            {showMsgSearch && selectedTopic && (
+              <input
+                autoFocus
+                value={msgSearch}
+                onChange={(e) => setMsgSearch(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Escape') { setShowMsgSearch(false); setMsgSearch('') } }}
+                placeholder="Search messages…"
+                style={{ background: '#18181b', border: '1px solid #3f3f46', borderRadius: 6, color: '#fafafa', fontSize: 12, outline: 'none', padding: '4px 10px', width: 200 }}
+              />
+            )}
+            {selectedTopic && (
+              <button
+                onClick={() => { setShowMsgSearch((v) => !v); if (showMsgSearch) setMsgSearch('') }}
+                title="Search messages (Cmd+F)"
+                style={{ background: showMsgSearch ? 'rgba(37,99,235,0.15)' : 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: showMsgSearch ? '#60a5fa' : '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px' }}
+              >
+                🔍
+              </button>
+            )}
             {searching && (
               <span style={{ color: '#60a5fa', fontSize: 12 }}>🔍 Searching…</span>
             )}
@@ -178,6 +199,7 @@ export function HomePage(): React.ReactElement {
               onRegenerate={regenerate}
               onEditResend={editResend}
               showTimestamps={prefs.showTimestamps}
+              searchQuery={msgSearch}
             />
             <InputBar
               onSend={sendMessage}
