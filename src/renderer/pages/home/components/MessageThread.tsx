@@ -12,12 +12,14 @@ type Props = {
   showTimestamps?: boolean
   searchQuery?: string
   autoScroll?: boolean
+  onMultiDelete?: (ids: string[]) => void
 }
 
-export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, onEditResend, showTimestamps = false, searchQuery = '', autoScroll = true }: Props) {
+export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, onEditResend, showTimestamps = false, searchQuery = '', autoScroll = true, onMultiDelete }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
   const matchRefs = useRef<Array<HTMLDivElement | null>>([])
   const [matchIdx, setMatchIdx] = useState(0)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
 
   const q = searchQuery.trim().toLowerCase()
   const matchedIds = q
@@ -39,6 +41,27 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
     if (autoScroll) bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length, streamingText, autoScroll])
 
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selected.size === messages.length) setSelected(new Set())
+    else setSelected(new Set(messages.map((m) => m.id)))
+  }
+
+  const deleteSelected = () => {
+    if (selected.size > 0 && onMultiDelete) {
+      onMultiDelete(Array.from(selected))
+      setSelected(new Set())
+    }
+  }
+
   if (messages.length === 0 && !streaming) {
     return (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#52525b' }}>
@@ -51,6 +74,25 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
 
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: '16px 0', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      {/* Multi-select toolbar */}
+      {selected.size > 0 && (
+        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(37,99,235,0.15)', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid #2563eb' }}>
+          <span style={{ fontSize: 12, color: '#60a5fa' }}>{selected.size} selected</span>
+          <button
+            onClick={deleteSelected}
+            style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: 12, textDecoration: 'underline' }}
+          >
+            Delete Selected
+          </button>
+          <button
+            onClick={() => setSelected(new Set())}
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#a1a1aa', cursor: 'pointer', fontSize: 12 }}
+          >
+            ✕ Cancel
+          </button>
+        </div>
+      )}
+
       {/* In-thread search nav */}
       {q && matchedIds.length > 0 && (
         <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(9,9,11,0.9)', padding: '4px 16px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid #27272a' }}>
@@ -66,9 +108,17 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
       {messages.map((msg, idx) => {
         const matchPos = matchedIds.indexOf(msg.id)
         const isCurrentMatch = matchPos === matchIdx
+        const isSelected = selected.has(msg.id)
         return (
-          <div key={msg.id} ref={(el) => { if (matchPos >= 0) matchRefs.current[matchPos] = el }} style={isCurrentMatch ? { outline: '2px solid #2563eb', outlineOffset: -2, borderRadius: 8 } : undefined}>
-            <MessageBubble
+          <div key={msg.id} ref={(el) => { if (matchPos >= 0) matchRefs.current[matchPos] = el }} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, paddingLeft: 8, ...(isCurrentMatch ? { outline: '2px solid #2563eb', outlineOffset: -2, borderRadius: 8 } : {}) }}>
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => toggleSelect(msg.id)}
+              style={{ marginTop: 6, accentColor: '#2563eb', cursor: 'pointer' }}
+            />
+            <div style={{ flex: 1 }}>
+              <MessageBubble
               message={msg}
               onDelete={onDelete}
               showTimestamp={showTimestamps}
@@ -76,7 +126,9 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
               onRegenerate={msg.role === 'assistant' && idx === messages.length - 1 && !streaming ? onRegenerate : undefined}
               onEditResend={msg.role === 'user' && idx === messages.length - 2 && !streaming ? onEditResend : undefined}
               highlightQuery={q}
+              isSelected={isSelected}
             />
+            </div>
           </div>
         )
       })}
@@ -109,7 +161,8 @@ function MessageBubble({
   onEditResend,
   showTimestamp,
   isLast,
-  highlightQuery
+  highlightQuery,
+  isSelected
 }: {
   message: Message
   isStreaming?: boolean
@@ -119,6 +172,7 @@ function MessageBubble({
   showTimestamp: boolean
   isLast?: boolean
   highlightQuery?: string
+  isSelected?: boolean
 }) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)

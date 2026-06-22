@@ -355,6 +355,7 @@ export function HomePage(): React.ReactElement {
               showTimestamps={prefs.showTimestamps}
               searchQuery={msgSearch}
               autoScroll={prefs.autoScrollToBottom}
+              onMultiDelete={(ids) => Promise.all(ids.map((id) => deleteMessage(id)))}
             />
             <InputBar
               onSend={(text, opts) => { sendMessage(text, opts); setDraft('') }}
