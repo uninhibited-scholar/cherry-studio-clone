@@ -21,6 +21,8 @@ export function HomePage(): React.ReactElement {
   const [showMsgSearch, setShowMsgSearch] = useState(false)
   const [draft, setDraft] = useState('')
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false)
+  const [sysPromptEdit, setSysPromptEdit] = useState(false)
+  const [tempSysPrompt, setTempSysPrompt] = useState('')
 
   const commands: Command[] = [
     { id: 'new-topic', label: 'New Topic', icon: '📝', onSelect: handleNewTopic },
@@ -214,13 +216,22 @@ export function HomePage(): React.ReactElement {
               />
             )}
             {selectedTopic && (
-              <button
-                onClick={() => { setShowMsgSearch((v) => !v); if (showMsgSearch) setMsgSearch('') }}
-                title="Search messages (Cmd+F)"
-                style={{ background: showMsgSearch ? 'rgba(37,99,235,0.15)' : 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: showMsgSearch ? '#60a5fa' : '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px' }}
-              >
-                🔍
-              </button>
+              <>
+                <button
+                  onClick={() => setSysPromptEdit((v) => !v)}
+                  title="Edit system prompt for this conversation"
+                  style={{ background: sysPromptEdit ? 'rgba(37,99,235,0.15)' : 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: sysPromptEdit ? '#60a5fa' : '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px' }}
+                >
+                  📝
+                </button>
+                <button
+                  onClick={() => { setShowMsgSearch((v) => !v); if (showMsgSearch) setMsgSearch('') }}
+                  title="Search messages"
+                  style={{ background: showMsgSearch ? 'rgba(37,99,235,0.15)' : 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: showMsgSearch ? '#60a5fa' : '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px' }}
+                >
+                  🔍
+                </button>
+              </>
             )}
             {searching && (
               <span style={{ color: '#60a5fa', fontSize: 12 }}>🔍 Searching…</span>
@@ -268,6 +279,21 @@ export function HomePage(): React.ReactElement {
 
         {selectedTopic ? (
           <>
+            {sysPromptEdit && selectedAssistant && (
+              <div style={{ background: '#18181b', borderBottom: '1px solid #27272a', padding: '12px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#fafafa' }}>System Prompt</span>
+                  <button onClick={() => setSysPromptEdit(false)} style={{ marginLeft: 'auto', fontSize: 11, background: 'none', border: 'none', color: '#52525b', cursor: 'pointer' }}>Close</button>
+                </div>
+                <textarea
+                  value={tempSysPrompt || selectedAssistant.prompt || ''}
+                  onChange={(e) => setTempSysPrompt(e.target.value)}
+                  placeholder="System prompt (affects this conversation only)"
+                  rows={3}
+                  style={{ width: '100%', background: '#27272a', border: '1px solid #3f3f46', borderRadius: 6, color: '#fafafa', padding: '8px 12px', fontFamily: 'monospace', fontSize: 12, outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
+                />
+              </div>
+            )}
             <MessageThread
               messages={messages}
               streamingText={streamingText}
