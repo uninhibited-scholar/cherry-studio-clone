@@ -8,6 +8,8 @@ type GeneralPrefs = {
   autoScrollToBottom: boolean
   theme: 'dark' | 'light'
   language: 'en' | 'zh'
+  useProxy: boolean
+  proxyUrl: string
 }
 
 const DEFAULT_PREFS: GeneralPrefs = {
@@ -16,7 +18,9 @@ const DEFAULT_PREFS: GeneralPrefs = {
   showTimestamps: false,
   autoScrollToBottom: true,
   theme: 'dark',
-  language: 'en'
+  language: 'en',
+  useProxy: false,
+  proxyUrl: ''
 }
 
 const PREFS_KEY = 'cherry-studio-clone:general-prefs'
@@ -172,6 +176,30 @@ export function GeneralSettings(): React.ReactElement {
           Launch on system startup
         </label>
         <p style={sublabel}>Start Cherry Studio automatically when you log in.</p>
+      </div>
+
+      <div style={row}>
+        <label style={label}>
+          <input
+            type="checkbox" checked={prefs.useProxy}
+            onChange={(e) => update('useProxy', e.target.checked)}
+          />
+          Use HTTP Proxy
+        </label>
+        <p style={sublabel}>Enable proxy for API requests (optional).</p>
+        {prefs.useProxy && (
+          <input
+            type="text"
+            value={prefs.proxyUrl}
+            onChange={(e) => update('proxyUrl', e.target.value)}
+            placeholder="http://proxy.example.com:8080"
+            style={{
+              marginTop: 8, width: '100%', background: '#27272a', border: '1px solid #3f3f46',
+              borderRadius: 6, color: '#fafafa', fontSize: 12, padding: '6px 10px', outline: 'none',
+              boxSizing: 'border-box'
+            }}
+          />
+        )}
       </div>
 
       <button
