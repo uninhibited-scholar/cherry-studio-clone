@@ -13,9 +13,10 @@ type Props = {
   searchQuery?: string
   autoScroll?: boolean
   onMultiDelete?: (ids: string[]) => void
+  onQuote?: (message: Message) => void
 }
 
-export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, onEditResend, showTimestamps = false, searchQuery = '', autoScroll = true, onMultiDelete }: Props) {
+export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, onEditResend, showTimestamps = false, searchQuery = '', autoScroll = true, onMultiDelete, onQuote }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
   const matchRefs = useRef<Array<HTMLDivElement | null>>([])
   const [matchIdx, setMatchIdx] = useState(0)
@@ -127,6 +128,7 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
               onEditResend={msg.role === 'user' && idx === messages.length - 2 && !streaming ? onEditResend : undefined}
               highlightQuery={q}
               isSelected={isSelected}
+              onQuote={onQuote}
             />
             </div>
           </div>
@@ -162,7 +164,8 @@ function MessageBubble({
   showTimestamp,
   isLast,
   highlightQuery,
-  isSelected
+  isSelected,
+  onQuote
 }: {
   message: Message
   isStreaming?: boolean
@@ -173,6 +176,7 @@ function MessageBubble({
   isLast?: boolean
   highlightQuery?: string
   isSelected?: boolean
+  onQuote?: (message: Message) => void
 }) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
@@ -280,6 +284,14 @@ function MessageBubble({
               >
                 ↓ MD
               </button>
+              {onQuote && (
+                <button
+                  onClick={() => onQuote(message)}
+                  style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                >
+                  💬 Quote
+                </button>
+              )}
               {onEditResend && !editing && (
                 <button
                   onClick={() => { setEditing(true); setEditValue(message.content) }}

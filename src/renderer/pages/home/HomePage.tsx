@@ -26,6 +26,7 @@ export function HomePage(): React.ReactElement {
   const [showStats, setShowStats] = useState(false)
   const [showModelMenu, setShowModelMenu] = useState(false)
   const [availableModels, setAvailableModels] = useState<any[]>([])
+  const [quotedMessage, setQuotedMessage] = useState<any>(null)
 
   const importTopic = async () => {
     const file = await window.api.invoke(IpcChannel.FILE_SELECT, { filters: [{ name: 'JSON', extensions: ['json'] }] }) as string | null
@@ -440,9 +441,24 @@ export function HomePage(): React.ReactElement {
               searchQuery={msgSearch}
               autoScroll={prefs.autoScrollToBottom}
               onMultiDelete={(ids) => Promise.all(ids.map((id) => deleteMessage(id)))}
+              onQuote={(msg) => setQuotedMessage(msg)}
             />
+            {quotedMessage && (
+              <div style={{ background: '#27272a', borderLeft: '3px solid #2563eb', padding: '8px 12px', marginBottom: 8, borderRadius: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ flex: 1, fontSize: 12, color: '#a1a1aa' }}>
+                  <div style={{ color: '#71717a', fontSize: 11, marginBottom: 2 }}>Replying to {quotedMessage.role === 'user' ? 'your message' : 'assistant'}</div>
+                  <div style={{ color: '#fafafa', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{quotedMessage.content.slice(0, 100)}{quotedMessage.content.length > 100 ? '…' : ''}</div>
+                </div>
+                <button
+                  onClick={() => setQuotedMessage(null)}
+                  style={{ background: 'none', border: 'none', color: '#52525b', cursor: 'pointer', fontSize: 16 }}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
             <InputBar
-              onSend={(text, opts) => { sendMessage(text, opts); setDraft('') }}
+              onSend={(text, opts) => { sendMessage(text, opts); setDraft(''); setQuotedMessage(null) }}
               onAbort={abort}
               streaming={streaming}
               disabled={!canChat}
