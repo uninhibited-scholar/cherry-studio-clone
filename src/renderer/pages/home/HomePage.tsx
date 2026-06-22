@@ -18,6 +18,21 @@ export function HomePage(): React.ReactElement {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [msgSearch, setMsgSearch] = useState('')
   const [showMsgSearch, setShowMsgSearch] = useState(false)
+  const [draft, setDraft] = useState('')
+
+  const getDraftKey = (topicId: string | null) => `cherry-clone:draft:${topicId}`
+
+  useEffect(() => {
+    if (selectedTopic) {
+      const saved = localStorage.getItem(getDraftKey(selectedTopic.id))
+      setDraft(saved ?? '')
+    }
+  }, [selectedTopic?.id])
+
+  const saveDraft = (text: string) => {
+    setDraft(text)
+    if (selectedTopic) localStorage.setItem(getDraftKey(selectedTopic.id), text)
+  }
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     const saved = localStorage.getItem('cherry-clone:sidebar-width')
     return saved ? parseInt(saved) : 220
@@ -203,7 +218,7 @@ export function HomePage(): React.ReactElement {
               autoScroll={prefs.autoScrollToBottom}
             />
             <InputBar
-              onSend={sendMessage}
+              onSend={(text, opts) => { sendMessage(text, opts); setDraft('') }}
               onAbort={abort}
               streaming={streaming}
               disabled={!canChat}
@@ -212,6 +227,8 @@ export function HomePage(): React.ReactElement {
               mcpTools={mcpTools}
               setMcpTools={setMcpTools}
               sendOnEnter={prefs.sendOnEnter}
+              draftText={draft}
+              onDraftChange={saveDraft}
             />
           </>
         ) : (

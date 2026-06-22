@@ -14,10 +14,21 @@ type Props = {
   mcpTools: McpTool[]
   setMcpTools: (tools: McpTool[]) => void
   sendOnEnter?: boolean
+  draftText?: string
+  onDraftChange?: (text: string) => void
 }
 
-export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowledgeBaseId, onSelectKnowledgeBase, mcpTools, setMcpTools, sendOnEnter = true }: Props) {
-  const [text, setText] = useState('')
+export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowledgeBaseId, onSelectKnowledgeBase, mcpTools, setMcpTools, sendOnEnter = true, draftText = '', onDraftChange }: Props) {
+  const [text, setText] = useState(draftText)
+
+  useEffect(() => {
+    setText(draftText)
+  }, [draftText])
+
+  useEffect(() => {
+    const timer = setTimeout(() => onDraftChange?.(text), 500)
+    return () => clearTimeout(timer)
+  }, [text, onDraftChange])
   const [webSearchEnabled, setWebSearchEnabled] = useState(false)
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([])
   const [showKbPicker, setShowKbPicker] = useState(false)
