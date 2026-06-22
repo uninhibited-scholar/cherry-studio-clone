@@ -29,6 +29,7 @@ export function HomePage(): React.ReactElement {
   const [quotedMessage, setQuotedMessage] = useState<any>(null)
   const [generatingSummary, setGeneratingSummary] = useState(false)
   const [topicSummary, setTopicSummary] = useState<string>('')
+  const [showSharePanel, setShowSharePanel] = useState(false)
 
   const importTopic = async () => {
     const file = await window.api.invoke(IpcChannel.FILE_SELECT, { filters: [{ name: 'JSON', extensions: ['json'] }] }) as string | null
@@ -206,6 +207,77 @@ export function HomePage(): React.ReactElement {
     }
   }
 
+  const exportAsFormat = (format: 'json' | 'markdown' | 'html') => {
+    if (!selectedTopic) return
+
+    let content = ''
+    const filename = `${selectedTopic.title || 'export'}.${format}`
+
+    if (format === 'json') {
+      content = JSON.stringify({ topic: selectedTopic, messages }, null, 2)
+    } else if (format === 'markdown') {
+      content = `# ${selectedTopic.title || 'Conversation'}\n\n`
+      content += `**Assistant:** ${selectedAssistant?.name}\n`
+      content += `**Date:** ${new Date().toLocaleString()}\n\n`
+      content += `---\n\n`
+      messages.forEach((m) => {
+        content += `## ${m.role === 'user' ? '👤 User' : '🤖 Assistant'}\n\n${m.content}\n\n`
+      })
+    } else if (format === 'html') {
+      const htmlMessages = messages
+        .map((m) => {
+          const isUser = m.role === 'user'
+          return `
+        <div style="margin: 16px 0; padding: 12px; border-radius: 8px; background: ${isUser ? '#2563eb' : '#27272a'}; color: #fafafa;">
+          <strong>${isUser ? '👤 You' : '🤖 Assistant'}</strong>
+          <p style="margin: 8px 0 0; white-space: pre-wrap;">${m.content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+        </div>
+      `
+        })
+        .join('')
+
+      content = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>${selectedTopic.title || 'Conversation'}</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 900px; margin: 0 auto; padding: 24px; background: #f5f5f5; }
+          .container { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+          h1 { margin: 0 0 8px; color: #09090b; }
+          .meta { font-size: 14px; color: #666; margin: 12px 0 24px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
+          .message { margin: 16px 0; padding: 12px; border-radius: 8px; }
+          .user-msg { background: #2563eb; color: white; }
+          .ai-msg { background: #27272a; color: #fafafa; }
+          strong { display: block; margin-bottom: 8px; }
+          p { margin: 8px 0; white-space: pre-wrap; word-break: break-word; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>${selectedTopic.title || 'Conversation'}</h1>
+          <div class="meta">
+            <strong>Assistant:</strong> ${selectedAssistant?.name || 'N/A'}<br>
+            <strong>Messages:</strong> ${messages.length}<br>
+            <strong>Exported:</strong> ${new Date().toLocaleString()}
+          </div>
+          ${htmlMessages}
+        </div>
+      </body>
+      </html>
+      `
+    }
+
+    const blob = new Blob([content], { type: format === 'json' ? 'application/json' : format === 'markdown' ? 'text/markdown' : 'text/html' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   // Handle menu events from main process
   useEffect(() => {
     const offNew = window.api.on(IpcChannel.MENU_NEW_TOPIC, () => {
@@ -365,27 +437,26 @@ export function HomePage(): React.ReactElement {
               </button>
             )}
             {selectedTopic && (
-              <div style={{ display: 'flex', gap: 6 }}>
-                <button
-                  title="Export as Markdown"
-                  onClick={() => window.api.invoke(IpcChannel.EXPORT_TOPIC, selectedTopic.id)}
-                  style={{
-                    background: 'transparent', border: '1px solid #3f3f46', borderRadius: 6,
-                    color: '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px'
-                  }}
-                >
-                  ↓ Markdown
-                </button>
-                <button
-                  title="Export as JSON with all messages"
-                  onClick={() => window.api.invoke(IpcChannel.EXPORT_TOPIC_JSON, { topic: selectedTopic, messages })}
-                  style={{
-                    background: 'transparent', border: '1px solid #3f3f46', borderRadius: 6,
-                    color: '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px'
-                  }}
-                >
-                  ↓ JSON
-                </button>
+              <div style={{ display: 'flex', gap: 6, position: 'relative' }}>
+                <div>
+                  <button
+                    title="Share and export this conversation"
+                    onClick={() => setShowSharePanel((v) => !v)}
+                    style={{
+                      background: showSharePanel ? 'rgba(37,99,235,0.15)' : 'transparent', border: '1px solid #3f3f46', borderRadius: 6,
+                      color: showSharePanel ? '#60a5fa' : '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px'
+                    }}
+                  >
+                    📤 Share
+                  </button>
+                  {showSharePanel && (
+                    <div style={{ position: 'absolute', top: 32, right: 0, background: '#18181b', border: '1px solid #27272a', borderRadius: 8, zIndex: 100, minWidth: 180, boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
+                      <button onClick={() => { exportAsFormat('json'); setShowSharePanel(false) }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 12, background: 'transparent', border: 'none', color: '#a1a1aa', cursor: 'pointer', borderBottom: '1px solid #27272a' }}>📄 Export as JSON</button>
+                      <button onClick={() => { exportAsFormat('markdown'); setShowSharePanel(false) }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 12, background: 'transparent', border: 'none', color: '#a1a1aa', cursor: 'pointer', borderBottom: '1px solid #27272a' }}>📝 Export as Markdown</button>
+                      <button onClick={() => { exportAsFormat('html'); setShowSharePanel(false) }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 12, background: 'transparent', border: 'none', color: '#a1a1aa', cursor: 'pointer' }}>🌐 Export as HTML</button>
+                    </div>
+                  )}
+                </div>
                 <button
                   title="Clear all messages in this topic"
                   onClick={() => {
