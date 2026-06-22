@@ -14,11 +14,28 @@ type HistoryEntry = {
 
 type HistorySearchResult = HistoryEntry & { matchedContent: string }
 
+type SearchFilters = {
+  query: string
+  dateFrom: string
+  dateTo: string
+  minLength: number
+  maxLength: number
+  starred: boolean | null
+}
+
 export function HistoryPage(): React.ReactElement {
   const [entries, setEntries] = useState<HistoryEntry[]>([])
-  const [query, setQuery] = useState('')
+  const [filters, setFilters] = useState<SearchFilters>({
+    query: '',
+    dateFrom: '',
+    dateTo: '',
+    minLength: 0,
+    maxLength: 10000,
+    starred: null
+  })
   const [results, setResults] = useState<HistorySearchResult[] | null>(null)
   const [loading, setLoading] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
   const navigate = useNavigate()
 
   const loadAll = useCallback(async () => {
@@ -31,9 +48,29 @@ export function HistoryPage(): React.ReactElement {
   useEffect(() => { loadAll() }, [loadAll])
 
   const handleSearch = async () => {
-    if (!query.trim()) { setResults(null); return }
+    if (!filters.query.trim() && !filters.dateFrom && !filters.dateTo) { setResults(null); return }
     setLoading(true)
-    const found = await window.api.invoke(IpcChannel.HISTORY_SEARCH, query) as HistorySearchResult[]
+    let found = await window.api.invoke(IpcChannel.HISTORY_SEARCH, filters.query) as HistorySearchResult[]
+
+    // Apply filters
+    found = found.filter(entry => {
+      // Date range
+      if (filters.dateFrom) {
+        const from = new Date(filters.dateFrom).getTime()
+        if (entry.updatedAt < from) return false
+      }
+      if (filters.dateTo) {
+        const to = new Date(filters.dateTo).getTime() + 86400000 // end of day
+        if (entry.updatedAt > to) return false
+      }
+
+      // Length
+      const length = entry.matchedContent.length
+      if (length < filters.minLength || length > filters.maxLength) return false
+
+      return true
+    })
+
     setResults(found)
     setLoading(false)
   }
@@ -63,22 +100,83 @@ export function HistoryPage(): React.ReactElement {
       {/* Header */}
       <div style={{ padding: '16px 24px', borderBottom: '1px solid #27272a', flexShrink: 0 }}>
         <h2 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>🕐 Conversation History</h2>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
           <input
-            value={query}
-            onChange={(e) => { setQuery(e.target.value); if (!e.target.value) setResults(null) }}
+            value={filters.query}
+            onChange={(e) => { setFilters({ ...filters, query: e.target.value }); if (!e.target.value) setResults(null) }}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSearch() }}
             placeholder="Search across all conversations…"
-            style={inputStyle}
+            style={{ ...inputStyle, flex: 1 }}
           />
           <button onClick={handleSearch} style={btnStyle}>Search</button>
+          <button onClick={() => setShowFilters((v) => !v)} title="Advanced filters" style={btnStyle}>⚙️ {showFilters ? 'Hide' : 'Show'}</button>
           {results !== null && (
-            <button onClick={() => { setResults(null); setQuery('') }} style={btnStyle}>✕</button>
+            <button onClick={() => { setResults(null); setFilters({ ...filters, query: '' }) }} style={btnStyle}>✕</button>
           )}
         </div>
+
+        {/* Advanced Filters */}
+        {showFilters && (
+          <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 8, padding: 12, marginBottom: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 12 }}>
+              {/* Date From */}
+              <div>
+                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4 }}>From Date</label>
+                <input
+                  type="date"
+                  value={filters.dateFrom}
+                  onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+
+              {/* Date To */}
+              <div>
+                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4 }}>To Date</label>
+                <input
+                  type="date"
+                  value={filters.dateTo}
+                  onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+
+              {/* Min Length */}
+              <div>
+                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4 }}>Min Length</label>
+                <input
+                  type="number"
+                  value={filters.minLength}
+                  onChange={(e) => setFilters({ ...filters, minLength: Number(e.target.value) })}
+                  style={inputStyle}
+                  placeholder="0"
+                />
+              </div>
+
+              {/* Max Length */}
+              <div>
+                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4 }}>Max Length</label>
+                <input
+                  type="number"
+                  value={filters.maxLength}
+                  onChange={(e) => setFilters({ ...filters, maxLength: Number(e.target.value) })}
+                  style={inputStyle}
+                  placeholder="10000"
+                />
+              </div>
+            </div>
+            <button
+              onClick={() => setFilters({ query: '', dateFrom: '', dateTo: '', minLength: 0, maxLength: 10000, starred: null })}
+              style={{ fontSize: 12, padding: '4px 8px', background: 'transparent', border: '1px solid #3f3f46', borderRadius: 4, color: '#a1a1aa', cursor: 'pointer' }}
+            >
+              Reset Filters
+            </button>
+          </div>
+        )}
+
         {results !== null && (
           <p style={{ fontSize: 11, color: '#71717a', marginTop: 6 }}>
-            {results.length} result{results.length !== 1 ? 's' : ''} for "{query}"
+            {results.length} result{results.length !== 1 ? 's' : ''} {filters.query ? `for "${filters.query}"` : 'with applied filters'}
           </p>
         )}
       </div>
