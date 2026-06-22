@@ -7,6 +7,7 @@ type GeneralPrefs = {
   showTimestamps: boolean
   autoScrollToBottom: boolean
   theme: 'dark' | 'light'
+  language: 'en' | 'zh'
 }
 
 const DEFAULT_PREFS: GeneralPrefs = {
@@ -14,7 +15,8 @@ const DEFAULT_PREFS: GeneralPrefs = {
   sendOnEnter: true,
   showTimestamps: false,
   autoScrollToBottom: true,
-  theme: 'dark'
+  theme: 'dark',
+  language: 'en'
 }
 
 const PREFS_KEY = 'cherry-studio-clone:general-prefs'
@@ -101,6 +103,29 @@ export function GeneralSettings(): React.ReactElement {
               }}
             >
               {t === 'dark' ? '🌙' : '☀️'} {t}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={row}>
+        <p style={{ ...label, cursor: 'default', marginBottom: 10 }}>Language</p>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {(['en', 'zh'] as const).map((lang) => (
+            <button
+              key={lang}
+              onClick={() => update('language', lang)}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 6,
+                border: prefs.language === lang ? '2px solid #2563eb' : '1px solid #3f3f46',
+                background: prefs.language === lang ? 'rgba(37,99,235,0.1)' : '#27272a',
+                color: prefs.language === lang ? '#60a5fa' : '#a1a1aa',
+                cursor: 'pointer',
+                fontSize: 12
+              }}
+            >
+              {lang === 'en' ? '🇬🇧 English' : '🇨🇳 中文'}
             </button>
           ))}
         </div>
