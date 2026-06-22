@@ -38,6 +38,10 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
   const [allMcpTools, setAllMcpTools] = useState<McpTool[]>([])
   const [templateSearch, setTemplateSearch] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [quickReplies, setQuickReplies] = useState<string[]>(() => {
+    const saved = localStorage.getItem('cherry-clone:quick-replies')
+    return saved ? JSON.parse(saved) : ['👍', 'Thanks!', 'OK, got it', 'Can you elaborate?']
+  })
   const kbRef = useRef<HTMLDivElement>(null)
   const tplRef = useRef<HTMLDivElement>(null)
   const mcpRef = useRef<HTMLDivElement>(null)
@@ -246,6 +250,34 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
           {streaming ? '⏹' : '↑'}
         </button>
       </div>
+
+      {/* Quick replies */}
+      {quickReplies.length > 0 && !disabled && (
+        <div style={{ marginTop: 8, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {quickReplies.map((reply, idx) => (
+            <button
+              key={idx}
+              onClick={() => setText(reply)}
+              title={`Quick reply: ${reply}`}
+              style={{
+                fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid #3f3f46',
+                background: 'transparent', color: '#a1a1aa', cursor: 'pointer', transition: 'all 0.15s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(37,99,235,0.1)'
+                e.currentTarget.style.color = '#60a5fa'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent'
+                e.currentTarget.style.color = '#a1a1aa'
+              }}
+            >
+              {reply.length > 20 ? reply.slice(0, 17) + '…' : reply}
+            </button>
+          ))}
+        </div>
+      )}
+
       <p style={{ fontSize: 11, color: '#52525b', marginTop: 6, display: 'flex', justifyContent: 'space-between' }}>
         <span>Enter to send · Shift+Enter for newline{webSearchEnabled ? ' · 🔍 Web on' : ''}{selectedKb ? ` · 📚 ${selectedKb.name}` : ''}{mcpTools.length > 0 ? ` · 🔧 ${mcpTools.length} tool${mcpTools.length > 1 ? 's' : ''}` : ''}</span>
         <span style={{ color: '#3f3f46' }}>{text.length > 0 ? `${text.length}` : ''}</span>
