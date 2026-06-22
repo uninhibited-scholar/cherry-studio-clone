@@ -6,6 +6,7 @@ import { AssistantSidebar } from './components/AssistantSidebar'
 import { MessageThread } from './components/MessageThread'
 import { InputBar } from './components/InputBar'
 import { CreateAssistantModal } from './components/CreateAssistantModal'
+import { CommandPalette, type Command } from '../../components/CommandPalette'
 import { IpcChannel } from '@shared/IpcChannel'
 import { loadGeneralPrefs } from '../settings/sections/GeneralSettings'
 import type { Assistant } from '@shared/data/types/assistant'
@@ -19,6 +20,26 @@ export function HomePage(): React.ReactElement {
   const [msgSearch, setMsgSearch] = useState('')
   const [showMsgSearch, setShowMsgSearch] = useState(false)
   const [draft, setDraft] = useState('')
+  const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false)
+
+  const commands: Command[] = [
+    { id: 'new-topic', label: 'New Topic', icon: '📝', onSelect: handleNewTopic },
+    { id: 'new-assistant', label: 'New Assistant', icon: '🤖', onSelect: () => setShowCreateModal(true) },
+    selectedTopic ? { id: 'export-md', label: 'Export as Markdown', icon: '↓', onSelect: () => window.api.invoke(IpcChannel.EXPORT_TOPIC, selectedTopic.id) } : null,
+    selectedTopic ? { id: 'export-json', label: 'Export as JSON', icon: '↓', onSelect: () => window.api.invoke(IpcChannel.EXPORT_TOPIC_JSON, { topic: selectedTopic, messages }) } : null,
+    { id: 'settings', label: 'Settings', icon: '⚙️', onSelect: () => window.location.hash = '#/settings' }
+  ].filter((c) => c !== null) as Command[]
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setCmdPaletteOpen((v) => !v)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const getDraftKey = (topicId: string | null) => `cherry-clone:draft:${topicId}`
 
@@ -110,7 +131,9 @@ export function HomePage(): React.ReactElement {
   }, [selectedAssistant, selectedTopic, handleNewTopic])
 
   return (
-    <div style={{ display: 'flex', height: '100%', background: '#09090b' }}>
+    <>
+      <CommandPalette commands={commands} isOpen={cmdPaletteOpen} onClose={() => setCmdPaletteOpen(false)} />
+      <div style={{ display: 'flex', height: '100%', background: '#09090b' }}>
       <div style={{ width: sidebarWidth, flexShrink: 0, display: 'flex' }}>
         <AssistantSidebar
           assistants={assistants}
@@ -304,6 +327,7 @@ export function HomePage(): React.ReactElement {
         onClose={() => setShowCreateModal(false)}
         onCreated={handleCreateAssistant}
       />
-    </div>
+      </div>
+    </>
   )
 }
