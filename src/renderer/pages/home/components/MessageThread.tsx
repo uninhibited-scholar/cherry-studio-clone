@@ -125,8 +125,18 @@ function MessageBubble({
   const [hovered, setHovered] = useState(false)
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState(message.content)
+  const [starred, setStarred] = useState(() => {
+    const saved = localStorage.getItem(`starred-msg:${message.id}`)
+    return saved === 'true'
+  })
   void isLast
   void highlightQuery
+
+  const toggleStar = () => {
+    const newState = !starred
+    setStarred(newState)
+    localStorage.setItem(`starred-msg:${message.id}`, String(newState))
+  }
 
   const copy = () => {
     navigator.clipboard.writeText(message.content)
@@ -189,6 +199,12 @@ function MessageBubble({
           {/* Action bar */}
           {!isStreaming && hovered && (
             <div style={{ display: 'flex', gap: 4, marginTop: 4, justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
+              <button
+                onClick={toggleStar}
+                style={{ background: 'none', border: '1px solid #3f3f46', color: starred ? '#fbbf24' : '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+              >
+                {starred ? '★' : '☆'} Star
+              </button>
               <button
                 onClick={copy}
                 style={{ background: 'none', border: '1px solid #3f3f46', color: copied ? '#4ade80' : '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
