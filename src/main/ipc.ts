@@ -456,6 +456,21 @@ export function registerIpcHandlers(): void {
   })
 
   // ── Notifications ────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.EXPORT_TOPIC_JSON, async (_event, { topic, messages }: { topic: unknown; messages: unknown[] }) => {
+    const { dialog } = await import('electron')
+    const { writeFile } = await import('fs/promises')
+    const topicData = { topic, messages, exportedAt: new Date().toISOString() }
+    const result = await dialog.showSaveDialog({
+      defaultPath: `topic-${Date.now()}.json`,
+      filters: [{ name: 'JSON Files', extensions: ['json'] }]
+    })
+    if (!result.canceled && result.filePath) {
+      await writeFile(result.filePath, JSON.stringify(topicData, null, 2))
+      return { ok: true, path: result.filePath }
+    }
+    return { ok: false }
+  })
+
   ipcMain.handle(IpcChannel.NOTIFY, (_event, { title, body }: { title: string; body: string }) => {
     const { Notification } = require('electron') as typeof import('electron')
     if (Notification.isSupported()) {

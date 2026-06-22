@@ -86,6 +86,7 @@ export const IpcChannel = {
 
   // Export
   EXPORT_TOPIC: 'export:topic',
+  EXPORT_TOPIC_JSON: 'export:topic:json',
 
   // Settings
   SETTINGS_GET: 'settings:get',

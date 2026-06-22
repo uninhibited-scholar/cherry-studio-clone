@@ -193,16 +193,28 @@ export function HomePage(): React.ReactElement {
               <span style={{ color: '#60a5fa', fontSize: 12 }}>🔍 Searching…</span>
             )}
             {selectedTopic && (
-              <button
-                title="Export conversation"
-                onClick={() => window.api.invoke(IpcChannel.EXPORT_TOPIC, selectedTopic.id)}
-                style={{
-                  background: 'transparent', border: '1px solid #3f3f46', borderRadius: 6,
-                  color: '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px'
-                }}
-              >
-                ↓ Export
-              </button>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button
+                  title="Export as Markdown"
+                  onClick={() => window.api.invoke(IpcChannel.EXPORT_TOPIC, selectedTopic.id)}
+                  style={{
+                    background: 'transparent', border: '1px solid #3f3f46', borderRadius: 6,
+                    color: '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px'
+                  }}
+                >
+                  ↓ Markdown
+                </button>
+                <button
+                  title="Export as JSON with all messages"
+                  onClick={() => window.api.invoke(IpcChannel.EXPORT_TOPIC_JSON, { topic: selectedTopic, messages })}
+                  style={{
+                    background: 'transparent', border: '1px solid #3f3f46', borderRadius: 6,
+                    color: '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px'
+                  }}
+                >
+                  ↓ JSON
+                </button>
+              </div>
             )}
           </div>
         </div>
