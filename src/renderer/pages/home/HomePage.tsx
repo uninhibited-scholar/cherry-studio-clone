@@ -23,6 +23,7 @@ export function HomePage(): React.ReactElement {
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false)
   const [sysPromptEdit, setSysPromptEdit] = useState(false)
   const [tempSysPrompt, setTempSysPrompt] = useState('')
+  const [showStats, setShowStats] = useState(false)
 
   const importTopic = async () => {
     const file = await window.api.invoke(IpcChannel.FILE_SELECT, { filters: [{ name: 'JSON', extensions: ['json'] }] }) as string | null
@@ -153,6 +154,16 @@ export function HomePage(): React.ReactElement {
   const canChat = Boolean(selectedTopic && selectedAssistant?.providerId && selectedAssistant?.modelId)
   const prefs = loadGeneralPrefs()
 
+  const stats = (() => {
+    if (!selectedTopic) return null
+    const totalMessages = messages.length
+    const userMessages = messages.filter((m) => m.role === 'user').length
+    const assistantMessages = messages.filter((m) => m.role === 'assistant').length
+    const totalWords = messages.reduce((sum, m) => sum + m.content.split(/\s+/).filter(Boolean).length, 0)
+    const totalTokens = messages.reduce((sum, m) => sum + (m.usage?.inputTokens ?? 0) + (m.usage?.outputTokens ?? 0), 0)
+    return { totalMessages, userMessages, assistantMessages, totalWords, totalTokens }
+  })()
+
   // Handle menu events from main process
   useEffect(() => {
     const offNew = window.api.on(IpcChannel.MENU_NEW_TOPIC, () => {
@@ -258,6 +269,15 @@ export function HomePage(): React.ReactElement {
             {searching && (
               <span style={{ color: '#60a5fa', fontSize: 12 }}>🔍 Searching…</span>
             )}
+            {selectedTopic && stats && (
+              <button
+                onClick={() => setShowStats((v) => !v)}
+                title="Toggle statistics"
+                style={{ background: showStats ? 'rgba(37,99,235,0.15)' : 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: showStats ? '#60a5fa' : '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px' }}
+              >
+                📊 {stats.totalMessages}
+              </button>
+            )}
             {selectedAssistant && (
               <button
                 title="Import topic from JSON file"
@@ -313,6 +333,37 @@ export function HomePage(): React.ReactElement {
 
         {selectedTopic ? (
           <>
+            {showStats && stats && selectedTopic && (
+              <div style={{ background: '#18181b', borderBottom: '1px solid #27272a', padding: '12px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#fafafa' }}>📊 Conversation Statistics</span>
+                  <button onClick={() => setShowStats(false)} style={{ marginLeft: 'auto', fontSize: 11, background: 'none', border: 'none', color: '#52525b', cursor: 'pointer' }}>Close</button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+                  <div style={{ background: '#27272a', padding: '8px 12px', borderRadius: 6, textAlign: 'center' }}>
+                    <div style={{ fontSize: 18, fontWeight: 600, color: '#fafafa' }}>{stats.totalMessages}</div>
+                    <div style={{ fontSize: 11, color: '#71717a', marginTop: 2 }}>Total Messages</div>
+                  </div>
+                  <div style={{ background: '#27272a', padding: '8px 12px', borderRadius: 6, textAlign: 'center' }}>
+                    <div style={{ fontSize: 18, fontWeight: 600, color: '#60a5fa' }}>{stats.userMessages}</div>
+                    <div style={{ fontSize: 11, color: '#71717a', marginTop: 2 }}>Your Messages</div>
+                  </div>
+                  <div style={{ background: '#27272a', padding: '8px 12px', borderRadius: 6, textAlign: 'center' }}>
+                    <div style={{ fontSize: 18, fontWeight: 600, color: '#a78bfa' }}>{stats.assistantMessages}</div>
+                    <div style={{ fontSize: 11, color: '#71717a', marginTop: 2 }}>AI Responses</div>
+                  </div>
+                  <div style={{ background: '#27272a', padding: '8px 12px', borderRadius: 6, textAlign: 'center' }}>
+                    <div style={{ fontSize: 18, fontWeight: 600, color: '#4ade80' }}>{stats.totalWords}</div>
+                    <div style={{ fontSize: 11, color: '#71717a', marginTop: 2 }}>Total Words</div>
+                  </div>
+                  <div style={{ background: '#27272a', padding: '8px 12px', borderRadius: 6, textAlign: 'center' }}>
+                    <div style={{ fontSize: 18, fontWeight: 600, color: '#fbbf24' }}>{stats.totalTokens}</div>
+                    <div style={{ fontSize: 11, color: '#71717a', marginTop: 2 }}>Total Tokens</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {sysPromptEdit && selectedAssistant && (
               <div style={{ background: '#18181b', borderBottom: '1px solid #27272a', padding: '12px 16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
