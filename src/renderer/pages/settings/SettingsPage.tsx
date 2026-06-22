@@ -12,6 +12,7 @@ const SECTIONS = [
   { key: 'providers', label: 'AI Providers', icon: '🔌' },
   { key: 'mcp', label: 'MCP Servers', icon: '🔧' },
   { key: 'web-search', label: 'Web Search', icon: '🔍' },
+  { key: 'shortcuts', label: 'Keyboard Shortcuts', icon: '⌨️' },
   { key: 'backup', label: 'Backup', icon: '💾' },
   { key: 'storage', label: 'Storage', icon: '🗄️' },
   { key: 'about', label: 'About', icon: 'ℹ️' }
@@ -50,6 +51,7 @@ export function SettingsPage(): React.ReactElement {
         {active === 'providers' && <ProvidersSettings />}
         {active === 'mcp' && <McpSettings />}
         {active === 'web-search' && <WebSearchSettings />}
+        {active === 'shortcuts' && <KeyboardSettings />}
         {active === 'backup' && <BackupSettings />}
         {active === 'storage' && <StorageSettings />}
         {active === 'about' && <AboutSection />}
@@ -58,11 +60,61 @@ export function SettingsPage(): React.ReactElement {
   )
 }
 
+const DEFAULT_SHORTCUTS: Record<string, string> = {
+  'cmd-k': 'Cmd+K',
+  'cmd-n': 'Cmd+N',
+  'cmd-shift-lt': 'Cmd+Shift+<',
+  'cmd-shift-gt': 'Cmd+Shift+>',
+  'send-message': 'Enter',
+  'new-line': 'Shift+Enter',
+}
+
+function KeyboardSettings() {
+  const [shortcuts, setShortcuts] = useState(() => {
+    const saved = localStorage.getItem('cherry-clone:shortcuts')
+    return saved ? JSON.parse(saved) : DEFAULT_SHORTCUTS
+  })
+
+  const updateShortcut = (key: string, value: string) => {
+    const updated = { ...shortcuts, [key]: value }
+    setShortcuts(updated)
+    localStorage.setItem('cherry-clone:shortcuts', JSON.stringify(updated))
+  }
+
+  return (
+    <div>
+      <h2 style={{ color: '#fafafa', fontSize: 18, marginBottom: 4 }}>Keyboard Shortcuts</h2>
+      <p style={{ color: '#71717a', fontSize: 13, marginBottom: 20 }}>
+        Customize keyboard shortcuts for quick actions.
+      </p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {Object.entries(shortcuts).map(([action, keys]) => (
+          <div key={action} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', background: '#111113', borderRadius: 8, border: '1px solid #27272a' }}>
+            <span style={{ color: '#a1a1aa', fontSize: 13, minWidth: 150, textTransform: 'capitalize' }}>
+              {action.replace(/-/g, ' ')}
+            </span>
+            <input
+              value={keys as string}
+              onChange={(e) => updateShortcut(action, e.target.value)}
+              placeholder="e.g. Cmd+K"
+              style={{
+                flex: 1, background: '#27272a', border: '1px solid #3f3f46', borderRadius: 6,
+                color: '#fafafa', fontSize: 12, padding: '6px 10px', outline: 'none'
+              }}
+            />
+            <span style={{ fontSize: 11, color: '#52525b' }}>Custom</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const SHORTCUTS = [
+  { keys: '⌘K', label: 'Command palette' },
   { keys: '⌘N', label: 'New topic' },
-  { keys: '⌘E', label: 'Export conversation' },
-  { keys: '⌘F', label: 'Find in page' },
-  { keys: '⌘⇧Space', label: 'Show / hide window (tray)' },
+  { keys: '⌘⇧<', label: 'Previous assistant' },
+  { keys: '⌘⇧>', label: 'Next assistant' },
   { keys: 'Enter', label: 'Send message' },
   { keys: '⇧Enter', label: 'New line in message' },
   { keys: 'Esc', label: 'Close overlay / cancel edit' },
