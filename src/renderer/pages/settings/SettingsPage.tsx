@@ -71,16 +71,42 @@ const SHORTCUTS = [
 
 function AboutSection() {
   const [version, setVersion] = useState('…')
+  const [checking, setChecking] = useState(false)
+  const [updateInfo, setUpdateInfo] = useState<{ hasUpdate: boolean; latest: string } | null>(null)
 
   useEffect(() => {
     window.api.invoke(IpcChannel.APP_VERSION).then((v) => setVersion(v as string))
   }, [])
 
+  const checkUpdate = async () => {
+    setChecking(true)
+    try {
+      const info = await window.api.invoke(IpcChannel.APP_CHECK_UPDATE) as { hasUpdate: boolean; latest: string; current: string }
+      setUpdateInfo(info)
+    } finally {
+      setChecking(false)
+    }
+  }
+
   return (
     <div>
       <h2 style={{ color: '#fafafa', fontSize: 18, marginBottom: 8 }}>Cherry Studio Clone</h2>
       <p style={{ color: '#71717a', fontSize: 13 }}>Version {version} · Electron + React + TypeScript</p>
-      <p style={{ color: '#52525b', fontSize: 12, marginTop: 8, marginBottom: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, marginBottom: 24 }}>
+        <button
+          onClick={checkUpdate}
+          disabled={checking}
+          style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid #3f3f46', background: '#27272a', color: '#a1a1aa', cursor: 'pointer', fontSize: 12 }}
+        >
+          {checking ? 'Checking…' : 'Check for Updates'}
+        </button>
+        {updateInfo && (
+          <span style={{ fontSize: 12, color: updateInfo.hasUpdate ? '#fbbf24' : '#71717a' }}>
+            {updateInfo.hasUpdate ? `Update available: v${updateInfo.latest}` : 'You are up to date'}
+          </span>
+        )}
+      </div>
+      <p style={{ color: '#52525b', fontSize: 12, marginBottom: 24 }}>
         A from-scratch replication of Cherry Studio — an AI desktop client.
       </p>
 

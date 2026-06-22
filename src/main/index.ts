@@ -1,4 +1,4 @@
-import { app } from 'electron'
+import { app, BrowserWindow, globalShortcut } from 'electron'
 import { application } from './core/application'
 import { createTray, destroyTray } from './services/TrayService'
 import { buildAndSetAppMenu } from './services/AppMenuService'
@@ -14,6 +14,23 @@ app.whenReady().then(async () => {
   buildAndSetAppMenu()
   await application.bootstrap()
   createTray()
+
+  // Register zoom shortcuts
+  const registerZoomShortcuts = () => {
+    globalShortcut.register('CommandOrControl+Equal', () => {
+      const win = BrowserWindow.getFocusedWindow()
+      if (win) win.webContents.zoomFactor = Math.min(2, win.webContents.zoomFactor + 0.1)
+    })
+    globalShortcut.register('CommandOrControl+Minus', () => {
+      const win = BrowserWindow.getFocusedWindow()
+      if (win) win.webContents.zoomFactor = Math.max(0.5, win.webContents.zoomFactor - 0.1)
+    })
+    globalShortcut.register('CommandOrControl+0', () => {
+      const win = BrowserWindow.getFocusedWindow()
+      if (win) win.webContents.zoomFactor = 1
+    })
+  }
+  registerZoomShortcuts()
 })
 
 // Keep the app alive in the tray when the last window is closed.

@@ -473,5 +473,17 @@ export function registerIpcHandlers(): void {
     return process.env.npm_package_version ?? '0.1.0'
   })
 
+  ipcMain.handle(IpcChannel.APP_CHECK_UPDATE, async () => {
+    const current = process.env.npm_package_version ?? '0.1.0'
+    try {
+      const res = await fetch('https://api.github.com/repos/uninhibited-scholar/cherry-studio-clone/releases/latest', { timeout: 5000 }).then((r) => r.json()) as Record<string, unknown>
+      const latest = (res.tag_name as string)?.replace('v', '') ?? current
+      const hasUpdate = latest > current
+      return { current, latest, hasUpdate }
+    } catch {
+      return { current, latest: current, hasUpdate: false }
+    }
+  })
+
   logger.info('All IPC handlers registered')
 }

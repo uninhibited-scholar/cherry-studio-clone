@@ -11,9 +11,10 @@ type Props = {
   onEditResend?: (id: string, newText: string) => void
   showTimestamps?: boolean
   searchQuery?: string
+  autoScroll?: boolean
 }
 
-export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, onEditResend, showTimestamps = false, searchQuery = '' }: Props) {
+export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, onEditResend, showTimestamps = false, searchQuery = '', autoScroll = true }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
   const matchRefs = useRef<Array<HTMLDivElement | null>>([])
   const [matchIdx, setMatchIdx] = useState(0)
@@ -35,8 +36,8 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
   }, [matchIdx, matchedIds.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages.length, streamingText])
+    if (autoScroll) bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages.length, streamingText, autoScroll])
 
   if (messages.length === 0 && !streaming) {
     return (

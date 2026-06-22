@@ -125,6 +125,7 @@ export const IpcChannel = {
 
   // App
   APP_VERSION: 'app:version',
+  APP_CHECK_UPDATE: 'app:check-update',
   APP_READY: 'app:ready'
 } as const
 

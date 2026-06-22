@@ -13,9 +13,10 @@ type Props = {
   onSelectKnowledgeBase: (id: string | null) => void
   mcpTools: McpTool[]
   setMcpTools: (tools: McpTool[]) => void
+  sendOnEnter?: boolean
 }
 
-export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowledgeBaseId, onSelectKnowledgeBase, mcpTools, setMcpTools }: Props) {
+export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowledgeBaseId, onSelectKnowledgeBase, mcpTools, setMcpTools, sendOnEnter = true }: Props) {
   const [text, setText] = useState('')
   const [webSearchEnabled, setWebSearchEnabled] = useState(false)
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([])
@@ -64,9 +65,12 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
+      if (e.key === 'Enter') {
+        const shouldSend = sendOnEnter ? !e.shiftKey : e.shiftKey
+        if (shouldSend) { e.preventDefault(); handleSend() }
+      }
     },
-    [handleSend]
+    [handleSend, sendOnEnter]
   )
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

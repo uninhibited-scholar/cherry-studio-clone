@@ -200,6 +200,7 @@ export function HomePage(): React.ReactElement {
               onEditResend={editResend}
               showTimestamps={prefs.showTimestamps}
               searchQuery={msgSearch}
+              autoScroll={prefs.autoScrollToBottom}
             />
             <InputBar
               onSend={sendMessage}
@@ -210,6 +211,7 @@ export function HomePage(): React.ReactElement {
               onSelectKnowledgeBase={setSelectedKnowledgeBaseId}
               mcpTools={mcpTools}
               setMcpTools={setMcpTools}
+              sendOnEnter={prefs.sendOnEnter}
             />
           </>
         ) : (
