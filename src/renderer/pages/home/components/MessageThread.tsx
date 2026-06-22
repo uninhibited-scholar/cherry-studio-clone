@@ -265,6 +265,21 @@ function MessageBubble({
               >
                 {copied ? '✓' : '⎘ Copy'}
               </button>
+              <button
+                onClick={() => {
+                  const md = `# ${isUser ? 'User' : 'Assistant'} Message\n\n${message.content}`
+                  const blob = new Blob([md], { type: 'text/markdown' })
+                  const url = URL.createObjectURL(blob)
+                  const a = document.createElement('a')
+                  a.href = url
+                  a.download = `message-${message.id.slice(0, 8)}.md`
+                  a.click()
+                  URL.revokeObjectURL(url)
+                }}
+                style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+              >
+                ↓ MD
+              </button>
               {onEditResend && !editing && (
                 <button
                   onClick={() => { setEditing(true); setEditValue(message.content) }}
