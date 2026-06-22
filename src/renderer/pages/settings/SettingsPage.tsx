@@ -13,6 +13,7 @@ const SECTIONS = [
   { key: 'mcp', label: 'MCP Servers', icon: '🔧' },
   { key: 'web-search', label: 'Web Search', icon: '🔍' },
   { key: 'shortcuts', label: 'Keyboard Shortcuts', icon: '⌨️' },
+  { key: 'performance', label: 'Performance & Usage', icon: '📊' },
   { key: 'backup', label: 'Backup', icon: '💾' },
   { key: 'storage', label: 'Storage', icon: '🗄️' },
   { key: 'about', label: 'About', icon: 'ℹ️' }
@@ -52,10 +53,115 @@ export function SettingsPage(): React.ReactElement {
         {active === 'mcp' && <McpSettings />}
         {active === 'web-search' && <WebSearchSettings />}
         {active === 'shortcuts' && <KeyboardSettings />}
+        {active === 'performance' && <PerformanceSettings />}
         {active === 'backup' && <BackupSettings />}
         {active === 'storage' && <StorageSettings />}
         {active === 'about' && <AboutSection />}
       </div>
+    </div>
+  )
+}
+
+function PerformanceSettings() {
+  const [stats, setStats] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem('cherry-clone:api-stats')
+    return saved ? JSON.parse(saved) : {
+      totalCalls: 0,
+      totalTokens: 0,
+      totalTime: 0,
+      avgTime: 0,
+      estimatedCost: 0
+    }
+  })
+
+  const resetStats = () => {
+    const reset = {
+      totalCalls: 0,
+      totalTokens: 0,
+      totalTime: 0,
+      avgTime: 0,
+      estimatedCost: 0
+    }
+    setStats(reset)
+    localStorage.setItem('cherry-clone:api-stats', JSON.stringify(reset))
+  }
+
+  const tokenCostEstimate = (tokens: number) => {
+    // Rough estimate: $0.0005 per 1K tokens input, $0.0015 per 1K tokens output
+    return (tokens / 1000) * 0.001
+  }
+
+  return (
+    <div>
+      <h2 style={{ color: '#fafafa', fontSize: 18, marginBottom: 4 }}>Performance & Usage</h2>
+      <p style={{ color: '#71717a', fontSize: 13, marginBottom: 24 }}>API usage statistics and performance metrics.</p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+        {/* Total API Calls */}
+        <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 10, padding: 16 }}>
+          <p style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 8 }}>Total API Calls</p>
+          <div style={{ fontSize: 28, fontWeight: 600, color: '#60a5fa' }}>{stats.totalCalls}</div>
+          <p style={{ fontSize: 11, color: '#52525b', marginTop: 8 }}>API requests sent</p>
+        </div>
+
+        {/* Total Tokens */}
+        <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 10, padding: 16 }}>
+          <p style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 8 }}>Total Tokens Used</p>
+          <div style={{ fontSize: 28, fontWeight: 600, color: '#4ade80' }}>{(stats.totalTokens / 1000).toFixed(1)}K</div>
+          <p style={{ fontSize: 11, color: '#52525b', marginTop: 8 }}>Input + Output tokens</p>
+        </div>
+
+        {/* Avg Response Time */}
+        <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 10, padding: 16 }}>
+          <p style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 8 }}>Avg Response Time</p>
+          <div style={{ fontSize: 28, fontWeight: 600, color: '#fbbf24' }}>{stats.avgTime.toFixed(0)}ms</div>
+          <p style={{ fontSize: 11, color: '#52525b', marginTop: 8 }}>Average latency</p>
+        </div>
+
+        {/* Total Time */}
+        <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 10, padding: 16 }}>
+          <p style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 8 }}>Total API Time</p>
+          <div style={{ fontSize: 28, fontWeight: 600, color: '#a78bfa' }}>{(stats.totalTime / 1000).toFixed(1)}s</div>
+          <p style={{ fontSize: 11, color: '#52525b', marginTop: 8 }}>Cumulative wait time</p>
+        </div>
+
+        {/* Estimated Cost */}
+        <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 10, padding: 16 }}>
+          <p style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 8 }}>Est. Cost</p>
+          <div style={{ fontSize: 28, fontWeight: 600, color: '#f87171' }}>${stats.estimatedCost.toFixed(3)}</div>
+          <p style={{ fontSize: 11, color: '#52525b', marginTop: 8 }}>Rough API cost estimate</p>
+        </div>
+
+        {/* Efficiency */}
+        <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 10, padding: 16 }}>
+          <p style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 8 }}>Efficiency</p>
+          <div style={{ fontSize: 28, fontWeight: 600, color: '#06b6d4' }}>
+            {stats.totalCalls > 0 ? (stats.totalTokens / stats.totalCalls).toFixed(0) : 0}
+          </div>
+          <p style={{ fontSize: 11, color: '#52525b', marginTop: 8 }}>Avg tokens per call</p>
+        </div>
+      </div>
+
+      <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 10, padding: 16, marginBottom: 20 }}>
+        <h3 style={{ color: '#fafafa', fontSize: 14, marginBottom: 12 }}>💡 Notes</h3>
+        <ul style={{ color: '#a1a1aa', fontSize: 12, margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+          <li>Statistics are calculated locally on your device.</li>
+          <li>Cost estimates are rough approximations based on typical token pricing.</li>
+          <li>Actual API costs depend on your provider's pricing model.</li>
+          <li>Response time is measured from request sent to response received.</li>
+        </ul>
+      </div>
+
+      <button
+        onClick={resetStats}
+        style={{
+          padding: '8px 20px', borderRadius: 6, border: 'none',
+          background: '#7f1d1d', color: '#fef2f2',
+          cursor: 'pointer', fontSize: 13
+        }}
+      >
+        🗑 Reset Statistics
+      </button>
     </div>
   )
 }

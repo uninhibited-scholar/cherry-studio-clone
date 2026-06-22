@@ -57,6 +57,17 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
 
       if (!topicId) return
 
+      // Record API statistics
+      const stats = (() => {
+        const saved = localStorage.getItem('cherry-clone:api-stats')
+        return saved ? JSON.parse(saved) : { totalCalls: 0, totalTokens: 0, totalTime: 0, avgTime: 0, estimatedCost: 0 }
+      })()
+      const totalTokens = (usage?.inputTokens ?? 0) + (usage?.outputTokens ?? 0)
+      stats.totalCalls += 1
+      stats.totalTokens += totalTokens
+      stats.estimatedCost += (totalTokens / 1000) * 0.001
+      localStorage.setItem('cherry-clone:api-stats', JSON.stringify(stats))
+
       // Send system notification if app is backgrounded
       if (!error && text && document.hidden) {
         window.api.invoke(IpcChannel.NOTIFY, {
