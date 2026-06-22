@@ -317,7 +317,24 @@ export function HomePage(): React.ReactElement {
               <div style={{ background: '#18181b', borderBottom: '1px solid #27272a', padding: '12px 16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <span style={{ fontSize: 12, fontWeight: 600, color: '#fafafa' }}>System Prompt</span>
-                  <button onClick={() => setSysPromptEdit(false)} style={{ marginLeft: 'auto', fontSize: 11, background: 'none', border: 'none', color: '#52525b', cursor: 'pointer' }}>Close</button>
+                  <button
+                    onClick={async () => {
+                      const text = tempSysPrompt || selectedAssistant.prompt || ''
+                      if (text.trim()) {
+                        const name = prompt('Save this prompt as:', 'My Prompt')
+                        if (name) {
+                          await window.api.invoke(IpcChannel.LIBRARY_CREATE, {
+                            name: name.trim(), content: text, category: 'System Prompts'
+                          })
+                        }
+                      }
+                    }}
+                    title="Save this system prompt to Library"
+                    style={{ marginLeft: 'auto', fontSize: 11, background: 'none', border: '1px solid #3f3f46', color: '#a1a1aa', cursor: 'pointer', padding: '2px 8px', borderRadius: 4 }}
+                  >
+                    💾 Save
+                  </button>
+                  <button onClick={() => setSysPromptEdit(false)} style={{ fontSize: 11, background: 'none', border: 'none', color: '#52525b', cursor: 'pointer' }}>Close</button>
                 </div>
                 <textarea
                   value={tempSysPrompt || selectedAssistant.prompt || ''}
