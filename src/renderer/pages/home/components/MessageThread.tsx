@@ -21,6 +21,10 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
   const matchRefs = useRef<Array<HTMLDivElement | null>>([])
   const [matchIdx, setMatchIdx] = useState(0)
   const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [reactions, setReactions] = useState<Record<string, Record<string, number>>>(() => {
+    const saved = localStorage.getItem('cherry-clone:message-reactions')
+    return saved ? JSON.parse(saved) : {}
+  })
 
   const q = searchQuery.trim().toLowerCase()
   const matchedIds = q
@@ -61,6 +65,20 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
       onMultiDelete(Array.from(selected))
       setSelected(new Set())
     }
+  }
+
+  const toggleReaction = (msgId: string, emoji: string) => {
+    const updated = { ...reactions }
+    if (!updated[msgId]) updated[msgId] = {}
+    if (updated[msgId][emoji]) {
+      updated[msgId][emoji]--
+      if (updated[msgId][emoji] === 0) delete updated[msgId][emoji]
+    } else {
+      updated[msgId][emoji] = 1
+    }
+    if (Object.keys(updated[msgId]).length === 0) delete updated[msgId]
+    setReactions(updated)
+    localStorage.setItem('cherry-clone:message-reactions', JSON.stringify(updated))
   }
 
   if (messages.length === 0 && !streaming) {
@@ -129,6 +147,8 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
               highlightQuery={q}
               isSelected={isSelected}
               onQuote={onQuote}
+              reactions={reactions[msg.id] ?? {}}
+              onToggleReaction={(emoji) => toggleReaction(msg.id, emoji)}
             />
             </div>
           </div>
@@ -155,6 +175,8 @@ const navBtn: React.CSSProperties = {
   cursor: 'pointer', fontSize: 12, padding: '1px 7px'
 }
 
+const QUICK_REACTIONS = ['👍', '❤️', '😂', '🔥', '👀', '🎉']
+
 function MessageBubble({
   message,
   isStreaming,
@@ -165,7 +187,9 @@ function MessageBubble({
   isLast,
   highlightQuery,
   isSelected,
-  onQuote
+  onQuote,
+  reactions,
+  onToggleReaction
 }: {
   message: Message
   isStreaming?: boolean
@@ -177,6 +201,8 @@ function MessageBubble({
   highlightQuery?: string
   isSelected?: boolean
   onQuote?: (message: Message) => void
+  reactions?: Record<string, number>
+  onToggleReaction?: (emoji: string) => void
 }) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
@@ -316,6 +342,59 @@ function MessageBubble({
                   ✕ Delete
                 </button>
               )}
+            </div>
+          )}
+
+          {/* Reactions */}
+          {reactions && Object.keys(reactions).length > 0 && (
+            <div style={{ display: 'flex', gap: 4, marginTop: 6, flexWrap: 'wrap' }}>
+              {Object.entries(reactions).map(([emoji, count]) => (
+                <button
+                  key={emoji}
+                  onClick={() => onToggleReaction?.(emoji)}
+                  style={{
+                    background: 'rgba(37,99,235,0.1)', border: '1px solid #2563eb', borderRadius: 12, padding: '2px 8px',
+                    fontSize: 12, color: '#60a5fa', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3
+                  }}
+                >
+                  <span>{emoji}</span>
+                  <span style={{ fontSize: 10 }}>{count}</span>
+                </button>
+              ))}
+              {onToggleReaction && hovered && (
+                <div style={{ display: 'flex', gap: 2 }}>
+                  {QUICK_REACTIONS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => onToggleReaction(emoji)}
+                      style={{
+                        background: 'transparent', border: 'none', fontSize: 14, cursor: 'pointer', opacity: 0.6, transition: 'opacity 0.15s'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                      onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          {reactions && Object.keys(reactions).length === 0 && hovered && onToggleReaction && (
+            <div style={{ display: 'flex', gap: 2, marginTop: 6 }}>
+              {QUICK_REACTIONS.map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={() => onToggleReaction(emoji)}
+                  style={{
+                    background: 'transparent', border: 'none', fontSize: 14, cursor: 'pointer', opacity: 0.5, transition: 'opacity 0.15s'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.5')}
+                >
+                  {emoji}
+                </button>
+              ))}
             </div>
           )}
 
