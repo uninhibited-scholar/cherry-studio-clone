@@ -24,9 +24,31 @@ export function HomePage(): React.ReactElement {
   const [sysPromptEdit, setSysPromptEdit] = useState(false)
   const [tempSysPrompt, setTempSysPrompt] = useState('')
 
+  const importTopic = async () => {
+    const file = await window.api.invoke(IpcChannel.FILE_SELECT, { filters: [{ name: 'JSON', extensions: ['json'] }] }) as string | null
+    if (!file) return
+    try {
+      const content = await window.api.invoke(IpcChannel.FILE_READ, file) as string
+      const data = JSON.parse(content) as { topic: Topic; messages: any[] }
+      const newTopic = await createTopic()
+      if (newTopic) {
+        setSelectedTopic(newTopic)
+        // Create messages in DB
+        for (const msg of data.messages) {
+          await window.api.invoke(IpcChannel.MESSAGES_CREATE, { topicId: newTopic.id, role: msg.role, content: msg.content, fileIds: msg.fileIds || [], usage: msg.usage })
+        }
+        // Refresh topic
+        setSelectedTopic(newTopic)
+      }
+    } catch (e) {
+      console.error('Failed to import topic:', e)
+    }
+  }
+
   const commands: Command[] = [
     { id: 'new-topic', label: 'New Topic', icon: '📝', onSelect: handleNewTopic },
     { id: 'new-assistant', label: 'New Assistant', icon: '🤖', onSelect: () => setShowCreateModal(true) },
+    { id: 'import-topic', label: 'Import Topic', icon: '↑', onSelect: importTopic },
     selectedTopic ? { id: 'export-md', label: 'Export as Markdown', icon: '↓', onSelect: () => window.api.invoke(IpcChannel.EXPORT_TOPIC, selectedTopic.id) } : null,
     selectedTopic ? { id: 'export-json', label: 'Export as JSON', icon: '↓', onSelect: () => window.api.invoke(IpcChannel.EXPORT_TOPIC_JSON, { topic: selectedTopic, messages }) } : null,
     { id: 'settings', label: 'Settings', icon: '⚙️', onSelect: () => window.location.hash = '#/settings' }
@@ -235,6 +257,18 @@ export function HomePage(): React.ReactElement {
             )}
             {searching && (
               <span style={{ color: '#60a5fa', fontSize: 12 }}>🔍 Searching…</span>
+            )}
+            {selectedAssistant && (
+              <button
+                title="Import topic from JSON file"
+                onClick={importTopic}
+                style={{
+                  background: 'transparent', border: '1px solid #3f3f46', borderRadius: 6,
+                  color: '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px'
+                }}
+              >
+                ↑ Import
+              </button>
             )}
             {selectedTopic && (
               <div style={{ display: 'flex', gap: 6 }}>
