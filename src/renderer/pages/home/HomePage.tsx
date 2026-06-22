@@ -24,6 +24,8 @@ export function HomePage(): React.ReactElement {
   const [sysPromptEdit, setSysPromptEdit] = useState(false)
   const [tempSysPrompt, setTempSysPrompt] = useState('')
   const [showStats, setShowStats] = useState(false)
+  const [showModelMenu, setShowModelMenu] = useState(false)
+  const [availableModels, setAvailableModels] = useState<any[]>([])
 
   const importTopic = async () => {
     const file = await window.api.invoke(IpcChannel.FILE_SELECT, { filters: [{ name: 'JSON', extensions: ['json'] }] }) as string | null
@@ -164,6 +166,15 @@ export function HomePage(): React.ReactElement {
     return { totalMessages, userMessages, assistantMessages, totalWords, totalTokens }
   })()
 
+  // Load available models when showing menu
+  useEffect(() => {
+    if (showModelMenu && selectedAssistant) {
+      window.api.invoke(IpcChannel.MODELS_LIST, selectedAssistant.providerId).then((models) => {
+        setAvailableModels((models as any[]) || [])
+      })
+    }
+  }, [showModelMenu, selectedAssistant])
+
   // Handle menu events from main process
   useEffect(() => {
     const offNew = window.api.on(IpcChannel.MENU_NEW_TOPIC, () => {
@@ -229,9 +240,31 @@ export function HomePage(): React.ReactElement {
                 </>
               )}
               {selectedAssistant.modelId && (
-                <span style={{ marginLeft: 4, fontSize: 11, color: '#3f3f46', background: '#18181b', border: '1px solid #27272a', borderRadius: 4, padding: '1px 7px' }}>
-                  {selectedAssistant.modelId}
-                </span>
+                <div style={{ position: 'relative' }}>
+                  <button
+                    onClick={() => setShowModelMenu((v) => !v)}
+                    style={{ marginLeft: 4, fontSize: 11, color: '#3f3f46', background: showModelMenu ? '#2563eb' : '#18181b', border: '1px solid #27272a', borderRadius: 4, padding: '1px 7px', cursor: 'pointer', color: showModelMenu ? '#fff' : '#3f3f46' }}
+                  >
+                    {selectedAssistant.modelId} ▼
+                  </button>
+                  {showModelMenu && (
+                    <div style={{ position: 'absolute', top: 24, left: 0, background: '#18181b', border: '1px solid #27272a', borderRadius: 4, zIndex: 100, minWidth: 200, maxHeight: 300, overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
+                      {availableModels.map((m) => (
+                        <div
+                          key={m.id}
+                          onClick={async () => {
+                            await window.api.invoke(IpcChannel.ASSISTANTS_UPSERT, { ...selectedAssistant, modelId: m.id })
+                            setSelectedAssistant({ ...selectedAssistant, modelId: m.id })
+                            setShowModelMenu(false)
+                          }}
+                          style={{ padding: '8px 12px', fontSize: 12, color: selectedAssistant.modelId === m.id ? '#60a5fa' : '#a1a1aa', background: selectedAssistant.modelId === m.id ? 'rgba(96,165,250,0.1)' : 'transparent', cursor: 'pointer', borderBottom: '1px solid #27272a' }}
+                        >
+                          {m.modelId === m.id ? '✓' : ' '} {m.displayName || m.id}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               )}
             </>
           ) : (
