@@ -36,10 +36,20 @@ export function HomePage(): React.ReactElement {
         e.preventDefault()
         setCmdPaletteOpen((v) => !v)
       }
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === '<' || e.key === ',')) {
+        e.preventDefault()
+        const idx = assistants.findIndex((a) => a.id === selectedAssistant?.id)
+        if (idx > 0) setSelectedAssistant(assistants[idx - 1])
+      }
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === '>' || e.key === '.')) {
+        e.preventDefault()
+        const idx = assistants.findIndex((a) => a.id === selectedAssistant?.id)
+        if (idx < assistants.length - 1) setSelectedAssistant(assistants[idx + 1])
+      }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [assistants, selectedAssistant])
 
   const getDraftKey = (topicId: string | null) => `cherry-clone:draft:${topicId}`
 
