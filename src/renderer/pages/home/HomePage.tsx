@@ -155,6 +155,9 @@ export function HomePage(): React.ReactElement {
                 <>
                   <span style={{ color: '#52525b' }}>›</span>
                   <span style={{ color: '#71717a', fontSize: 13 }}>{selectedTopic.title}</span>
+                  <span style={{ marginLeft: 8, fontSize: 11, color: '#3f3f46' }}>
+                    {messages.length} msg{messages.length !== 1 ? 's' : ''} · {messages.reduce((sum, m) => sum + m.content.split(/\s+/).filter(Boolean).length, 0)} words
+                  </span>
                 </>
               )}
               {selectedAssistant.modelId && (
