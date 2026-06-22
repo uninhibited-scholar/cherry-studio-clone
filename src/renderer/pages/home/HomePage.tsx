@@ -27,6 +27,8 @@ export function HomePage(): React.ReactElement {
   const [showModelMenu, setShowModelMenu] = useState(false)
   const [availableModels, setAvailableModels] = useState<any[]>([])
   const [quotedMessage, setQuotedMessage] = useState<any>(null)
+  const [generatingSummary, setGeneratingSummary] = useState(false)
+  const [topicSummary, setTopicSummary] = useState<string>('')
 
   const importTopic = async () => {
     const file = await window.api.invoke(IpcChannel.FILE_SELECT, { filters: [{ name: 'JSON', extensions: ['json'] }] }) as string | null
@@ -176,6 +178,34 @@ export function HomePage(): React.ReactElement {
     }
   }, [showModelMenu, selectedAssistant])
 
+  const generateSummary = async () => {
+    if (!selectedAssistant || !messages.length) return
+    setGeneratingSummary(true)
+    try {
+      const text = messages
+        .map((m) => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
+        .join('\n\n')
+      const requestId = `summary-${Date.now()}`
+      const result = await window.api.invoke(IpcChannel.AI_CHAT, {
+        requestId,
+        providerId: selectedAssistant.providerId,
+        modelId: selectedAssistant.modelId,
+        messages: [
+          {
+            role: 'user',
+            content: `Please provide a concise summary (2-3 sentences) of the following conversation:\n\n${text.slice(0, 2000)}`
+          }
+        ],
+        temperature: 0.7
+      }) as any
+      setTopicSummary(result)
+    } catch (e) {
+      console.error('Failed to generate summary:', e)
+    } finally {
+      setGeneratingSummary(false)
+    }
+  }
+
   // Handle menu events from main process
   useEffect(() => {
     const offNew = window.api.on(IpcChannel.MENU_NEW_TOPIC, () => {
@@ -304,13 +334,23 @@ export function HomePage(): React.ReactElement {
               <span style={{ color: '#60a5fa', fontSize: 12 }}>🔍 Searching…</span>
             )}
             {selectedTopic && stats && (
-              <button
-                onClick={() => setShowStats((v) => !v)}
-                title="Toggle statistics"
-                style={{ background: showStats ? 'rgba(37,99,235,0.15)' : 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: showStats ? '#60a5fa' : '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px' }}
-              >
-                📊 {stats.totalMessages}
-              </button>
+              <>
+                <button
+                  onClick={() => setShowStats((v) => !v)}
+                  title="Toggle statistics"
+                  style={{ background: showStats ? 'rgba(37,99,235,0.15)' : 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: showStats ? '#60a5fa' : '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px' }}
+                >
+                  📊 {stats.totalMessages}
+                </button>
+                <button
+                  onClick={generateSummary}
+                  disabled={generatingSummary || messages.length === 0}
+                  title="Generate AI summary of this conversation"
+                  style={{ background: 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: generatingSummary ? '#60a5fa' : '#a1a1aa', cursor: generatingSummary ? 'wait' : 'pointer', fontSize: 13, padding: '3px 10px', opacity: generatingSummary || messages.length === 0 ? 0.5 : 1 }}
+                >
+                  {generatingSummary ? '✨ …' : '✨ Summary'}
+                </button>
+              </>
             )}
             {selectedAssistant && (
               <button
@@ -367,6 +407,16 @@ export function HomePage(): React.ReactElement {
 
         {selectedTopic ? (
           <>
+            {topicSummary && selectedTopic && (
+              <div style={{ background: '#18181b', borderBottom: '1px solid #27272a', padding: '12px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#fafafa' }}>✨ AI Summary</span>
+                  <button onClick={() => setTopicSummary('')} style={{ marginLeft: 'auto', fontSize: 11, background: 'none', border: 'none', color: '#52525b', cursor: 'pointer' }}>Close</button>
+                </div>
+                <div style={{ fontSize: 13, color: '#e4e4e7', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{topicSummary}</div>
+              </div>
+            )}
+
             {showStats && stats && selectedTopic && (
               <div style={{ background: '#18181b', borderBottom: '1px solid #27272a', padding: '12px 16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
