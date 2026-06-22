@@ -247,6 +247,20 @@ export function HomePage(): React.ReactElement {
                 >
                   ↓ JSON
                 </button>
+                <button
+                  title="Clear all messages in this topic"
+                  onClick={() => {
+                    if (confirm(`Delete all ${messages.length} messages in this topic?`)) {
+                      Promise.all(messages.map((m) => deleteMessage(m.id)))
+                    }
+                  }}
+                  style={{
+                    background: 'transparent', border: '1px solid #7f1d1d', borderRadius: 6,
+                    color: '#f87171', cursor: 'pointer', fontSize: 13, padding: '3px 10px'
+                  }}
+                >
+                  🗑 Clear
+                </button>
               </div>
             )}
           </div>
