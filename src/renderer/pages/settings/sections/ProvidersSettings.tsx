@@ -11,6 +11,8 @@ const BUILTIN_PROVIDERS = [
   { name: 'Ollama', defaultEndpointType: 'openai_chat_completions' as const, defaultModels: [] }
 ]
 
+type Preset = { id: string; name: string; providerId: string; modelId: string }
+
 export function ProvidersSettings() {
   const [providers, setProviders] = useState<Provider[]>([])
   const [models, setModels] = useState<Record<string, Model[]>>({})
@@ -19,6 +21,12 @@ export function ProvidersSettings() {
   const [editingHost, setEditingHost] = useState<Record<string, string>>({})
   const [newModelName, setNewModelName] = useState<Record<string, string>>({})
   const [testStatus, setTestStatus] = useState<Record<string, { ok: boolean; text?: string; error?: string } | 'testing'>>({})
+  const [presets, setPresets] = useState<Preset[]>(() => {
+    const saved = localStorage.getItem('cherry-clone:model-presets')
+    return saved ? JSON.parse(saved) : []
+  })
+  const [presetName, setPresetName] = useState('')
+  const [selectedForPreset, setSelectedForPreset] = useState<{ providerId: string; modelId: string } | null>(null)
 
   const testProvider = async (p: Provider) => {
     setTestStatus((prev) => ({ ...prev, [p.id]: 'testing' }))
@@ -92,12 +100,103 @@ export function ProvidersSettings() {
     await refresh()
   }
 
+  const savePreset = () => {
+    if (!presetName.trim() || !selectedForPreset) return
+    const newPreset: Preset = {
+      id: nanoid(),
+      name: presetName.trim(),
+      providerId: selectedForPreset.providerId,
+      modelId: selectedForPreset.modelId
+    }
+    const updated = [...presets, newPreset]
+    setPresets(updated)
+    localStorage.setItem('cherry-clone:model-presets', JSON.stringify(updated))
+    setPresetName('')
+    setSelectedForPreset(null)
+  }
+
+  const deletePreset = (id: string) => {
+    const updated = presets.filter((p) => p.id !== id)
+    setPresets(updated)
+    localStorage.setItem('cherry-clone:model-presets', JSON.stringify(updated))
+  }
+
   return (
     <div>
       <h2 style={{ color: '#fafafa', fontSize: 18, marginBottom: 4 }}>AI Providers</h2>
       <p style={{ color: '#71717a', fontSize: 13, marginBottom: 20 }}>
         Manage provider API keys and models. Keys are stored locally.
       </p>
+
+      {/* Model Presets Section */}
+      {presets.length > 0 && (
+        <div style={{ marginBottom: 24, padding: 12, background: '#111113', borderRadius: 8, border: '1px solid #27272a' }}>
+          <p style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 10, fontWeight: 600 }}>⚡ Quick Model Presets</p>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {presets.map((preset) => {
+              const prov = providers.find((p) => p.id === preset.providerId)
+              return (
+                <div key={preset.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px', background: 'rgba(37,99,235,0.1)', border: '1px solid #2563eb', borderRadius: 6 }}>
+                  <span style={{ color: '#60a5fa', fontSize: 12 }}>{preset.name}</span>
+                  <span style={{ color: '#52525b', fontSize: 11 }}>({prov?.name ?? 'unknown'} / {preset.modelId})</span>
+                  <button
+                    onClick={() => deletePreset(preset.id)}
+                    style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '0 2px' }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Save New Preset */}
+      <div style={{ marginBottom: 20, padding: 12, background: '#111113', borderRadius: 8, border: '1px solid #27272a' }}>
+        <p style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 10, fontWeight: 600 }}>💾 Save Current Selection as Preset</p>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+          <select
+            value={selectedForPreset?.providerId ?? ''}
+            onChange={(e) => {
+              if (e.target.value) {
+                const provider = providers.find((p) => p.id === e.target.value)
+                const firstModel = (models[e.target.value] ?? [])[0]
+                if (provider && firstModel) {
+                  setSelectedForPreset({ providerId: provider.id, modelId: firstModel.id })
+                }
+              }
+            }}
+            style={{ flex: 1, ...inputSty }}
+          >
+            <option value="">Select Provider</option>
+            {providers.map((p) => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+          {selectedForPreset && (
+            <select
+              value={selectedForPreset.modelId}
+              onChange={(e) => setSelectedForPreset({ ...selectedForPreset, modelId: e.target.value })}
+              style={{ flex: 1, ...inputSty }}
+            >
+              {(models[selectedForPreset.providerId] ?? []).map((m) => (
+                <option key={m.id} value={m.id}>{m.displayName ?? m.name}</option>
+              ))}
+            </select>
+          )}
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input
+            value={presetName}
+            onChange={(e) => setPresetName(e.target.value)}
+            placeholder="Preset name (e.g. 'Fast Drafts', 'Research')"
+            onKeyDown={(e) => e.key === 'Enter' && savePreset()}
+            style={{ flex: 1, ...inputSty }}
+          />
+          <button onClick={savePreset} disabled={!presetName.trim() || !selectedForPreset} style={btnSty}>Save</button>
+        </div>
+      </div>
 
       {/* Quick-add builtins */}
       {BUILTIN_PROVIDERS.filter(
