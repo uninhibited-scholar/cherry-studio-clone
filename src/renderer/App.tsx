@@ -19,6 +19,10 @@ export function App(): React.ReactElement {
   useEffect(() => {
     const prefs = loadGeneralPrefs()
     document.documentElement.style.setProperty('--chat-font-size', `${prefs.fontSize}px`)
+    const isDark = prefs.theme === 'dark'
+    document.documentElement.style.colorScheme = prefs.theme
+    document.documentElement.style.background = isDark ? '#09090b' : '#fafafa'
+    document.documentElement.style.color = isDark ? '#fafafa' : '#09090b'
   }, [])
 
   return (

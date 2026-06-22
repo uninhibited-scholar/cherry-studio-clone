@@ -6,13 +6,15 @@ type GeneralPrefs = {
   sendOnEnter: boolean
   showTimestamps: boolean
   autoScrollToBottom: boolean
+  theme: 'dark' | 'light'
 }
 
 const DEFAULT_PREFS: GeneralPrefs = {
   fontSize: 14,
   sendOnEnter: true,
   showTimestamps: false,
-  autoScrollToBottom: true
+  autoScrollToBottom: true,
+  theme: 'dark'
 }
 
 const PREFS_KEY = 'cherry-studio-clone:general-prefs'
@@ -33,7 +35,11 @@ export function GeneralSettings(): React.ReactElement {
 
   useEffect(() => {
     document.documentElement.style.setProperty('--chat-font-size', `${prefs.fontSize}px`)
-  }, [prefs.fontSize])
+    const isDark = prefs.theme === 'dark'
+    document.documentElement.style.colorScheme = prefs.theme
+    document.documentElement.style.background = isDark ? '#09090b' : '#fafafa'
+    document.documentElement.style.color = isDark ? '#fafafa' : '#09090b'
+  }, [prefs.fontSize, prefs.theme])
 
   useEffect(() => {
     window.api.invoke(IpcChannel.APP_LAUNCH_ON_BOOT_GET).then((v) => setLaunchOnBoot(v as boolean))
@@ -73,6 +79,30 @@ export function GeneralSettings(): React.ReactElement {
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span style={sublabel}>11px</span>
           <span style={sublabel}>20px</span>
+        </div>
+      </div>
+
+      <div style={row}>
+        <p style={{ ...label, cursor: 'default', marginBottom: 10 }}>Theme</p>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {(['dark', 'light'] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => update('theme', t)}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 6,
+                border: prefs.theme === t ? '2px solid #2563eb' : '1px solid #3f3f46',
+                background: prefs.theme === t ? 'rgba(37,99,235,0.1)' : '#27272a',
+                color: prefs.theme === t ? '#60a5fa' : '#a1a1aa',
+                cursor: 'pointer',
+                fontSize: 12,
+                textTransform: 'capitalize'
+              }}
+            >
+              {t === 'dark' ? '🌙' : '☀️'} {t}
+            </button>
+          ))}
         </div>
       </div>
 
