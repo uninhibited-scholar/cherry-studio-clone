@@ -209,6 +209,11 @@ function MessageBubble({
   const [hovered, setHovered] = useState(false)
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState(message.content)
+  const [showHistory, setShowHistory] = useState(false)
+  const [editHistory, setEditHistory] = useState<Array<{ content: string; editedAt: number }>>(() => {
+    const saved = localStorage.getItem(`msg-history:${message.id}`)
+    return saved ? JSON.parse(saved) : []
+  })
   const [starred, setStarred] = useState(() => {
     const saved = localStorage.getItem(`starred-msg:${message.id}`)
     return saved === 'true'
@@ -274,7 +279,15 @@ function MessageBubble({
                 />
                 <div style={{ display: 'flex', gap: 6, marginTop: 6, justifyContent: 'flex-end' }}>
                   <button onClick={() => { setEditing(false); setEditValue(message.content) }} style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 12, padding: '3px 10px', borderRadius: 4 }}>Cancel</button>
-                  <button onClick={() => { onEditResend?.(message.id, editValue.trim()); setEditing(false) }} style={{ background: '#2563eb', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 12, padding: '3px 10px', borderRadius: 4 }}>Resend</button>
+                  <button onClick={() => {
+                    if (editValue.trim() !== message.content) {
+                      const newHistory = [...editHistory, { content: message.content, editedAt: Date.now() }]
+                      setEditHistory(newHistory)
+                      localStorage.setItem(`msg-history:${message.id}`, JSON.stringify(newHistory))
+                    }
+                    onEditResend?.(message.id, editValue.trim())
+                    setEditing(false)
+                  }} style={{ background: '#2563eb', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 12, padding: '3px 10px', borderRadius: 4 }}>Resend</button>
                 </div>
               </div>
             ) : (
@@ -335,6 +348,14 @@ function MessageBubble({
                   💬 Quote
                 </button>
               )}
+              {editHistory.length > 0 && (
+                <button
+                  onClick={() => setShowHistory((v) => !v)}
+                  style={{ background: 'none', border: '1px solid #3f3f46', color: '#a78bfa', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                >
+                  📝 History ({editHistory.length})
+                </button>
+              )}
               {onEditResend && !editing && (
                 <button
                   onClick={() => { setEditing(true); setEditValue(message.content) }}
@@ -361,6 +382,25 @@ function MessageBubble({
                   ✕ {canDelete ? 'Delete' : `${deleteTimeRemaining}s`}
                 </button>
               )}
+            </div>
+          )}
+
+          {/* Edit History */}
+          {showHistory && editHistory.length > 0 && (
+            <div style={{ marginTop: 8, padding: 8, background: '#18181b', borderRadius: 6, border: '1px solid #27272a' }}>
+              <p style={{ fontSize: 11, color: '#a1a1aa', margin: '0 0 6px', fontWeight: 600 }}>Edit History ({editHistory.length})</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 200, overflowY: 'auto' }}>
+                {editHistory.map((edit, idx) => (
+                  <div key={idx} style={{ padding: 6, background: '#27272a', borderRadius: 4, fontSize: 11 }}>
+                    <p style={{ color: '#a1a1aa', margin: '0 0 4px' }}>
+                      {new Date(edit.editedAt).toLocaleTimeString()}
+                    </p>
+                    <p style={{ color: '#e4e4e7', margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: 60, overflow: 'hidden' }}>
+                      {edit.content.slice(0, 100)}{edit.content.length > 100 ? '…' : ''}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
