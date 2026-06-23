@@ -81,6 +81,21 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
     localStorage.setItem('cherry-clone:message-reactions', JSON.stringify(updated))
   }
 
+  const addTag = (tag: string) => {
+    if (tag.trim() && !tags.includes(tag.trim())) {
+      const newTags = [...tags, tag.trim()]
+      setTags(newTags)
+      localStorage.setItem(`msg-tags:${message.id}`, JSON.stringify(newTags))
+      setNewTag('')
+    }
+  }
+
+  const removeTag = (tag: string) => {
+    const newTags = tags.filter((t) => t !== tag)
+    setTags(newTags)
+    localStorage.setItem(`msg-tags:${message.id}`, JSON.stringify(newTags))
+  }
+
   if (messages.length === 0 && !streaming) {
     return (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#52525b' }}>
@@ -214,6 +229,12 @@ function MessageBubble({
     const saved = localStorage.getItem(`msg-history:${message.id}`)
     return saved ? JSON.parse(saved) : []
   })
+  const [tags, setTags] = useState<string[]>(() => {
+    const saved = localStorage.getItem(`msg-tags:${message.id}`)
+    return saved ? JSON.parse(saved) : []
+  })
+  const [showTagInput, setShowTagInput] = useState(false)
+  const [newTag, setNewTag] = useState('')
   const [starred, setStarred] = useState(() => {
     const saved = localStorage.getItem(`starred-msg:${message.id}`)
     return saved === 'true'
@@ -356,6 +377,12 @@ function MessageBubble({
                   📝 History ({editHistory.length})
                 </button>
               )}
+              <button
+                onClick={() => setShowTagInput((v) => !v)}
+                style={{ background: 'none', border: '1px solid #3f3f46', color: tags.length > 0 ? '#60a5fa' : '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+              >
+                🏷️ Tag{tags.length > 0 ? `(${tags.length})` : ''}
+              </button>
               {onEditResend && !editing && (
                 <button
                   onClick={() => { setEditing(true); setEditValue(message.content) }}
@@ -382,6 +409,32 @@ function MessageBubble({
                   ✕ {canDelete ? 'Delete' : `${deleteTimeRemaining}s`}
                 </button>
               )}
+            </div>
+          )}
+
+          {/* Tags */}
+          {tags.length > 0 && (
+            <div style={{ marginTop: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {tags.map((tag) => (
+                <div key={tag} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 8px', background: 'rgba(96,165,250,0.1)', border: '1px solid #2563eb', borderRadius: 12, fontSize: 11, color: '#60a5fa' }}>
+                  <span>{tag}</span>
+                  <button onClick={() => removeTag(tag)} style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: 0, fontSize: 10 }}>✕</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {showTagInput && (
+            <div style={{ marginTop: 8, display: 'flex', gap: 4 }}>
+              <input
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') addTag(newTag); if (e.key === 'Escape') { setShowTagInput(false); setNewTag('') } }}
+                placeholder="Add tag…"
+                style={{ flex: 1, fontSize: 11, padding: '4px 8px', background: '#27272a', border: '1px solid #3f3f46', borderRadius: 4, color: '#fafafa', outline: 'none' }}
+                autoFocus
+              />
+              <button onClick={() => addTag(newTag)} style={{ fontSize: 11, padding: '4px 10px', background: '#2563eb', border: 'none', borderRadius: 4, color: '#fff', cursor: 'pointer' }}>Add</button>
             </div>
           )}
 
