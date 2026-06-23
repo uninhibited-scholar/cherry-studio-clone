@@ -96,6 +96,20 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
     localStorage.setItem(`msg-tags:${message.id}`, JSON.stringify(newTags))
   }
 
+  const generateShareLink = () => {
+    const payload = {
+      id: message.id,
+      content: message.content,
+      role: message.role,
+      timestamp: message.createdAt
+    }
+    const encoded = btoa(JSON.stringify(payload))
+    const link = `${window.location.href.split('#')[0]}#/shared/${encoded}`
+    navigator.clipboard.writeText(link)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
+
   if (messages.length === 0 && !streaming) {
     return (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#52525b' }}>
@@ -360,6 +374,13 @@ function MessageBubble({
                 style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
               >
                 ↓ MD
+              </button>
+              <button
+                onClick={generateShareLink}
+                style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                title="Copy shareable link"
+              >
+                🔗 Share
               </button>
               {onQuote && (
                 <button
