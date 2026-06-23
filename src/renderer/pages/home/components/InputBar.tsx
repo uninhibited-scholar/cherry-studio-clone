@@ -20,15 +20,40 @@ type Props = {
 
 export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowledgeBaseId, onSelectKnowledgeBase, mcpTools, setMcpTools, sendOnEnter = true, draftText = '', onDraftChange }: Props) {
   const [text, setText] = useState(draftText)
+  const [history, setHistory] = useState<string[]>([])
+  const [historyIndex, setHistoryIndex] = useState(-1)
 
   useEffect(() => {
     setText(draftText)
+    setHistory([])
+    setHistoryIndex(-1)
   }, [draftText])
 
   useEffect(() => {
     const timer = setTimeout(() => onDraftChange?.(text), 500)
     return () => clearTimeout(timer)
   }, [text, onDraftChange])
+
+  const updateText = (newText: string) => {
+    setText(newText)
+    if (historyIndex >= 0) {
+      const newHistory = history.slice(0, historyIndex + 1)
+      newHistory.push(newText)
+      setHistory(newHistory)
+      setHistoryIndex(newHistory.length - 1)
+    } else {
+      setHistory([...history, newText])
+      setHistoryIndex(history.length)
+    }
+  }
+
+  const undo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1
+      setText(history[newIndex])
+      setHistoryIndex(newIndex)
+    }
+  }
   const [webSearchEnabled, setWebSearchEnabled] = useState(false)
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([])
   const [showKbPicker, setShowKbPicker] = useState(false)
@@ -80,16 +105,19 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter') {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault()
+        undo()
+      } else if (e.key === 'Enter') {
         const shouldSend = sendOnEnter ? !e.shiftKey : e.shiftKey
         if (shouldSend) { e.preventDefault(); handleSend() }
       }
     },
-    [handleSend, sendOnEnter]
+    [handleSend, sendOnEnter, historyIndex, history]
   )
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value)
+    updateText(e.target.value)
     const el = e.target
     el.style.height = 'auto'
     el.style.height = `${Math.min(el.scrollHeight, 200)}px`
@@ -257,7 +285,7 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
           {quickReplies.map((reply, idx) => (
             <button
               key={idx}
-              onClick={() => setText(reply)}
+              onClick={() => updateText(reply)}
               title={`Quick reply: ${reply}`}
               style={{
                 fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid #3f3f46',
