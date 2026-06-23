@@ -179,6 +179,33 @@ export function HomePage(): React.ReactElement {
     }
   }, [showModelMenu, selectedAssistant])
 
+  // Apply custom shortcuts
+  useEffect(() => {
+    const shortcuts = (() => {
+      const saved = localStorage.getItem('cherry-clone:shortcuts')
+      if (!saved) return null
+      return JSON.parse(saved) as Record<string, string>
+    })()
+
+    if (!shortcuts) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // cmd-k: command palette
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setCmdPaletteOpen((v) => !v)
+      }
+      // cmd-n: new topic
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'n') {
+        e.preventDefault()
+        if (selectedAssistant) handleNewTopic()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedAssistant, handleNewTopic])
+
   const generateSummary = async () => {
     if (!selectedAssistant || !messages.length) return
     setGeneratingSummary(true)
