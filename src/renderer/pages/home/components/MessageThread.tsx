@@ -213,6 +213,23 @@ function MessageBubble({
     const saved = localStorage.getItem(`starred-msg:${message.id}`)
     return saved === 'true'
   })
+
+  // Check if message can be deleted (within 5 minutes)
+  const canDelete = (() => {
+    const now = Date.now()
+    const msgTime = message.createdAt || 0
+    const ageSeconds = (now - msgTime) / 1000
+    return ageSeconds < 300 // 5 minutes
+  })()
+
+  const deleteTimeRemaining = (() => {
+    const now = Date.now()
+    const msgTime = message.createdAt || 0
+    const ageSeconds = (now - msgTime) / 1000
+    const remaining = Math.max(0, Math.ceil(300 - ageSeconds))
+    return remaining
+  })()
+
   void isLast
   void highlightQuery
 
@@ -336,10 +353,12 @@ function MessageBubble({
               )}
               {onDelete && message.id !== '__streaming__' && (
                 <button
-                  onClick={() => onDelete(message.id)}
-                  style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                  onClick={() => canDelete && onDelete(message.id)}
+                  disabled={!canDelete}
+                  title={canDelete ? 'Delete this message' : `Delete unavailable (${deleteTimeRemaining}s remaining)`}
+                  style={{ background: 'none', border: '1px solid #3f3f46', color: canDelete ? '#f87171' : '#52525b', cursor: canDelete ? 'pointer' : 'not-allowed', fontSize: 11, padding: '2px 8px', borderRadius: 4, opacity: canDelete ? 1 : 0.5 }}
                 >
-                  ✕ Delete
+                  ✕ {canDelete ? 'Delete' : `${deleteTimeRemaining}s`}
                 </button>
               )}
             </div>
