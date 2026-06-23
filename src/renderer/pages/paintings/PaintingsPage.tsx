@@ -22,6 +22,12 @@ export function PaintingsPage(): React.ReactElement {
   const [error, setError] = useState<string | null>(null)
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
 
+  const [showSketchPad, setShowSketchPad] = useState(false)
+  const [sketches, setSketches] = useState<Array<{ id: string; dataUrl: string; savedAt: number }>>(() => {
+    const saved = localStorage.getItem('cherry-clone:sketches')
+    return saved ? JSON.parse(saved) : []
+  })
+
   const loadPaintings = useCallback(async () => {
     const list = await window.api.invoke(IpcChannel.PAINTINGS_LIST) as Painting[]
     setPaintings(list)
@@ -79,7 +85,11 @@ export function PaintingsPage(): React.ReactElement {
       {/* ── Left: generation panel ── */}
       <aside style={{ width: 280, borderRight: '1px solid #27272a', display: 'flex', flexDirection: 'column', flexShrink: 0, overflowY: 'auto' }}>
         <div style={{ padding: '16px', borderBottom: '1px solid #27272a' }}>
-          <h2 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700 }}>🎨 AI Paintings</h2>
+          <h2 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700 }}>🎨 Paintings</h2>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+            <button onClick={() => setShowSketchPad(false)} style={{ flex: 1, padding: '6px 0', fontSize: 11, border: '1px solid #3f3f46', borderRadius: 4, background: !showSketchPad ? '#2563eb' : 'transparent', color: !showSketchPad ? '#fff' : '#a1a1aa', cursor: 'pointer' }}>Generate</button>
+            <button onClick={() => setShowSketchPad(true)} style={{ flex: 1, padding: '6px 0', fontSize: 11, border: '1px solid #3f3f46', borderRadius: 4, background: showSketchPad ? '#2563eb' : 'transparent', color: showSketchPad ? '#fff' : '#a1a1aa', cursor: 'pointer' }}>Sketch</button>
+          </div>
 
           {/* Provider */}
           <label style={labelStyle}>Provider</label>
@@ -132,31 +142,51 @@ export function PaintingsPage(): React.ReactElement {
             style={{ ...inputStyle, resize: 'vertical' }}
           />
 
-          {error && (
-            <div style={{ marginTop: 8, padding: '8px 10px', background: '#450a0a', borderRadius: 6, fontSize: 11, color: '#fca5a5', wordBreak: 'break-all' }}>
-              {error}
-            </div>
+          {!showSketchPad && (
+            <>
+              {error && (
+                <div style={{ marginTop: 8, padding: '8px 10px', background: '#450a0a', borderRadius: 6, fontSize: 11, color: '#fca5a5', wordBreak: 'break-all' }}>
+                  {error}
+                </div>
+              )}
+
+              <button
+                onClick={handleGenerate}
+                disabled={generating || !prompt.trim() || !selectedProviderId || !selectedModel}
+                style={{
+                  marginTop: 12,
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: 8,
+                  border: 'none',
+                  background: generating ? '#1d4ed8' : '#2563eb',
+                  color: 'white',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: generating ? 'default' : 'pointer',
+                  opacity: (!prompt.trim() || !selectedProviderId || !selectedModel) ? 0.5 : 1
+                }}
+              >
+                {generating ? '⏳ Generating…' : '✨ Generate'}
+              </button>
+            </>
           )}
 
-          <button
-            onClick={handleGenerate}
-            disabled={generating || !prompt.trim() || !selectedProviderId || !selectedModel}
-            style={{
-              marginTop: 12,
-              width: '100%',
-              padding: '10px',
-              borderRadius: 8,
-              border: 'none',
-              background: generating ? '#1d4ed8' : '#2563eb',
-              color: 'white',
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: generating ? 'default' : 'pointer',
-              opacity: (!prompt.trim() || !selectedProviderId || !selectedModel) ? 0.5 : 1
-            }}
-          >
-            {generating ? '⏳ Generating…' : '✨ Generate'}
-          </button>
+          {showSketchPad && (
+            <SketchPadUI
+              sketches={sketches}
+              onSaveSketch={(dataUrl) => {
+                const newSketches = [...sketches, { id: `sketch-${Date.now()}`, dataUrl, savedAt: Date.now() }]
+                setSketches(newSketches)
+                localStorage.setItem('cherry-clone:sketches', JSON.stringify(newSketches))
+              }}
+              onDeleteSketch={(id) => {
+                const newSketches = sketches.filter(s => s.id !== id)
+                setSketches(newSketches)
+                localStorage.setItem('cherry-clone:sketches', JSON.stringify(newSketches))
+              }}
+            />
+          )}
         </div>
 
         <div style={{ padding: '10px 16px' }}>
@@ -197,6 +227,124 @@ export function PaintingsPage(): React.ReactElement {
         >
           <img src={lightboxSrc} alt="painting" style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: 8, boxShadow: '0 0 40px rgba(0,0,0,0.8)' }} />
         </div>
+      )}
+    </div>
+  )
+}
+
+function SketchPadUI({
+  sketches,
+  onSaveSketch,
+  onDeleteSketch
+}: {
+  sketches: Array<{ id: string; dataUrl: string; savedAt: number }>
+  onSaveSketch: (dataUrl: string) => void
+  onDeleteSketch: (id: string) => void
+}) {
+  const canvasRef = React.useRef<HTMLCanvasElement>(null)
+  const [isDrawing, setIsDrawing] = useState(false)
+  const [brushColor, setBrushColor] = useState('#fafafa')
+  const [brushSize, setBrushSize] = useState(3)
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    setIsDrawing(true)
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const rect = canvas.getBoundingClientRect()
+    ctx.beginPath()
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top)
+  }
+
+  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const rect = canvas.getBoundingClientRect()
+    ctx.lineWidth = brushSize
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    ctx.strokeStyle = brushColor
+    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top)
+    ctx.stroke()
+  }
+
+  const stopDrawing = () => setIsDrawing(false)
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height)
+  }
+
+  const saveSketch = () => {
+    const canvas = canvasRef.current
+    if (canvas) {
+      const dataUrl = canvas.toDataURL()
+      onSaveSketch(dataUrl)
+      clearCanvas()
+    }
+  }
+
+  return (
+    <div>
+      <p style={{ fontSize: 12, color: '#a1a1aa', marginBottom: 8 }}>Brush Settings</p>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        <div style={{ flex: 1 }}>
+          <label style={{ fontSize: 11, color: '#71717a', display: 'block', marginBottom: 4 }}>Color</label>
+          <input
+            type="color"
+            value={brushColor}
+            onChange={(e) => setBrushColor(e.target.value)}
+            style={{ width: '100%', height: 32, border: 'none', borderRadius: 6, cursor: 'pointer' }}
+          />
+        </div>
+        <div style={{ flex: 1 }}>
+          <label style={{ fontSize: 11, color: '#71717a', display: 'block', marginBottom: 4 }}>Size: {brushSize}</label>
+          <input
+            type="range"
+            min="1"
+            max="20"
+            value={brushSize}
+            onChange={(e) => setBrushSize(Number(e.target.value))}
+            style={{ width: '100%' }}
+          />
+        </div>
+      </div>
+
+      <canvas
+        ref={canvasRef}
+        width={240}
+        height={240}
+        onMouseDown={startDrawing}
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+        onMouseLeave={stopDrawing}
+        style={{ width: '100%', height: 240, border: '1px solid #3f3f46', borderRadius: 8, background: '#18181b', cursor: 'crosshair', marginBottom: 12, display: 'block' }}
+      />
+
+      <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+        <button onClick={clearCanvas} style={{ flex: 1, padding: '6px 0', fontSize: 11, border: '1px solid #3f3f46', borderRadius: 4, background: 'transparent', color: '#a1a1aa', cursor: 'pointer' }}>🗑 Clear</button>
+        <button onClick={saveSketch} style={{ flex: 1, padding: '6px 0', fontSize: 11, border: 'none', borderRadius: 4, background: '#2563eb', color: '#fff', cursor: 'pointer' }}>💾 Save</button>
+      </div>
+
+      {sketches.length > 0 && (
+        <>
+          <p style={{ fontSize: 11, color: '#a1a1aa', marginBottom: 6 }}>Saved Sketches ({sketches.length})</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 200, overflowY: 'auto' }}>
+            {sketches.map((sketch) => (
+              <div key={sketch.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <img src={sketch.dataUrl} alt="sketch" style={{ width: 40, height: 40, borderRadius: 4, border: '1px solid #27272a' }} />
+                <div style={{ flex: 1, fontSize: 10, color: '#71717a' }}>{new Date(sketch.savedAt).toLocaleTimeString()}</div>
+                <button onClick={() => onDeleteSketch(sketch.id)} style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: 12 }}>✕</button>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )
