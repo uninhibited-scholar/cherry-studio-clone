@@ -128,6 +128,14 @@ export function ProvidersSettings() {
         Manage provider API keys and models. Keys are stored locally.
       </p>
 
+      {/* Local Models Info */}
+      <div style={{ marginBottom: 20, padding: 12, background: 'rgba(96,165,250,0.05)', border: '1px solid #2563eb', borderRadius: 8 }}>
+        <p style={{ color: '#60a5fa', fontSize: 12, fontWeight: 600, margin: '0 0 8px' }}>💡 Running Local Models?</p>
+        <p style={{ color: '#a1a1aa', fontSize: 12, margin: '0 0 8px', lineHeight: 1.6 }}>
+          Use <strong>Ollama</strong> to run models locally. <a href="https://ollama.com" target="_blank" rel="noopener noreferrer" style={{ color: '#60a5fa', textDecoration: 'underline' }}>Install Ollama</a>, run <code style={{ background: '#09090b', padding: '2px 6px', borderRadius: 4, fontSize: 11 }}>ollama pull llama2</code>, then add as provider with API host <code style={{ background: '#09090b', padding: '2px 6px', borderRadius: 4, fontSize: 11 }}>http://localhost:11434</code>
+        </p>
+      </div>
+
       {/* Model Presets Section */}
       {presets.length > 0 && (
         <div style={{ marginBottom: 24, padding: 12, background: '#111113', borderRadius: 8, border: '1px solid #27272a' }}>
