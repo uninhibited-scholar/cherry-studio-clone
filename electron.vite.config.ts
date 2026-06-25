@@ -25,6 +25,10 @@ export default defineConfig({
     }
   },
   renderer: {
+    input: {
+      index: resolve(__dirname, 'src/renderer/index.html'),
+      'quick-assistant': resolve(__dirname, 'src/renderer/windows/quick-assistant.html')
+    },
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

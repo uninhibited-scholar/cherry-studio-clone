@@ -2,6 +2,7 @@ import { app, BrowserWindow, globalShortcut } from 'electron'
 import { application } from './core/application'
 import { createTray, destroyTray } from './services/TrayService'
 import { buildAndSetAppMenu } from './services/AppMenuService'
+import { quickAssistantWindow } from './core/window/QuickAssistantWindow'
 
 // Enforce single instance
 const gotLock = app.requestSingleInstanceLock()
@@ -14,6 +15,8 @@ app.whenReady().then(async () => {
   buildAndSetAppMenu()
   await application.bootstrap()
   createTray()
+  quickAssistantWindow.create()
+  quickAssistantWindow.registerShortcut()
 
   // Register zoom shortcuts
   const registerZoomShortcuts = () => {
@@ -40,6 +43,10 @@ app.on('window-all-closed', () => {
     // Since we always create one, we intentionally keep the process alive.
     // Users can quit via the tray context menu.
   }
+})
+
+app.on('will-quit', () => {
+  quickAssistantWindow.unregisterShortcut()
 })
 
 app.on('before-quit', () => {
