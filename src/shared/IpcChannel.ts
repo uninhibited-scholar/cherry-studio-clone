@@ -49,6 +49,7 @@ export const IpcChannel = {
   KNOWLEDGE_CREATE: 'knowledge:create',
   KNOWLEDGE_DELETE: 'knowledge:delete',
   KNOWLEDGE_SEARCH: 'knowledge:search',
+  KNOWLEDGE_REINDEX: 'knowledge:reindex',
 
   // Notes
   NOTES_LIST: 'notes:list',
@@ -123,6 +124,10 @@ export const IpcChannel = {
   APP_LAUNCH_ON_BOOT_SET: 'app:launch-on-boot:set',
   APP_CACHE_SIZE: 'app:cache-size',
   APP_CACHE_CLEAR: 'app:cache-clear',
+
+  // Quick Assistant
+  QUICK_ASSISTANT_HIDE: 'quick-assistant:hide',
+  QUICK_ASSISTANT_SHOW: 'quick-assistant:show',
 
   // App
   APP_VERSION: 'app:version',

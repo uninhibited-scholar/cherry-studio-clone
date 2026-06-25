@@ -1,6 +1,10 @@
 import { ipcMain, BrowserWindow, shell } from 'electron'
 import { IpcChannel } from '@shared/IpcChannel'
+import { quickAssistantWindow } from './core/window/QuickAssistantWindow'
 import { loggerService } from '@logger'
+import { topic as topicSchema } from './data/db/schemas/topic'
+import { message as messageSchema } from './data/db/schemas/message'
+import { getDb } from './data/db/DbService'
 import { aiService } from './ai/AiService'
 import { assistantService } from './data/services/AssistantService'
 import { topicService } from './data/services/TopicService'
@@ -10,6 +14,7 @@ import { noteService } from './data/services/NoteService'
 import { translateService } from './data/services/TranslateService'
 import { webSearch, setWebSearchConfig, getWebSearchConfig, type WebSearchConfig } from './services/webSearch/WebSearchService'
 import { knowledgeService } from './data/services/KnowledgeService'
+import { knowledgeIndexService } from './data/services/KnowledgeIndexService'
 import { paintingService } from './data/services/PaintingService'
 import { mcpService } from './services/McpService'
 import { topicNamingService } from './services/TopicNamingService'
@@ -186,7 +191,12 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle(IpcChannel.KNOWLEDGE_SEARCH, async (_event, { knowledgeBaseId, query, limit }) => {
+    // Delegates to KnowledgeIndexService.search() which uses BM25 ranking
     return knowledgeService.search(knowledgeBaseId, query, limit)
+  })
+
+  ipcMain.handle(IpcChannel.KNOWLEDGE_REINDEX, async (_event, { knowledgeBaseId }: { knowledgeBaseId: string }) => {
+    await knowledgeIndexService.rebuildIndex(knowledgeBaseId)
   })
 
   // ── Paintings ───────────────────────────────────────────────────────────
@@ -329,10 +339,13 @@ export function registerIpcHandlers(): void {
         const sdk = createGoogleGenerativeAI({ apiKey: provider.apiKey })
         model = sdk('gemini-2.0-flash')
       } else {
+        const models = await providerService.listModels(provider.id)
+        const firstModel = models.find((m) => m.isEnabled)?.name ?? models[0]?.name
+        if (!firstModel) return { ok: false, error: '请先在 Models 栏添加至少一个模型，再点 Test' }
         const cfg: Parameters<typeof createOpenAI>[0] = { apiKey: provider.apiKey || 'no-key' }
         if (provider.apiHost) cfg.baseURL = provider.apiHost
         const sdk = createOpenAI(cfg)
-        model = sdk('gpt-4o-mini')
+        model = sdk(firstModel)
       }
       const res = await generateText({ model, messages: [{ role: 'user', content: 'Reply with one word: OK' }], maxTokens: 5 })
       return { ok: true, text: res.text.trim() }
@@ -405,10 +418,8 @@ export function registerIpcHandlers(): void {
       notes
     }
 
-    const { dialog, writeFile: _wf } = await Promise.all([
-      import('electron').then(m => m.dialog),
-      import('fs/promises')
-    ]).then(([d, fs]) => ({ dialog: d, writeFile: fs.writeFile }))
+    const { dialog } = await import('electron')
+    const { writeFile } = await import('fs/promises')
 
     const result = await dialog.showSaveDialog({
       defaultPath: `cherry-studio-backup-${new Date().toISOString().slice(0, 10)}.json`,
@@ -416,7 +427,6 @@ export function registerIpcHandlers(): void {
     })
     if (result.canceled || !result.filePath) return null
 
-    const { writeFile } = await import('fs/promises')
     await writeFile(result.filePath, JSON.stringify(backup, null, 2), 'utf8')
     shell.showItemInFolder(result.filePath)
     return result.filePath
@@ -445,8 +455,24 @@ export function registerIpcHandlers(): void {
       if (backup.version !== 1) return { success: false, reason: 'Unsupported backup version' }
 
       // Import: upsert each entity
+      const db = getDb()
       for (const p of backup.providers ?? []) await providerService.upsertProvider(p as Parameters<typeof providerService.upsertProvider>[0])
       for (const a of backup.assistants ?? []) await assistantService.upsert(a as Parameters<typeof assistantService.upsert>[0])
+      for (const t of backup.topics ?? []) {
+        const row = t as { id: string; assistantId: string; title: string; isPinned?: boolean; createdAt: number; updatedAt: number }
+        await db.insert(topicSchema).values({
+          id: row.id, assistantId: row.assistantId, title: row.title,
+          isPinned: row.isPinned ?? false, createdAt: row.createdAt, updatedAt: row.updatedAt
+        }).onConflictDoNothing()
+      }
+      for (const m of backup.messages ?? []) {
+        const row = m as { id: string; topicId: string; role: 'user' | 'assistant' | 'system'; content: string; modelId?: string; providerId?: string; usage?: unknown; fileIds?: string[]; createdAt: number; updatedAt: number }
+        await db.insert(messageSchema).values({
+          id: row.id, topicId: row.topicId, role: row.role, content: row.content,
+          modelId: row.modelId, providerId: row.providerId, usage: row.usage as string ?? null,
+          fileIds: row.fileIds ?? [], createdAt: row.createdAt, updatedAt: row.updatedAt
+        }).onConflictDoNothing()
+      }
       for (const n of backup.notes ?? []) await noteService.create(n as Parameters<typeof noteService.create>[0])
 
       return { success: true }
@@ -491,13 +517,31 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannel.APP_CHECK_UPDATE, async () => {
     const current = process.env.npm_package_version ?? '0.1.0'
     try {
-      const res = await fetch('https://api.github.com/repos/uninhibited-scholar/cherry-studio-clone/releases/latest', { timeout: 5000 }).then((r) => r.json()) as Record<string, unknown>
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), 5000)
+      const res = await fetch('https://api.github.com/repos/uninhibited-scholar/cherry-studio-clone/releases/latest', { signal: controller.signal })
+        .then((r) => r.json()).finally(() => clearTimeout(timer)) as Record<string, unknown>
       const latest = (res.tag_name as string)?.replace('v', '') ?? current
-      const hasUpdate = latest > current
+      const semverGt = (a: string, b: string) => {
+        const pa = a.split('.').map(Number)
+        const pb = b.split('.').map(Number)
+        for (let i = 0; i < 3; i++) { if ((pa[i] ?? 0) !== (pb[i] ?? 0)) return (pa[i] ?? 0) > (pb[i] ?? 0) }
+        return false
+      }
+      const hasUpdate = semverGt(latest, current)
       return { current, latest, hasUpdate }
     } catch {
       return { current, latest: current, hasUpdate: false }
     }
+  })
+
+  // ── Quick Assistant ──────────────────────────────────────────────────────
+  ipcMain.on(IpcChannel.QUICK_ASSISTANT_HIDE, () => {
+    quickAssistantWindow.hide()
+  })
+
+  ipcMain.on(IpcChannel.QUICK_ASSISTANT_SHOW, () => {
+    quickAssistantWindow.show()
   })
 
   logger.info('All IPC handlers registered')

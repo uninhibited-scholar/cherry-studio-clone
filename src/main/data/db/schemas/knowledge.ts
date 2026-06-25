@@ -14,5 +14,9 @@ export const knowledgeDocument = sqliteTable('knowledge_document', {
   name: text('name').notNull(),
   content: text('content').notNull().default(''),
   type: text('type').notNull().default('text'),
+  /** Reserved for future vector embedding storage (e.g. JSON-encoded float array). */
+  embedding: text('embedding'),
+  /** Index of this chunk within a parent document (0 = whole document or first chunk). */
+  chunkIndex: integer('chunk_index').notNull().default(0),
   createdAt: integer('created_at').notNull()
 })
