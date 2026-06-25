@@ -3,6 +3,8 @@ import { buildLanguageModel } from './provider/factory'
 import { providerService } from '../data/services/ProviderService'
 import { mcpService } from '../services/McpService'
 import { loggerService } from '@logger'
+import { withRetry } from './RetryPolicy'
+import { truncateContext } from './ContextManager'
 
 const logger = loggerService.withContext('AiService')
 
@@ -51,12 +53,17 @@ export class AiService {
     }
 
     const abortController = new AbortController()
+    const timeoutId = setTimeout(() => abortController.abort(), 120_000)
     this.activeStreams.set(requestId, abortController)
 
     logger.info(`Stream start [${requestId}]: ${provider.name}/${model.name}`)
 
     try {
       const languageModel = buildLanguageModel(provider, model)
+
+      // Truncate context to avoid exceeding model context windows
+      const contextLimit = model.contextWindow ?? 100_000
+      const truncated = truncateContext(messages, contextLimit, systemPrompt)
 
       // Build tool definitions with MCP executors when tools are provided
       const tools = mcpTools && Object.keys(mcpTools).length > 0
@@ -78,16 +85,16 @@ export class AiService {
           }, {})
         : undefined
 
-      const result = streamText({
+      const result = await withRetry(() => Promise.resolve(streamText({
         model: languageModel,
         system: systemPrompt,
-        messages: messages.map((m) => ({ role: m.role, content: m.content })),
+        messages: truncated.map((m) => ({ role: m.role, content: m.content })),
         temperature: temperature ?? 1,
         maxTokens,
         tools,
         maxSteps: tools ? 5 : 1,
         abortSignal: abortController.signal
-      })
+      })))
 
       let usage: Awaited<typeof result.usage> | undefined
       for await (const part of result.fullStream) {
@@ -116,6 +123,7 @@ export class AiService {
       logger.error(`Stream error [${requestId}]`, err)
       onChunk({ type: 'error', error: String(err) })
     } finally {
+      clearTimeout(timeoutId)
       this.activeStreams.delete(requestId)
     }
   }

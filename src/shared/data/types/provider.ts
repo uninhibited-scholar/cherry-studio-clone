@@ -7,6 +7,7 @@ export const ENDPOINT_TYPE = {
   ANTHROPIC_MESSAGES: 'anthropic_messages',
   GOOGLE_GEMINI: 'google_gemini',
   AZURE_OPENAI: 'azure_openai',
+  GROQ: 'groq',
   CUSTOM: 'custom'
 } as const
 
@@ -28,6 +29,10 @@ export const ProviderSchema = z.object({
   defaultEndpointType: z.nativeEnum(ENDPOINT_TYPE).default(ENDPOINT_TYPE.OPENAI_CHAT_COMPLETIONS),
   isEnabled: z.boolean().default(true),
   isBuiltin: z.boolean().default(false),
+  /** Azure: resource name (subdomain before .openai.azure.com) */
+  resourceName: z.string().optional(),
+  /** Azure: API version string */
+  apiVersion: z.string().optional(),
   /** Provider website / docs urls */
   website: z
     .object({

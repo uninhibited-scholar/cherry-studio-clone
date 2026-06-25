@@ -132,7 +132,28 @@ export const IpcChannel = {
   // App
   APP_VERSION: 'app:version',
   APP_CHECK_UPDATE: 'app:check-update',
-  APP_READY: 'app:ready'
+  APP_READY: 'app:ready',
+
+  // Theme
+  THEME_GET: 'theme:get',
+  THEME_SET: 'theme:set',
+  THEME_CHANGED: 'theme:changed',
+
+  // Auto-updater
+  UPDATE_CHECK: 'update:check',
+  UPDATE_DOWNLOAD: 'update:download',
+  UPDATE_INSTALL: 'update:install',
+  UPDATE_AVAILABLE: 'update:available',
+  UPDATE_NOT_AVAILABLE: 'update:not-available',
+  UPDATE_DOWNLOAD_PROGRESS: 'update:download-progress',
+  UPDATE_DOWNLOADED: 'update:downloaded',
+
+  // Selection Assistant
+  SELECTION_ASSISTANT_SHOW: 'selection-assistant:show',
+  SELECTION_ASSISTANT_HIDE: 'selection-assistant:hide',
+
+  // OCR
+  OCR_EXTRACT: 'ocr:extract'
 } as const
 
 export type IpcChannelKey = keyof typeof IpcChannel

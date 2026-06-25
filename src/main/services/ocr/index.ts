@@ -1,0 +1,1 @@
+export { ocrService } from './OcrService'

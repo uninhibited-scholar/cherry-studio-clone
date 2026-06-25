@@ -20,6 +20,7 @@ import { mcpService } from './services/McpService'
 import { topicNamingService } from './services/TopicNamingService'
 import { historyService } from './data/services/HistoryService'
 import { libraryService } from './data/services/LibraryService'
+import { ocrService } from './services/ocr'
 
 const logger = loggerService.withContext('IPC')
 
@@ -542,6 +543,11 @@ export function registerIpcHandlers(): void {
 
   ipcMain.on(IpcChannel.QUICK_ASSISTANT_SHOW, () => {
     quickAssistantWindow.show()
+  })
+
+  // ── OCR ─────────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.OCR_EXTRACT, async (_event, imagePath: string) => {
+    return ocrService.extractText(imagePath)
   })
 
   logger.info('All IPC handlers registered')

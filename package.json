@@ -18,19 +18,21 @@
     "i18n:check": "node scripts/i18n-check.js"
   },
   "dependencies": {
+    "@ai-sdk/azure": "^4.0.0",
     "@libsql/client": "^0.14.0",
-    "i18next": "^24.2.2",
-    "react-i18next": "^15.5.1",
-    "zustand": "^5.0.3",
-    "ml-distance": "^4.0.1",
     "drizzle-orm": "^0.44.2",
     "electron-updater": "^6.3.9",
     "highlight.js": "^11.11.1",
+    "i18next": "^24.2.2",
+    "ml-distance": "^4.0.1",
     "nanoid": "^5.1.11",
+    "react-i18next": "^15.5.1",
     "react-markdown": "^10.1.0",
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1",
-    "ws": "^8.18.2"
+    "tesseract.js": "^7.0.0",
+    "ws": "^8.18.2",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@ai-sdk/anthropic": "^1.2.12",

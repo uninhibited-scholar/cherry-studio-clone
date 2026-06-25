@@ -1,6 +1,7 @@
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
+import { createAzure } from '@ai-sdk/azure'
 import type { LanguageModel } from 'ai'
 import type { Provider } from '@shared/data/types/provider'
 import type { Model } from '@shared/data/types/model'
@@ -45,7 +46,25 @@ export function buildLanguageModel(provider: Provider, model: Model): LanguageMo
       return client.responses(model.name)
     }
 
-    // openai_chat_completions, azure_openai, custom — all through openai-compat
+    case ENDPOINT_TYPE.AZURE_OPENAI: {
+      const client = createAzure({
+        apiKey,
+        resourceName: provider.resourceName ?? '',
+        apiVersion: provider.apiVersion ?? '2024-10-21'
+      })
+      return client(model.name)
+    }
+
+    case ENDPOINT_TYPE.GROQ: {
+      const client = createOpenAI({
+        apiKey,
+        baseURL: 'https://api.groq.com/openai/v1',
+        compatibility: 'compatible'
+      })
+      return client(model.name)
+    }
+
+    // openai_chat_completions, custom — all through openai-compat
     default: {
       const client = createOpenAI({
         apiKey,

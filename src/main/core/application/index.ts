@@ -14,7 +14,11 @@ class Application {
     const { runMigrations } = await import('../../data/db/migrate')
     await runMigrations()
 
-    // 2. Register all IPC handlers
+    // 2. Seed default providers on first launch
+    const { seedDefaultProviders } = await import('../../data/services/DefaultProviderSeeder')
+    await seedDefaultProviders()
+
+    // 3. Register all IPC handlers
     const { registerIpcHandlers } = await import('../../ipc')
     registerIpcHandlers()
 
