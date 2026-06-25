@@ -13,6 +13,14 @@ export function useTopics(assistantId: string | null) {
 
   useEffect(() => { refresh() }, [refresh])
 
+  // Listen for AI auto-rename events so sidebar title updates live
+  useEffect(() => {
+    return window.api.on(IpcChannel.TOPIC_NAMED, (payload: unknown) => {
+      const { topicId, title } = payload as { topicId: string; title: string }
+      setTopics((prev) => prev.map((t) => (t.id === topicId ? { ...t, title } : t)))
+    }) as () => void
+  }, [])
+
   const createTopic = useCallback(async () => {
     if (!assistantId) return null
     const t = await window.api.invoke(IpcChannel.TOPICS_CREATE, { assistantId }) as Topic

@@ -22,8 +22,9 @@ export function CreateAssistantModal({ open, onClose, onCreated }: Props) {
     if (!open) return
     window.api.invoke(IpcChannel.PROVIDERS_LIST).then((list) => {
       const ps = list as Provider[]
-      setProviders(ps.filter((p) => p.isEnabled))
-      if (ps.length > 0) setSelectedProviderId(ps[0].id)
+      const enabled = ps.filter((p) => p.isEnabled)
+      setProviders(enabled)
+      if (enabled.length > 0) setSelectedProviderId(enabled[0].id)
     })
   }, [open])
 
@@ -31,8 +32,10 @@ export function CreateAssistantModal({ open, onClose, onCreated }: Props) {
     if (!selectedProviderId) return
     window.api.invoke(IpcChannel.MODELS_LIST, selectedProviderId).then((list) => {
       const ms = list as Model[]
-      setModels(ms.filter((m) => m.isEnabled))
-      if (ms.length > 0) setSelectedModelId(ms[0].id)
+      const enabled = ms.filter((m) => m.isEnabled)
+      setModels(enabled)
+      if (enabled.length > 0) setSelectedModelId(enabled[0].id)
+      else setSelectedModelId('')
     })
   }, [selectedProviderId])
 
@@ -77,14 +80,14 @@ export function CreateAssistantModal({ open, onClose, onCreated }: Props) {
           <input
             value={emoji}
             onChange={(e) => setEmoji(e.target.value)}
-            style={{ width: 48, ...inputStyle }}
+            style={{ ...inputStyle, width: 48, flexShrink: 0, textAlign: 'center', padding: '8px 4px' }}
           />
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Assistant name"
+            placeholder="助手名称"
             required
-            style={{ flex: 1, ...inputStyle }}
+            style={{ ...inputStyle, flex: 1, width: 'auto' }}
           />
         </div>
 
@@ -96,32 +99,59 @@ export function CreateAssistantModal({ open, onClose, onCreated }: Props) {
           style={{ ...inputStyle, resize: 'vertical' }}
         />
 
-        <select
-          value={selectedProviderId}
-          onChange={(e) => setSelectedProviderId(e.target.value)}
-          style={inputStyle}
-        >
-          {providers.length === 0 && <option value="">No providers — add one in Settings</option>}
-          {providers.map((p) => (
-            <option key={p.id} value={p.id}>{p.name}</option>
-          ))}
-        </select>
+        {providers.length === 0 ? (
+          <div style={{ background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.4)', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#fbbf24' }}>
+            ⚠️ 还没有可用的 Provider。请先到{' '}
+            <button
+              type="button"
+              onClick={() => { onClose(); window.location.hash = '#/settings' }}
+              style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: 0, fontSize: 13, textDecoration: 'underline' }}
+            >
+              设置 → Providers
+            </button>
+            {' '}添加 API Key 并启用至少一个模型。
+          </div>
+        ) : (
+          <>
+            <select
+              value={selectedProviderId}
+              onChange={(e) => setSelectedProviderId(e.target.value)}
+              style={inputStyle}
+            >
+              {providers.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
 
-        <select
-          value={selectedModelId}
-          onChange={(e) => setSelectedModelId(e.target.value)}
-          style={inputStyle}
-          disabled={models.length === 0}
-        >
-          {models.length === 0 && <option value="">No models for this provider</option>}
-          {models.map((m) => (
-            <option key={m.id} value={m.id}>{m.displayName ?? m.name}</option>
-          ))}
-        </select>
+            {models.length === 0 ? (
+              <div style={{ background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.4)', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#fbbf24' }}>
+                ⚠️ 该 Provider 下没有启用的模型。请到{' '}
+                <button
+                  type="button"
+                  onClick={() => { onClose(); window.location.hash = '#/settings' }}
+                  style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: 0, fontSize: 13, textDecoration: 'underline' }}
+                >
+                  设置 → Providers
+                </button>
+                {' '}启用至少一个模型。
+              </div>
+            ) : (
+              <select
+                value={selectedModelId}
+                onChange={(e) => setSelectedModelId(e.target.value)}
+                style={inputStyle}
+              >
+                {models.map((m) => (
+                  <option key={m.id} value={m.id}>{m.displayName ?? m.name}</option>
+                ))}
+              </select>
+            )}
+          </>
+        )}
 
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button type="button" onClick={onClose} style={btnStyle('#27272a')}>Cancel</button>
-          <button type="submit" style={btnStyle('#2563eb')}>Create</button>
+          <button type="button" onClick={onClose} style={btnStyle('#27272a')}>取消</button>
+          <button type="submit" disabled={providers.length === 0 || !selectedModelId} style={btnStyle(providers.length === 0 || !selectedModelId ? '#374151' : '#2563eb')}>创建</button>
         </div>
       </form>
     </div>

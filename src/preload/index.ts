@@ -20,8 +20,9 @@ const api = {
 
   /** Subscribe to events pushed from the main process */
   on: (channel: string, listener: (...args: unknown[]) => void) => {
-    ipcRenderer.on(channel, (_event, ...args) => listener(...args))
-    return () => ipcRenderer.removeAllListeners(channel)
+    const wrapped = (_event: Electron.IpcRendererEvent, ...args: unknown[]) => listener(...args)
+    ipcRenderer.on(channel, wrapped)
+    return () => ipcRenderer.removeListener(channel, wrapped)
   }
 }
 

@@ -89,12 +89,18 @@ export class AiService {
         abortSignal: abortController.signal
       })
 
-      for await (const chunk of result.textStream) {
+      let usage: Awaited<typeof result.usage> | undefined
+      for await (const part of result.fullStream) {
         if (abortController.signal.aborted) break
-        onChunk({ type: 'text', text: chunk })
+        if (part.type === 'text-delta') {
+          onChunk({ type: 'text', text: part.textDelta })
+        } else if (part.type === 'finish') {
+          usage = part.usage
+        } else if (part.type === 'error') {
+          throw part.error
+        }
       }
 
-      const usage = await result.usage
       onChunk({
         type: 'done',
         usage: usage

@@ -16,6 +16,13 @@ export function HomePage(): React.ReactElement {
   const { assistants, createAssistant } = useAssistants()
   const [selectedAssistant, setSelectedAssistant] = useState<Assistant | null>(null)
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null)
+
+  // Auto-select first assistant when list loads and nothing is selected
+  useEffect(() => {
+    if (!selectedAssistant && assistants.length > 0) {
+      setSelectedAssistant(assistants[0])
+    }
+  }, [assistants, selectedAssistant])
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [msgSearch, setMsgSearch] = useState('')
   const [showMsgSearch, setShowMsgSearch] = useState(false)
@@ -32,7 +39,8 @@ export function HomePage(): React.ReactElement {
   const [showSharePanel, setShowSharePanel] = useState(false)
 
   const importTopic = async () => {
-    const file = await window.api.invoke(IpcChannel.FILE_SELECT, { filters: [{ name: 'JSON', extensions: ['json'] }] }) as string | null
+    const paths = await window.api.invoke(IpcChannel.FILE_SELECT, { filters: [{ name: 'JSON', extensions: ['json'] }] }) as string[]
+    const file = paths?.[0]
     if (!file) return
     try {
       const content = await window.api.invoke(IpcChannel.FILE_READ, file) as string
@@ -51,15 +59,6 @@ export function HomePage(): React.ReactElement {
       console.error('Failed to import topic:', e)
     }
   }
-
-  const commands: Command[] = [
-    { id: 'new-topic', label: 'New Topic', icon: '📝', onSelect: handleNewTopic },
-    { id: 'new-assistant', label: 'New Assistant', icon: '🤖', onSelect: () => setShowCreateModal(true) },
-    { id: 'import-topic', label: 'Import Topic', icon: '↑', onSelect: importTopic },
-    selectedTopic ? { id: 'export-md', label: 'Export as Markdown', icon: '↓', onSelect: () => window.api.invoke(IpcChannel.EXPORT_TOPIC, selectedTopic.id) } : null,
-    selectedTopic ? { id: 'export-json', label: 'Export as JSON', icon: '↓', onSelect: () => window.api.invoke(IpcChannel.EXPORT_TOPIC_JSON, { topic: selectedTopic, messages }) } : null,
-    { id: 'settings', label: 'Settings', icon: '⚙️', onSelect: () => window.location.hash = '#/settings' }
-  ].filter((c) => c !== null) as Command[]
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -119,7 +118,7 @@ export function HomePage(): React.ReactElement {
   }, [sidebarWidth])
 
   const { topics, createTopic, deleteTopic, renameTopic } = useTopics(selectedAssistant?.id ?? null)
-  const { messages, streaming, streamingText, searching, sendMessage, abort, deleteMessage, regenerate, editResend, selectedKnowledgeBaseId, setSelectedKnowledgeBaseId } = useChat(
+  const { messages, streaming, streamingText, searching, sendMessage, abort, deleteMessage, regenerate, editResend, selectedKnowledgeBaseId, setSelectedKnowledgeBaseId, mcpTools, setMcpTools } = useChat(
     selectedTopic?.id ?? null,
     selectedAssistant
   )
@@ -140,6 +139,15 @@ export function HomePage(): React.ReactElement {
     const t = await createTopic()
     if (t) setSelectedTopic(t)
   }, [createTopic])
+
+  const commands: Command[] = [
+    { id: 'new-topic', label: 'New Topic', icon: '📝', onSelect: handleNewTopic },
+    { id: 'new-assistant', label: 'New Assistant', icon: '🤖', onSelect: () => setShowCreateModal(true) },
+    { id: 'import-topic', label: 'Import Topic', icon: '↑', onSelect: importTopic },
+    selectedTopic ? { id: 'export-md', label: 'Export as Markdown', icon: '↓', onSelect: () => window.api.invoke(IpcChannel.EXPORT_TOPIC, selectedTopic.id) } : null,
+    selectedTopic ? { id: 'export-json', label: 'Export as JSON', icon: '↓', onSelect: () => window.api.invoke(IpcChannel.EXPORT_TOPIC_JSON, { topic: selectedTopic, messages }) } : null,
+    { id: 'settings', label: 'Settings', icon: '⚙️', onSelect: () => window.location.hash = '#/settings' }
+  ].filter((c) => c !== null) as Command[]
 
   const handleDeleteTopic = useCallback(
     async (id: string) => {
@@ -209,24 +217,28 @@ export function HomePage(): React.ReactElement {
   const generateSummary = async () => {
     if (!selectedAssistant || !messages.length) return
     setGeneratingSummary(true)
+    setTopicSummary('')
     try {
       const text = messages
         .map((m) => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
         .join('\n\n')
       const requestId = `summary-${Date.now()}`
-      const result = await window.api.invoke(IpcChannel.AI_CHAT, {
-        requestId,
-        providerId: selectedAssistant.providerId,
-        modelId: selectedAssistant.modelId,
-        messages: [
-          {
-            role: 'user',
-            content: `Please provide a concise summary (2-3 sentences) of the following conversation:\n\n${text.slice(0, 2000)}`
-          }
-        ],
-        temperature: 0.7
-      }) as any
-      setTopicSummary(result)
+      await new Promise<void>((resolve, reject) => {
+        const cleanup = window.api.on(IpcChannel.AI_STREAM_CHUNK, (payload: unknown) => {
+          const { requestId: rid, chunk } = payload as { requestId: string; chunk: { type: string; text?: string; error?: string } }
+          if (rid !== requestId) return
+          if (chunk.type === 'text' && chunk.text) setTopicSummary((prev) => prev + chunk.text)
+          if (chunk.type === 'done') { (cleanup as () => void)(); resolve() }
+          if (chunk.type === 'error') { (cleanup as () => void)(); reject(new Error(chunk.error)) }
+        })
+        window.api.invoke(IpcChannel.AI_CHAT, {
+          requestId,
+          providerId: selectedAssistant.providerId,
+          modelId: selectedAssistant.modelId,
+          messages: [{ role: 'user', content: `Please provide a concise summary (2-3 sentences) of the following conversation:\n\n${text.slice(0, 2000)}` }],
+          temperature: 0.7
+        }).catch(reject)
+      })
     } catch (e) {
       console.error('Failed to generate summary:', e)
     } finally {
@@ -373,9 +385,9 @@ export function HomePage(): React.ReactElement {
                 <div style={{ position: 'relative' }}>
                   <button
                     onClick={() => setShowModelMenu((v) => !v)}
-                    style={{ marginLeft: 4, fontSize: 11, color: '#3f3f46', background: showModelMenu ? '#2563eb' : '#18181b', border: '1px solid #27272a', borderRadius: 4, padding: '1px 7px', cursor: 'pointer', color: showModelMenu ? '#fff' : '#3f3f46' }}
+                    style={{ marginLeft: 4, fontSize: 11, background: showModelMenu ? '#2563eb' : '#18181b', border: '1px solid #27272a', borderRadius: 4, padding: '1px 7px', cursor: 'pointer', color: showModelMenu ? '#fff' : '#3f3f46' }}
                   >
-                    {selectedAssistant.modelId} ▼
+                    {selectedAssistant.modelId?.includes('/') ? selectedAssistant.modelId.split('/').slice(1).join('/') : selectedAssistant.modelId} ▼
                   </button>
                   {showModelMenu && (
                     <div style={{ position: 'absolute', top: 24, left: 0, background: '#18181b', border: '1px solid #27272a', borderRadius: 4, zIndex: 100, minWidth: 200, maxHeight: 300, overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
@@ -389,7 +401,7 @@ export function HomePage(): React.ReactElement {
                           }}
                           style={{ padding: '8px 12px', fontSize: 12, color: selectedAssistant.modelId === m.id ? '#60a5fa' : '#a1a1aa', background: selectedAssistant.modelId === m.id ? 'rgba(96,165,250,0.1)' : 'transparent', cursor: 'pointer', borderBottom: '1px solid #27272a' }}
                         >
-                          {m.modelId === m.id ? '✓' : ' '} {m.displayName || m.id}
+                          {selectedAssistant.modelId === m.id ? '✓' : ' '} {m.displayName || m.name}
                         </div>
                       ))}
                     </div>

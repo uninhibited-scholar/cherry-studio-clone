@@ -58,7 +58,7 @@ export function ProvidersSettings() {
 
     // Add default models
     for (const modelName of template.defaultModels) {
-      await window.api.invoke(IpcChannel.MODELS_LIST + ':upsert', {
+      await window.api.invoke(IpcChannel.MODELS_UPSERT, {
         providerId: p.id,
         name: modelName,
         displayName: modelName,
@@ -88,15 +88,13 @@ export function ProvidersSettings() {
   const addModel = async (providerId: string) => {
     const name = (newModelName[providerId] ?? '').trim()
     if (!name) return
-    await window.api.invoke(IpcChannel.MODELS_LIST, providerId) // refresh
-    // Upsert model via IPC — reuse MODELS_LIST channel suffix workaround
-    await window.api.invoke('models:upsert', { providerId, name, displayName: name, isEnabled: true })
+    await window.api.invoke(IpcChannel.MODELS_UPSERT, { providerId, name, displayName: name, isEnabled: true })
     setNewModelName((prev) => ({ ...prev, [providerId]: '' }))
     await refresh()
   }
 
   const toggleModel = async (m: Model) => {
-    await window.api.invoke('models:upsert', { ...m, isEnabled: !m.isEnabled })
+    await window.api.invoke(IpcChannel.MODELS_UPSERT, { ...m, isEnabled: !m.isEnabled })
     await refresh()
   }
 
