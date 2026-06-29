@@ -7,6 +7,7 @@ import { MessageThread } from './components/MessageThread'
 import { InputBar } from './components/InputBar'
 import { CreateAssistantModal } from './components/CreateAssistantModal'
 import { CommandPalette, type Command } from '../../components/CommandPalette'
+import { ModelParamsPanel } from '../../components/ModelParamsPanel'
 import { IpcChannel } from '@shared/IpcChannel'
 import { loadGeneralPrefs } from '../settings/sections/GeneralSettings'
 import type { Assistant } from '@shared/data/types/assistant'
@@ -37,6 +38,7 @@ export function HomePage(): React.ReactElement {
   const [generatingSummary, setGeneratingSummary] = useState(false)
   const [topicSummary, setTopicSummary] = useState<string>('')
   const [showSharePanel, setShowSharePanel] = useState(false)
+  const [showModelParams, setShowModelParams] = useState(false)
 
   const importTopic = async () => {
     const paths = await window.api.invoke(IpcChannel.FILE_SELECT, { filters: [{ name: 'JSON', extensions: ['json'] }] }) as string[]
@@ -413,6 +415,15 @@ export function HomePage(): React.ReactElement {
                 className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-xs outline-none px-2.5 py-1 w-[200px]"
               />
             )}
+            {selectedAssistant && (
+              <button
+                onClick={() => setShowModelParams((v) => !v)}
+                title="Model parameters"
+                className={`border border-[#3f3f46] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${showModelParams ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
+              >
+                ⚙️
+              </button>
+            )}
             {selectedTopic && (
               <>
                 <button
@@ -539,6 +550,12 @@ export function HomePage(): React.ReactElement {
               </div>
             )}
 
+            {showModelParams && selectedAssistant && (
+              <ModelParamsPanel
+                assistant={selectedAssistant}
+                onUpdate={setSelectedAssistant}
+              />
+            )}
             {sysPromptEdit && selectedAssistant && (
               <div className="bg-[#18181b] border-b border-b-[#27272a] px-4 py-3">
                 <div className="flex items-center gap-2 mb-2">

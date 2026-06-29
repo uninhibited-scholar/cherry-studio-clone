@@ -28,6 +28,9 @@ export type StreamParams = {
   systemPrompt?: string
   temperature?: number
   maxTokens?: number
+  topP?: number
+  frequencyPenalty?: number
+  presencePenalty?: number
   mcpTools?: McpToolDefs
   onChunk: (chunk: StreamChunk) => void
 }
@@ -36,7 +39,7 @@ export class AiService {
   private activeStreams = new Map<string, AbortController>()
 
   async streamChat(params: StreamParams): Promise<void> {
-    const { requestId, providerId, modelId, messages, systemPrompt, temperature, maxTokens, mcpTools, onChunk } = params
+    const { requestId, providerId, modelId, messages, systemPrompt, temperature, maxTokens, topP, frequencyPenalty, presencePenalty, mcpTools, onChunk } = params
 
     const providers = await providerService.listProviders()
     const provider = providers.find((p) => p.id === providerId)
@@ -91,6 +94,9 @@ export class AiService {
         messages: truncated.map((m) => ({ role: m.role, content: m.content })),
         temperature: temperature ?? 1,
         maxTokens,
+        topP,
+        frequencyPenalty,
+        presencePenalty,
         tools,
         maxSteps: tools ? 5 : 1,
         abortSignal: abortController.signal

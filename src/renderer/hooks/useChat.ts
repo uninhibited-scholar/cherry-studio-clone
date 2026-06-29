@@ -172,6 +172,10 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
         messages: history,
         systemPrompt: assistant.prompt || undefined,
         temperature: assistant.temperature,
+        maxTokens: assistant.maxTokens,
+        topP: assistant.topP,
+        frequencyPenalty: assistant.frequencyPenalty,
+        presencePenalty: assistant.presencePenalty,
         mcpTools: mcpTools.length > 0
           ? mcpTools.reduce<Record<string, { description: string; inputSchema: Record<string, unknown> }>>((acc, t) => {
               acc[`${t.serverId}__${t.name}`] = { description: t.description, inputSchema: t.inputSchema }
@@ -232,6 +236,10 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
       messages: history,
       systemPrompt: assistant.prompt || undefined,
       temperature: assistant.temperature,
+      maxTokens: assistant.maxTokens,
+      topP: assistant.topP,
+      frequencyPenalty: assistant.frequencyPenalty,
+      presencePenalty: assistant.presencePenalty,
       mcpTools: mcpTools.length > 0
         ? mcpTools.reduce<Record<string, { description: string; inputSchema: Record<string, unknown> }>>((acc, t) => {
             acc[`${t.serverId}__${t.name}`] = { description: t.description, inputSchema: t.inputSchema }

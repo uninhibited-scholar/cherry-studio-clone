@@ -43,6 +43,14 @@ export async function setupSchema(db: ReturnType<typeof createTestDb>) {
     )
   `)
   await db.run(sql`
+    CREATE TABLE IF NOT EXISTS assistant_group (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      sort_order INTEGER DEFAULT 0,
+      created_at INTEGER NOT NULL
+    )
+  `)
+  await db.run(sql`
     CREATE TABLE IF NOT EXISTS assistant (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -53,8 +61,12 @@ export async function setupSchema(db: ReturnType<typeof createTestDb>) {
       provider_id TEXT,
       max_tokens INTEGER,
       temperature REAL NOT NULL DEFAULT 1,
+      top_p REAL,
+      frequency_penalty REAL,
+      presence_penalty REAL,
       is_builtin INTEGER NOT NULL DEFAULT 0,
       sort_order INTEGER NOT NULL DEFAULT 0,
+      group_id TEXT,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     )
@@ -80,6 +92,8 @@ export async function setupSchema(db: ReturnType<typeof createTestDb>) {
       usage TEXT,
       file_ids TEXT DEFAULT '[]',
       thinking_content TEXT,
+      parent_id TEXT,
+      branch_index INTEGER DEFAULT 0,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     )

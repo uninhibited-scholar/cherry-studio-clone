@@ -24,6 +24,7 @@ import { topicNamingService } from './services/TopicNamingService'
 import { historyService } from './data/services/HistoryService'
 import { backupService } from './services/BackupService'
 import { libraryService } from './data/services/LibraryService'
+import { assistantGroupService } from './data/services/AssistantGroupService'
 import { ocrService } from './services/ocr'
 
 const logger = loggerService.withContext('IPC')
@@ -31,7 +32,7 @@ const logger = loggerService.withContext('IPC')
 export function registerIpcHandlers(): void {
   // ── AI Stream ───────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.AI_CHAT, async (event, params) => {
-    const { requestId, providerId, modelId, messages, systemPrompt, temperature, maxTokens } = params
+    const { requestId, providerId, modelId, messages, systemPrompt, temperature, maxTokens, topP, frequencyPenalty, presencePenalty } = params
 
     await aiService.streamChat({
       requestId,
@@ -41,6 +42,9 @@ export function registerIpcHandlers(): void {
       systemPrompt,
       temperature,
       maxTokens,
+      topP,
+      frequencyPenalty,
+      presencePenalty,
       onChunk: (chunk) => {
         if (!event.sender.isDestroyed()) {
           event.sender.send(IpcChannel.AI_STREAM_CHUNK, { requestId, chunk })
@@ -89,6 +93,23 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannel.ASSISTANTS_DELETE, async (_event, id: string) => {
     return assistantService.delete(id)
+  })
+
+  // ── Assistant Groups ─────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.ASSISTANT_GROUPS_LIST, async () => {
+    return assistantGroupService.list()
+  })
+
+  ipcMain.handle(IpcChannel.ASSISTANT_GROUPS_CREATE, async (_event, name: string) => {
+    return assistantGroupService.create(name)
+  })
+
+  ipcMain.handle(IpcChannel.ASSISTANT_GROUPS_DELETE, async (_event, id: string) => {
+    return assistantGroupService.delete(id)
+  })
+
+  ipcMain.handle(IpcChannel.ASSISTANT_GROUPS_MOVE, async (_event, { assistantId, groupId }: { assistantId: string; groupId: string | null }) => {
+    return assistantGroupService.moveAssistant(assistantId, groupId)
   })
 
   // ── Topics ──────────────────────────────────────────────────────────────

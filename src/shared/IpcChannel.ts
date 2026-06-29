@@ -22,6 +22,12 @@ export const IpcChannel = {
   ASSISTANTS_UPSERT: 'assistants:upsert',
   ASSISTANTS_DELETE: 'assistants:delete',
 
+  // Assistant Groups
+  ASSISTANT_GROUPS_LIST: 'assistant-groups:list',
+  ASSISTANT_GROUPS_CREATE: 'assistant-groups:create',
+  ASSISTANT_GROUPS_DELETE: 'assistant-groups:delete',
+  ASSISTANT_GROUPS_MOVE: 'assistant-groups:move',
+
   // Topics
   TOPICS_LIST: 'topics:list',
   TOPICS_CREATE: 'topics:create',
