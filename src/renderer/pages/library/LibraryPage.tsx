@@ -62,12 +62,12 @@ export function LibraryPage(): React.ReactElement {
     : allTemplates
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#09090b', color: '#fafafa' }}>
+    <div className="flex flex-col h-full bg-[#09090b] text-[#fafafa]">
       {/* Header */}
-      <div style={{ padding: '16px 24px', borderBottom: '1px solid #27272a', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, flex: 'none' }}>📖 Prompt Library</h2>
-          <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter prompts…" style={inputStyle} />
+      <div className="px-6 py-4 border-b border-[#27272a] shrink-0">
+        <div className="flex items-center gap-3 mb-3">
+          <h2 className="m-0 text-[15px] font-bold flex-none">📖 Prompt Library</h2>
+          <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter prompts…" className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full" />
           <button
             onClick={() => {
               const data = JSON.stringify(saved, null, 2)
@@ -77,7 +77,7 @@ export function LibraryPage(): React.ReactElement {
               a.href = url; a.download = 'prompts.json'; a.click()
               URL.revokeObjectURL(url)
             }}
-            style={{ ...btnPrimaryStyle, background: '#27272a', color: '#a1a1aa' }}
+            className="bg-[#27272a] border-none rounded-md text-[#a1a1aa] cursor-pointer text-[12px] font-semibold px-[14px] py-[6px] whitespace-nowrap shrink-0"
             title="Export saved prompts as JSON"
           >
             ↓ Export
@@ -98,14 +98,14 @@ export function LibraryPage(): React.ReactElement {
               }
               input.click()
             }}
-            style={{ ...btnPrimaryStyle, background: '#27272a', color: '#a1a1aa' }}
+            className="bg-[#27272a] border-none rounded-md text-[#a1a1aa] cursor-pointer text-[12px] font-semibold px-[14px] py-[6px] whitespace-nowrap shrink-0"
             title="Import prompts from JSON"
           >
             ↑ Import
           </button>
-          <button onClick={() => setShowAdd(true)} style={btnPrimaryStyle}>+ Save Prompt</button>
+          <button onClick={() => setShowAdd(true)} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-[14px] py-[6px] whitespace-nowrap shrink-0">+ Save Prompt</button>
         </div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <div className="flex gap-[6px] flex-wrap">
           <CategoryChip label="All" active={!filter} onClick={() => setFilter('')} />
           {categories.map((cat) => (
             <CategoryChip key={cat} label={cat} active={filter === cat} onClick={() => setFilter(cat)} />
@@ -115,27 +115,27 @@ export function LibraryPage(): React.ReactElement {
 
       {/* Add prompt form */}
       {showAdd && (
-        <div style={{ padding: '16px 24px', borderBottom: '1px solid #27272a', background: '#18181b', flexShrink: 0 }}>
-          <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-            <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Prompt name" style={{ ...inputStyle, flex: 1 }} autoFocus />
-            <input value={newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="Category" style={{ ...inputStyle, width: 140 }} />
+        <div className="px-6 py-4 border-b border-[#27272a] bg-[#18181b] shrink-0">
+          <div className="flex gap-2 mb-2">
+            <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Prompt name" className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] flex-1" autoFocus />
+            <input value={newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="Category" className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-[140px]" />
           </div>
-          <textarea value={newContent} onChange={(e) => setNewContent(e.target.value)} placeholder="System prompt content…" rows={5} style={{ ...inputStyle, resize: 'vertical', fontFamily: 'ui-monospace, monospace', width: '100%', boxSizing: 'border-box' }} />
-          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-            <button onClick={handleSave} style={btnPrimaryStyle}>Save</button>
-            <button onClick={() => { setShowAdd(false); setNewName(''); setNewContent('') }} style={btnSecondaryStyle}>Cancel</button>
+          <textarea value={newContent} onChange={(e) => setNewContent(e.target.value)} placeholder="System prompt content…" rows={5} className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] resize-y font-mono w-full box-border" />
+          <div className="flex gap-2 mt-2">
+            <button onClick={handleSave} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-[14px] py-[6px]">Save</button>
+            <button onClick={() => { setShowAdd(false); setNewName(''); setNewContent('') }} className="bg-transparent border border-[#3f3f46] rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-[10px] py-[5px]">Cancel</button>
           </div>
         </div>
       )}
 
       {/* Grid */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
+      <div className="flex-1 overflow-y-auto p-4">
         {filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', marginTop: 60, color: '#52525b' }}>
-            <p style={{ fontSize: 14, color: '#71717a' }}>No prompts found</p>
+          <div className="text-center mt-[60px] text-[#52525b]">
+            <p className="text-[14px] text-[#71717a]">No prompts found</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 12 }}>
+          <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))' }}>
             {filtered.map((t) => (
               <PromptCard
                 key={t.id}
@@ -150,8 +150,8 @@ export function LibraryPage(): React.ReactElement {
         )}
       </div>
 
-      <div style={{ borderTop: '1px solid #18181b', padding: '6px 24px', flexShrink: 0 }}>
-        <span style={{ fontSize: 11, color: '#52525b' }}>{BUILTIN_TEMPLATES.length} built-in · {saved.length} saved</span>
+      <div className="border-t border-[#18181b] px-6 py-[6px] shrink-0">
+        <span className="text-[11px] text-[#52525b]">{BUILTIN_TEMPLATES.length} built-in · {saved.length} saved</span>
       </div>
     </div>
   )
@@ -173,27 +173,22 @@ function PromptCard({
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{ background: hovered ? '#18181b' : '#111113', border: '1px solid #27272a', borderRadius: 10, padding: 14, display: 'flex', flexDirection: 'column', gap: 8 }}
+      className={`border border-[#27272a] rounded-[10px] p-[14px] flex flex-col gap-2 ${hovered ? 'bg-[#18181b]' : 'bg-[#111113]'}`}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-        <div style={{ flex: 1, overflow: 'hidden' }}>
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 600 }}>{template.name}</p>
-          <span style={{ fontSize: 10, color: '#52525b', background: '#27272a', borderRadius: 4, padding: '1px 6px', display: 'inline-block', marginTop: 3 }}>{template.category}</span>
+      <div className="flex items-start gap-2">
+        <div className="flex-1 overflow-hidden">
+          <p className="m-0 text-[13px] font-semibold">{template.name}</p>
+          <span className="text-[10px] text-[#52525b] bg-[#27272a] rounded px-[6px] py-[1px] inline-block mt-[3px]">{template.category}</span>
         </div>
-        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-          <button onClick={onCopy} style={{ ...btnSecondaryStyle, fontSize: 11 }}>{isCopied ? '✓ Copied' : 'Copy'}</button>
-          {onDelete && <button onClick={onDelete} style={{ ...btnSecondaryStyle, fontSize: 11, color: '#f87171' }}>Del</button>}
+        <div className="flex gap-1 shrink-0">
+          <button onClick={onCopy} className="bg-transparent border border-[#3f3f46] rounded-md text-[#a1a1aa] cursor-pointer text-[11px] px-[10px] py-[5px]">{isCopied ? '✓ Copied' : 'Copy'}</button>
+          {onDelete && <button onClick={onDelete} className="bg-transparent border border-[#3f3f46] rounded-md text-[#f87171] cursor-pointer text-[11px] px-[10px] py-[5px]">Del</button>}
         </div>
       </div>
       <p
         onClick={() => setExpanded((p) => !p)}
-        style={{
-          margin: 0, fontSize: 12, color: '#71717a', lineHeight: 1.5, cursor: 'pointer',
-          overflow: expanded ? undefined : 'hidden',
-          display: expanded ? undefined : '-webkit-box',
-          WebkitLineClamp: expanded ? undefined : 3,
-          WebkitBoxOrient: expanded ? undefined : 'vertical'
-        } as React.CSSProperties}
+        className="m-0 text-[12px] text-[#71717a] leading-[1.5] cursor-pointer"
+        style={expanded ? undefined : { overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' } as React.CSSProperties}
       >
         {template.content}
       </p>
@@ -205,27 +200,9 @@ function CategoryChip({ label, active, onClick }: { label: string; active: boole
   return (
     <button
       onClick={onClick}
-      style={{
-        padding: '3px 10px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 11,
-        background: active ? '#2563eb' : '#27272a', color: active ? 'white' : '#a1a1aa'
-      }}
+      className={`px-[10px] py-[3px] rounded-[20px] border-none cursor-pointer text-[11px] ${active ? 'bg-[#2563eb] text-white' : 'bg-[#27272a] text-[#a1a1aa]'}`}
     >
       {label}
     </button>
   )
-}
-
-const inputStyle: React.CSSProperties = {
-  background: '#18181b', border: '1px solid #3f3f46', borderRadius: 6, color: '#fafafa',
-  fontSize: 13, outline: 'none', padding: '6px 10px', width: '100%'
-}
-
-const btnPrimaryStyle: React.CSSProperties = {
-  background: '#2563eb', border: 'none', borderRadius: 6, color: 'white',
-  cursor: 'pointer', fontSize: 12, fontWeight: 600, padding: '6px 14px', whiteSpace: 'nowrap', flexShrink: 0
-}
-
-const btnSecondaryStyle: React.CSSProperties = {
-  background: 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: '#a1a1aa',
-  cursor: 'pointer', fontSize: 12, padding: '5px 10px'
 }

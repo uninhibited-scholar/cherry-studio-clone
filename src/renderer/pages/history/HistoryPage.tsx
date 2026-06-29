@@ -96,78 +96,78 @@ export function HistoryPage(): React.ReactElement {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#09090b', color: '#fafafa' }}>
+    <div className="flex flex-col h-full bg-[#09090b] text-[#fafafa]">
       {/* Header */}
-      <div style={{ padding: '16px 24px', borderBottom: '1px solid #27272a', flexShrink: 0 }}>
-        <h2 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700 }}>🕐 Conversation History</h2>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+      <div className="px-6 py-4 border-b border-[#27272a] shrink-0">
+        <h2 className="m-0 mb-3 text-[15px] font-bold">🕐 Conversation History</h2>
+        <div className="flex gap-2 mb-3">
           <input
             value={filters.query}
             onChange={(e) => { setFilters({ ...filters, query: e.target.value }); if (!e.target.value) setResults(null) }}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSearch() }}
             placeholder="Search across all conversations…"
-            style={{ ...inputStyle, flex: 1 }}
+            className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] flex-1"
           />
-          <button onClick={handleSearch} style={btnStyle}>Search</button>
-          <button onClick={() => setShowFilters((v) => !v)} title="Advanced filters" style={btnStyle}>⚙️ {showFilters ? 'Hide' : 'Show'}</button>
+          <button onClick={handleSearch} className="bg-[#27272a] border-none rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-[14px] py-[6px] whitespace-nowrap">Search</button>
+          <button onClick={() => setShowFilters((v) => !v)} title="Advanced filters" className="bg-[#27272a] border-none rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-[14px] py-[6px] whitespace-nowrap">⚙️ {showFilters ? 'Hide' : 'Show'}</button>
           {results !== null && (
-            <button onClick={() => { setResults(null); setFilters({ ...filters, query: '' }) }} style={btnStyle}>✕</button>
+            <button onClick={() => { setResults(null); setFilters({ ...filters, query: '' }) }} className="bg-[#27272a] border-none rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-[14px] py-[6px] whitespace-nowrap">✕</button>
           )}
         </div>
 
         {/* Advanced Filters */}
         {showFilters && (
-          <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 8, padding: 12, marginBottom: 12 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 12 }}>
+          <div className="bg-[#18181b] border border-[#27272a] rounded-lg p-3 mb-3">
+            <div className="grid gap-3 mb-3" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
               {/* Date From */}
               <div>
-                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4 }}>From Date</label>
+                <label className="text-[11px] text-[#a1a1aa] block mb-1">From Date</label>
                 <input
                   type="date"
                   value={filters.dateFrom}
                   onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                  style={inputStyle}
+                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full"
                 />
               </div>
 
               {/* Date To */}
               <div>
-                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4 }}>To Date</label>
+                <label className="text-[11px] text-[#a1a1aa] block mb-1">To Date</label>
                 <input
                   type="date"
                   value={filters.dateTo}
                   onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                  style={inputStyle}
+                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full"
                 />
               </div>
 
               {/* Min Length */}
               <div>
-                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4 }}>Min Length</label>
+                <label className="text-[11px] text-[#a1a1aa] block mb-1">Min Length</label>
                 <input
                   type="number"
                   value={filters.minLength}
                   onChange={(e) => setFilters({ ...filters, minLength: Number(e.target.value) })}
-                  style={inputStyle}
+                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full"
                   placeholder="0"
                 />
               </div>
 
               {/* Max Length */}
               <div>
-                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4 }}>Max Length</label>
+                <label className="text-[11px] text-[#a1a1aa] block mb-1">Max Length</label>
                 <input
                   type="number"
                   value={filters.maxLength}
                   onChange={(e) => setFilters({ ...filters, maxLength: Number(e.target.value) })}
-                  style={inputStyle}
+                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full"
                   placeholder="10000"
                 />
               </div>
             </div>
             <button
               onClick={() => setFilters({ query: '', dateFrom: '', dateTo: '', minLength: 0, maxLength: 10000, starred: null })}
-              style={{ fontSize: 12, padding: '4px 8px', background: 'transparent', border: '1px solid #3f3f46', borderRadius: 4, color: '#a1a1aa', cursor: 'pointer' }}
+              className="text-[12px] px-2 py-1 bg-transparent border border-[#3f3f46] rounded text-[#a1a1aa] cursor-pointer"
             >
               Reset Filters
             </button>
@@ -175,21 +175,21 @@ export function HistoryPage(): React.ReactElement {
         )}
 
         {results !== null && (
-          <p style={{ fontSize: 11, color: '#71717a', marginTop: 6 }}>
+          <p className="text-[11px] text-[#71717a] mt-[6px]">
             {results.length} result{results.length !== 1 ? 's' : ''} {filters.query ? `for "${filters.query}"` : 'with applied filters'}
           </p>
         )}
       </div>
 
       {/* List */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      <div className="flex-1 overflow-y-auto">
         {loading ? (
-          <div style={{ padding: 48, textAlign: 'center', color: '#52525b' }}>Loading…</div>
+          <div className="p-12 text-center text-[#52525b]">Loading…</div>
         ) : displayed.length === 0 ? (
-          <div style={{ padding: 48, textAlign: 'center', color: '#52525b' }}>
-            <p style={{ fontSize: 36, marginBottom: 12 }}>🕐</p>
-            <p style={{ fontSize: 14, color: '#71717a' }}>
-              {results !== null ? `No results for "${query}"` : 'No conversations yet'}
+          <div className="p-12 text-center text-[#52525b]">
+            <p className="text-[36px] mb-3">🕐</p>
+            <p className="text-[14px] text-[#71717a]">
+              {results !== null ? `No results for "${filters.query}"` : 'No conversations yet'}
             </p>
           </div>
         ) : (
@@ -197,29 +197,26 @@ export function HistoryPage(): React.ReactElement {
             <div
               key={entry.topicId}
               onClick={() => navigate('/chat')}
-              style={{
-                padding: '14px 24px', borderBottom: '1px solid #18181b',
-                cursor: 'pointer', display: 'flex', gap: 14, alignItems: 'flex-start'
-              }}
+              className="px-6 py-[14px] border-b border-[#18181b] cursor-pointer flex gap-[14px] items-start"
               onMouseEnter={(e) => (e.currentTarget.style.background = '#111113')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
-              <span style={{ fontSize: 22, flexShrink: 0, lineHeight: 1.4 }}>{entry.assistantEmoji}</span>
-              <div style={{ flex: 1, overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#fafafa', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <span className="text-[22px] shrink-0 leading-[1.4]">{entry.assistantEmoji}</span>
+              <div className="flex-1 overflow-hidden">
+                <div className="flex items-center gap-2 mb-[3px]">
+                  <span className="text-[13px] font-semibold text-[#fafafa] overflow-hidden text-ellipsis whitespace-nowrap">
                     {entry.topicTitle}
                   </span>
-                  <span style={{ fontSize: 10, color: '#3f3f46', flexShrink: 0 }}>{formatDate(entry.updatedAt)}</span>
+                  <span className="text-[10px] text-[#3f3f46] shrink-0">{formatDate(entry.updatedAt)}</span>
                 </div>
-                <p style={{ margin: '0 0 2px', fontSize: 11, color: '#71717a' }}>{entry.assistantName}</p>
+                <p className="m-0 mb-[2px] text-[11px] text-[#71717a]">{entry.assistantName}</p>
                 {'matchedContent' in entry && (entry as HistorySearchResult).matchedContent ? (
                   <p
-                    style={{ margin: 0, fontSize: 11, color: '#52525b', lineHeight: 1.5 }}
-                    dangerouslySetInnerHTML={{ __html: highlight((entry as HistorySearchResult).matchedContent, query) }}
+                    className="m-0 text-[11px] text-[#52525b] leading-[1.5]"
+                    dangerouslySetInnerHTML={{ __html: highlight((entry as HistorySearchResult).matchedContent, filters.query) }}
                   />
                 ) : (
-                  <p style={{ margin: 0, fontSize: 11, color: '#52525b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p className="m-0 text-[11px] text-[#52525b] overflow-hidden text-ellipsis whitespace-nowrap">
                     {entry.preview}
                   </p>
                 )}
@@ -229,19 +226,9 @@ export function HistoryPage(): React.ReactElement {
         )}
       </div>
 
-      <div style={{ borderTop: '1px solid #18181b', padding: '6px 24px', flexShrink: 0 }}>
-        <span style={{ fontSize: 11, color: '#52525b' }}>{entries.length} conversation{entries.length !== 1 ? 's' : ''} total</span>
+      <div className="border-t border-[#18181b] px-6 py-[6px] shrink-0">
+        <span className="text-[11px] text-[#52525b]">{entries.length} conversation{entries.length !== 1 ? 's' : ''} total</span>
       </div>
     </div>
   )
-}
-
-const inputStyle: React.CSSProperties = {
-  flex: 1, background: '#18181b', border: '1px solid #3f3f46', borderRadius: 6,
-  color: '#fafafa', fontSize: 13, outline: 'none', padding: '6px 10px'
-}
-
-const btnStyle: React.CSSProperties = {
-  background: '#27272a', border: 'none', borderRadius: 6, color: '#a1a1aa',
-  cursor: 'pointer', fontSize: 12, padding: '6px 14px', whiteSpace: 'nowrap'
 }

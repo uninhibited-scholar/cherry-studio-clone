@@ -53,30 +53,16 @@ export function FilesPage(): React.ReactElement {
       d.content.toLowerCase().includes(search.toLowerCase())
   )
 
-  const input: React.CSSProperties = {
-    background: '#18181b', border: '1px solid #3f3f46', borderRadius: 8,
-    color: '#fafafa', padding: '7px 12px', fontSize: 13, outline: 'none'
-  }
-
   return (
-    <div style={{ display: 'flex', height: '100%', background: '#09090b', color: '#fafafa' }}>
+    <div className="flex h-full bg-[#09090b] text-[#fafafa]">
       {/* Sidebar: knowledge bases */}
-      <aside
-        style={{
-          width: 200, borderRight: '1px solid #27272a', padding: '16px 8px',
-          display: 'flex', flexDirection: 'column', gap: 2, flexShrink: 0, overflowY: 'auto'
-        }}
-      >
-        <p style={{ fontSize: 11, color: '#71717a', fontWeight: 600, letterSpacing: 1, padding: '0 8px', marginBottom: 8 }}>
+      <aside className="w-[200px] border-r border-[#27272a] px-2 py-4 flex flex-col gap-[2px] shrink-0 overflow-y-auto">
+        <p className="text-[11px] text-[#71717a] font-semibold tracking-[1px] px-2 mb-2">
           KNOWLEDGE BASES
         </p>
         <button
           onClick={() => setSelectedBase('all')}
-          style={{
-            textAlign: 'left', padding: '8px 12px', borderRadius: 6, border: 'none',
-            background: selectedBase === 'all' ? 'rgba(255,255,255,0.08)' : 'transparent',
-            color: selectedBase === 'all' ? '#fafafa' : '#71717a', cursor: 'pointer', fontSize: 13
-          }}
+          className={`text-left px-3 py-2 rounded-md border-none cursor-pointer text-[13px] ${selectedBase === 'all' ? 'bg-white/[0.08] text-[#fafafa]' : 'bg-transparent text-[#71717a]'}`}
         >
           📁 All files
         </button>
@@ -84,11 +70,7 @@ export function FilesPage(): React.ReactElement {
           <button
             key={b.id}
             onClick={() => setSelectedBase(b.id)}
-            style={{
-              textAlign: 'left', padding: '8px 12px', borderRadius: 6, border: 'none',
-              background: selectedBase === b.id ? 'rgba(255,255,255,0.08)' : 'transparent',
-              color: selectedBase === b.id ? '#fafafa' : '#71717a', cursor: 'pointer', fontSize: 13
-            }}
+            className={`text-left px-3 py-2 rounded-md border-none cursor-pointer text-[13px] ${selectedBase === b.id ? 'bg-white/[0.08] text-[#fafafa]' : 'bg-transparent text-[#71717a]'}`}
           >
             📚 {b.name}
           </button>
@@ -96,14 +78,14 @@ export function FilesPage(): React.ReactElement {
       </aside>
 
       {/* Main */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <div style={{ padding: '12px 20px', borderBottom: '1px solid #27272a', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ color: '#a1a1aa', fontSize: 14, fontWeight: 500 }}>
+        <div className="px-5 py-3 border-b border-[#27272a] flex items-center gap-3">
+          <span className="text-[#a1a1aa] text-[14px] font-medium">
             {filtered.length} document{filtered.length !== 1 ? 's' : ''}
           </span>
           <input
-            style={{ ...input, marginLeft: 'auto', width: 240 }}
+            className="bg-[#18181b] border border-[#3f3f46] rounded-lg text-[#fafafa] px-3 py-[7px] text-[13px] outline-none ml-auto w-[240px]"
             placeholder="Search documents…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -111,33 +93,30 @@ export function FilesPage(): React.ReactElement {
         </div>
 
         {/* Document list */}
-        <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
+        <div className="flex-1 overflow-auto p-5">
           {filtered.length === 0 ? (
-            <div style={{ color: '#52525b', textAlign: 'center', paddingTop: 80, fontSize: 14 }}>
+            <div className="text-[#52525b] text-center pt-[80px] text-[14px]">
               {bases.length === 0 ? 'No knowledge bases yet. Create one in the Knowledge page.' : 'No documents found.'}
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div className="flex flex-col gap-[10px]">
               {filtered.map((doc) => {
                 const base = bases.find((b) => b.id === doc.knowledgeBaseId)
                 return (
                   <div
                     key={doc.id}
-                    style={{
-                      background: '#18181b', border: '1px solid #27272a', borderRadius: 10,
-                      padding: '14px 16px'
-                    }}
+                    className="bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-[14px]"
                   >
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 6 }}>
-                      <span style={{ fontSize: 14, fontWeight: 500, color: '#fafafa' }}>📄 {doc.title}</span>
+                    <div className="flex items-baseline gap-[10px] mb-[6px]">
+                      <span className="text-[14px] font-medium text-[#fafafa]">📄 {doc.title}</span>
                       {base && (
-                        <span style={{ fontSize: 11, color: '#71717a', background: '#27272a', borderRadius: 4, padding: '1px 6px' }}>
+                        <span className="text-[11px] text-[#71717a] bg-[#27272a] rounded px-[6px] py-[1px]">
                           {base.name}
                         </span>
                       )}
-                      <span style={{ fontSize: 11, color: '#52525b', marginLeft: 'auto' }}>{formatDate(doc.createdAt)}</span>
+                      <span className="text-[11px] text-[#52525b] ml-auto">{formatDate(doc.createdAt)}</span>
                     </div>
-                    <p style={{ fontSize: 12, color: '#71717a', margin: 0, lineHeight: 1.5 }}>
+                    <p className="text-[12px] text-[#71717a] m-0 leading-[1.5]">
                       {truncate(doc.content)}
                     </p>
                   </div>

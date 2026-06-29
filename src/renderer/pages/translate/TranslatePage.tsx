@@ -73,52 +73,52 @@ export function TranslatePage(): React.ReactElement {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100%', background: '#09090b', color: '#fafafa' }}>
+    <div className="flex h-full bg-[#09090b] text-[#fafafa]">
       {/* Main panel */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 24, gap: 12 }}>
+      <div className="flex-1 flex flex-col p-6 gap-3">
         {/* Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <select value={sourceLang} onChange={(e) => setSourceLang(e.target.value as LangCode)} style={selSty}>
+        <div className="flex items-center gap-[10px] flex-wrap">
+          <select value={sourceLang} onChange={(e) => setSourceLang(e.target.value as LangCode)} className="bg-[#18181b] border border-[#3f3f46] rounded-lg px-[10px] py-[6px] text-[#fafafa] text-[13px] outline-none">
             {LANG_OPTIONS.map(([c, l]) => <option key={c} value={c}>{l}</option>)}
           </select>
-          <button onClick={swap} disabled={sourceLang === 'auto'} title="Swap" style={{ ...btnSty, background: 'transparent', border: '1px solid #3f3f46', fontSize: 18, padding: '4px 12px', opacity: sourceLang === 'auto' ? 0.4 : 1 }}>⇄</button>
-          <select value={targetLang} onChange={(e) => setTargetLang(e.target.value as LangCode)} style={selSty}>
+          <button onClick={swap} disabled={sourceLang === 'auto'} title="Swap" className={`px-3 py-1 rounded-lg border border-[#3f3f46] bg-transparent text-[#fafafa] text-[18px] cursor-pointer ${sourceLang === 'auto' ? 'opacity-40' : ''}`}>⇄</button>
+          <select value={targetLang} onChange={(e) => setTargetLang(e.target.value as LangCode)} className="bg-[#18181b] border border-[#3f3f46] rounded-lg px-[10px] py-[6px] text-[#fafafa] text-[13px] outline-none">
             {LANG_OPTIONS.filter(([c]) => c !== 'auto').map(([c, l]) => <option key={c} value={c}>{l}</option>)}
           </select>
-          <div style={{ flex: 1 }} />
-          <select value={selectedProvider} onChange={(e) => setSelectedProvider(e.target.value)} style={{ ...selSty, maxWidth: 150 }}>
+          <div className="flex-1" />
+          <select value={selectedProvider} onChange={(e) => setSelectedProvider(e.target.value)} className="bg-[#18181b] border border-[#3f3f46] rounded-lg px-[10px] py-[6px] text-[#fafafa] text-[13px] outline-none max-w-[150px]">
             {providers.length === 0 && <option value="">No providers</option>}
             {providers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
-          <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} style={{ ...selSty, maxWidth: 200 }}>
+          <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="bg-[#18181b] border border-[#3f3f46] rounded-lg px-[10px] py-[6px] text-[#fafafa] text-[13px] outline-none max-w-[200px]">
             {models.length === 0 && <option value="">No models</option>}
             {models.map((m) => <option key={m.id} value={m.id}>{m.displayName ?? m.name}</option>)}
           </select>
         </div>
 
         {/* Text areas */}
-        <div style={{ display: 'flex', gap: 12, flex: 1 }}>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div className="flex gap-3 flex-1">
+          <div className="flex-1 flex flex-col gap-2">
             <textarea
               value={sourceText}
               onChange={(e) => setSourceText(e.target.value)}
               placeholder="Enter text to translate…"
               onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) translate() }}
-              style={{ flex: 1, ...textareaSty }}
+              className="flex-1 bg-[#18181b] border border-[#27272a] rounded-[10px] p-4 text-[#fafafa] text-[14px] outline-none font-[inherit] leading-[1.7] resize-none"
             />
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={translate} disabled={!sourceText.trim() || translating || !selectedProvider} style={{ ...btnSty, opacity: !sourceText.trim() || translating ? 0.5 : 1 }}>
+            <div className="flex gap-2">
+              <button onClick={translate} disabled={!sourceText.trim() || translating || !selectedProvider} className={`px-[18px] py-2 rounded-lg border-none bg-[#2563eb] text-[#fafafa] text-[13px] cursor-pointer ${!sourceText.trim() || translating ? 'opacity-50' : ''}`}>
                 {translating ? 'Translating…' : 'Translate (⌘↵)'}
               </button>
-              <button onClick={() => { setSourceText(''); setTargetText('') }} style={{ ...btnSty, background: 'transparent', border: '1px solid #3f3f46' }}>Clear</button>
+              <button onClick={() => { setSourceText(''); setTargetText('') }} className="px-[18px] py-2 rounded-lg bg-transparent border border-[#3f3f46] text-[#fafafa] text-[13px] cursor-pointer">Clear</button>
             </div>
           </div>
 
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ flex: 1, ...textareaSty, overflowY: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: targetText ? '#fafafa' : '#52525b' }}>
-              {targetText || (translating ? <span style={{ color: '#71717a' }}>Translating…</span> : 'Translation will appear here')}
+          <div className="flex-1 flex flex-col gap-2">
+            <div className={`flex-1 bg-[#18181b] border border-[#27272a] rounded-[10px] p-4 text-[14px] outline-none font-[inherit] leading-[1.7] overflow-y-auto whitespace-pre-wrap break-words ${targetText ? 'text-[#fafafa]' : 'text-[#52525b]'}`}>
+              {targetText || (translating ? <span className="text-[#71717a]">Translating…</span> : 'Translation will appear here')}
             </div>
-            <button onClick={() => navigator.clipboard.writeText(targetText)} disabled={!targetText} style={{ ...btnSty, background: 'transparent', border: '1px solid #3f3f46', alignSelf: 'flex-start', opacity: targetText ? 1 : 0.4 }}>
+            <button onClick={() => navigator.clipboard.writeText(targetText)} disabled={!targetText} className={`px-[18px] py-2 rounded-lg bg-transparent border border-[#3f3f46] text-[#fafafa] text-[13px] cursor-pointer self-start ${targetText ? '' : 'opacity-40'}`}>
               Copy
             </button>
           </div>
@@ -126,27 +126,27 @@ export function TranslatePage(): React.ReactElement {
       </div>
 
       {/* History */}
-      <div style={{ width: 280, borderLeft: '1px solid #27272a', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #27272a' }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: '#71717a', letterSpacing: 1 }}>HISTORY</span>
+      <div className="w-[280px] border-l border-[#27272a] flex flex-col">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#27272a]">
+          <span className="text-[11px] font-semibold text-[#71717a] tracking-[1px]">HISTORY</span>
           {history.length > 0 && (
-            <button onClick={async () => { await window.api.invoke(IpcChannel.TRANSLATE_HISTORY_CLEAR); setHistory([]) }} style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', fontSize: 11 }}>Clear</button>
+            <button onClick={async () => { await window.api.invoke(IpcChannel.TRANSLATE_HISTORY_CLEAR); setHistory([]) }} className="bg-transparent border-none text-[#71717a] cursor-pointer text-[11px]">Clear</button>
           )}
         </div>
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div className="flex-1 overflow-y-auto">
           {history.length === 0 ? (
-            <p style={{ color: '#52525b', fontSize: 12, padding: 16 }}>No history yet</p>
+            <p className="text-[#52525b] text-[12px] p-4">No history yet</p>
           ) : history.map((h) => (
             <div
               key={h.id}
               onClick={() => { setSourceText(h.sourceText); setTargetText(h.targetText); setSourceLang(h.sourceLang as LangCode); setTargetLang(h.targetLang as LangCode) }}
-              style={{ padding: '10px 16px', borderBottom: '1px solid #18181b', cursor: 'pointer', transition: 'background 0.1s' }}
+              className="px-4 py-[10px] border-b border-[#18181b] cursor-pointer transition-colors"
               onMouseEnter={(e) => (e.currentTarget.style.background = '#18181b')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
-              <p style={{ fontSize: 12, color: '#a1a1aa', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.sourceText}</p>
-              <p style={{ fontSize: 12, color: '#52525b', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>→ {h.targetText}</p>
-              <p style={{ fontSize: 10, color: '#3f3f46', margin: '2px 0 0' }}>{h.sourceLang} → {h.targetLang}</p>
+              <p className="text-[12px] text-[#a1a1aa] m-0 overflow-hidden text-ellipsis whitespace-nowrap">{h.sourceText}</p>
+              <p className="text-[12px] text-[#52525b] mt-[2px] mb-0 overflow-hidden text-ellipsis whitespace-nowrap">→ {h.targetText}</p>
+              <p className="text-[10px] text-[#3f3f46] mt-[2px] mb-0">{h.sourceLang} → {h.targetLang}</p>
             </div>
           ))}
         </div>
@@ -154,7 +154,3 @@ export function TranslatePage(): React.ReactElement {
     </div>
   )
 }
-
-const selSty: React.CSSProperties = { background: '#18181b', border: '1px solid #3f3f46', borderRadius: 8, padding: '6px 10px', color: '#fafafa', fontSize: 13, outline: 'none' }
-const textareaSty: React.CSSProperties = { background: '#18181b', border: '1px solid #27272a', borderRadius: 10, padding: 16, color: '#fafafa', fontSize: 14, outline: 'none', fontFamily: 'inherit', lineHeight: 1.7, resize: 'none' }
-const btnSty: React.CSSProperties = { padding: '8px 18px', borderRadius: 8, border: 'none', background: '#2563eb', color: '#fafafa', fontSize: 13, cursor: 'pointer' }

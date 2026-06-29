@@ -81,30 +81,30 @@ export function PaintingsPage(): React.ReactElement {
   const formatDate = (ts: number) => new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 
   return (
-    <div style={{ display: 'flex', height: '100%', background: '#09090b', color: '#fafafa', overflow: 'hidden' }}>
+    <div className="flex h-full bg-[#09090b] text-[#fafafa] overflow-hidden">
       {/* ── Left: generation panel ── */}
-      <aside style={{ width: 280, borderRight: '1px solid #27272a', display: 'flex', flexDirection: 'column', flexShrink: 0, overflowY: 'auto' }}>
-        <div style={{ padding: '16px', borderBottom: '1px solid #27272a' }}>
-          <h2 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700 }}>🎨 Paintings</h2>
-          <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
-            <button onClick={() => setShowSketchPad(false)} style={{ flex: 1, padding: '6px 0', fontSize: 11, border: '1px solid #3f3f46', borderRadius: 4, background: !showSketchPad ? '#2563eb' : 'transparent', color: !showSketchPad ? '#fff' : '#a1a1aa', cursor: 'pointer' }}>Generate</button>
-            <button onClick={() => setShowSketchPad(true)} style={{ flex: 1, padding: '6px 0', fontSize: 11, border: '1px solid #3f3f46', borderRadius: 4, background: showSketchPad ? '#2563eb' : 'transparent', color: showSketchPad ? '#fff' : '#a1a1aa', cursor: 'pointer' }}>Sketch</button>
+      <aside className="w-[280px] border-r border-[#27272a] flex flex-col shrink-0 overflow-y-auto">
+        <div className="p-4 border-b border-[#27272a]">
+          <h2 className="m-0 mb-3 text-[14px] font-bold">🎨 Paintings</h2>
+          <div className="flex gap-[6px] mb-3">
+            <button onClick={() => setShowSketchPad(false)} className={`flex-1 py-[6px] text-[11px] border border-[#3f3f46] rounded cursor-pointer ${!showSketchPad ? 'bg-[#2563eb] text-white' : 'bg-transparent text-[#a1a1aa]'}`}>Generate</button>
+            <button onClick={() => setShowSketchPad(true)} className={`flex-1 py-[6px] text-[11px] border border-[#3f3f46] rounded cursor-pointer ${showSketchPad ? 'bg-[#2563eb] text-white' : 'bg-transparent text-[#a1a1aa]'}`}>Sketch</button>
           </div>
 
           {/* Provider */}
-          <label style={labelStyle}>Provider</label>
+          <label className="block text-[11px] text-[#71717a] mb-1 mt-[10px]">Provider</label>
           <select
             value={selectedProviderId}
             onChange={(e) => setSelectedProviderId(e.target.value)}
-            style={selectStyle}
+            className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border cursor-pointer"
           >
             {providers.length === 0 && <option value="">No providers configured</option>}
             {providers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
 
           {/* Model */}
-          <label style={labelStyle}>Model</label>
-          <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} style={selectStyle}>
+          <label className="block text-[11px] text-[#71717a] mb-1 mt-[10px]">Model</label>
+          <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border cursor-pointer">
             {models.length === 0 && <option value="">—</option>}
             {models.map((m) => <option key={m.id} value={m.name}>{m.name}</option>)}
             {/* allow typing custom model */}
@@ -113,39 +113,39 @@ export function PaintingsPage(): React.ReactElement {
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
             placeholder="or type model name…"
-            style={{ ...inputStyle, marginTop: 4 }}
+            className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border mt-1"
           />
 
           {/* Size */}
-          <label style={labelStyle}>Size</label>
-          <select value={size} onChange={(e) => setSize(e.target.value as Size)} style={selectStyle}>
+          <label className="block text-[11px] text-[#71717a] mb-1 mt-[10px]">Size</label>
+          <select value={size} onChange={(e) => setSize(e.target.value as Size)} className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border cursor-pointer">
             {SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
 
           {/* Prompt */}
-          <label style={labelStyle}>Prompt</label>
+          <label className="block text-[11px] text-[#71717a] mb-1 mt-[10px]">Prompt</label>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Describe the image you want to generate…"
             rows={5}
-            style={{ ...inputStyle, resize: 'vertical' }}
+            className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border resize-y"
           />
 
           {/* Negative prompt */}
-          <label style={labelStyle}>Negative Prompt</label>
+          <label className="block text-[11px] text-[#71717a] mb-1 mt-[10px]">Negative Prompt</label>
           <textarea
             value={negativePrompt}
             onChange={(e) => setNegativePrompt(e.target.value)}
             placeholder="What to avoid (optional)…"
             rows={2}
-            style={{ ...inputStyle, resize: 'vertical' }}
+            className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border resize-y"
           />
 
           {!showSketchPad && (
             <>
               {error && (
-                <div style={{ marginTop: 8, padding: '8px 10px', background: '#450a0a', borderRadius: 6, fontSize: 11, color: '#fca5a5', wordBreak: 'break-all' }}>
+                <div className="mt-2 px-[10px] py-2 bg-[#450a0a] rounded-md text-[11px] text-[#fca5a5] break-all">
                   {error}
                 </div>
               )}
@@ -153,19 +153,7 @@ export function PaintingsPage(): React.ReactElement {
               <button
                 onClick={handleGenerate}
                 disabled={generating || !prompt.trim() || !selectedProviderId || !selectedModel}
-                style={{
-                  marginTop: 12,
-                  width: '100%',
-                  padding: '10px',
-                  borderRadius: 8,
-                  border: 'none',
-                  background: generating ? '#1d4ed8' : '#2563eb',
-                  color: 'white',
-                  fontSize: 13,
-                  fontWeight: 700,
-                  cursor: generating ? 'default' : 'pointer',
-                  opacity: (!prompt.trim() || !selectedProviderId || !selectedModel) ? 0.5 : 1
-                }}
+                className={`mt-3 w-full py-[10px] rounded-lg border-none text-white text-[13px] font-bold cursor-pointer ${generating ? 'bg-[#1d4ed8] cursor-default' : 'bg-[#2563eb]'} ${(!prompt.trim() || !selectedProviderId || !selectedModel) ? 'opacity-50' : ''}`}
               >
                 {generating ? '⏳ Generating…' : '✨ Generate'}
               </button>
@@ -189,17 +177,17 @@ export function PaintingsPage(): React.ReactElement {
           )}
         </div>
 
-        <div style={{ padding: '10px 16px' }}>
-          <p style={{ fontSize: 11, color: '#52525b', margin: 0 }}>{paintings.length} painting{paintings.length !== 1 ? 's' : ''} saved</p>
+        <div className="px-4 py-[10px]">
+          <p className="text-[11px] text-[#52525b] m-0">{paintings.length} painting{paintings.length !== 1 ? 's' : ''} saved</p>
         </div>
       </aside>
 
       {/* ── Right: gallery ── */}
-      <main style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
+      <main className="flex-1 overflow-y-auto p-4">
         {paintings.length === 0 ? (
-          <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, color: '#52525b' }}>
-            <span style={{ fontSize: 56 }}>🖼️</span>
-            <p style={{ fontSize: 14, color: '#71717a' }}>Your generated images will appear here</p>
+          <div className="h-full flex items-center justify-center flex-col gap-3 text-[#52525b]">
+            <span className="text-[56px]">🖼️</span>
+            <p className="text-[14px] text-[#71717a]">Your generated images will appear here</p>
           </div>
         ) : (
           <div style={{ columns: 3, columnGap: 12 }}>
@@ -220,12 +208,9 @@ export function PaintingsPage(): React.ReactElement {
       {lightboxSrc && (
         <div
           onClick={() => setLightboxSrc(null)}
-          style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, cursor: 'zoom-out'
-          }}
+          className="fixed inset-0 bg-black/90 flex items-center justify-center z-[999] cursor-zoom-out"
         >
-          <img src={lightboxSrc} alt="painting" style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: 8, boxShadow: '0 0 40px rgba(0,0,0,0.8)' }} />
+          <img src={lightboxSrc} alt="painting" className="max-w-[90vw] max-h-[90vh] rounded-lg shadow-[0_0_40px_rgba(0,0,0,0.8)]" />
         </div>
       )}
     </div>
@@ -292,26 +277,26 @@ function SketchPadUI({
 
   return (
     <div>
-      <p style={{ fontSize: 12, color: '#a1a1aa', marginBottom: 8 }}>Brush Settings</p>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-        <div style={{ flex: 1 }}>
-          <label style={{ fontSize: 11, color: '#71717a', display: 'block', marginBottom: 4 }}>Color</label>
+      <p className="text-[12px] text-[#a1a1aa] mb-2">Brush Settings</p>
+      <div className="flex gap-2 mb-3">
+        <div className="flex-1">
+          <label className="text-[11px] text-[#71717a] block mb-1">Color</label>
           <input
             type="color"
             value={brushColor}
             onChange={(e) => setBrushColor(e.target.value)}
-            style={{ width: '100%', height: 32, border: 'none', borderRadius: 6, cursor: 'pointer' }}
+            className="w-full h-8 border-none rounded-md cursor-pointer"
           />
         </div>
-        <div style={{ flex: 1 }}>
-          <label style={{ fontSize: 11, color: '#71717a', display: 'block', marginBottom: 4 }}>Size: {brushSize}</label>
+        <div className="flex-1">
+          <label className="text-[11px] text-[#71717a] block mb-1">Size: {brushSize}</label>
           <input
             type="range"
             min="1"
             max="20"
             value={brushSize}
             onChange={(e) => setBrushSize(Number(e.target.value))}
-            style={{ width: '100%' }}
+            className="w-full"
           />
         </div>
       </div>
@@ -324,23 +309,24 @@ function SketchPadUI({
         onMouseMove={draw}
         onMouseUp={stopDrawing}
         onMouseLeave={stopDrawing}
-        style={{ width: '100%', height: 240, border: '1px solid #3f3f46', borderRadius: 8, background: '#18181b', cursor: 'crosshair', marginBottom: 12, display: 'block' }}
+        className="w-full border border-[#3f3f46] rounded-lg bg-[#18181b] cursor-crosshair mb-3 block"
+        style={{ height: 240 }}
       />
 
-      <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
-        <button onClick={clearCanvas} style={{ flex: 1, padding: '6px 0', fontSize: 11, border: '1px solid #3f3f46', borderRadius: 4, background: 'transparent', color: '#a1a1aa', cursor: 'pointer' }}>🗑 Clear</button>
-        <button onClick={saveSketch} style={{ flex: 1, padding: '6px 0', fontSize: 11, border: 'none', borderRadius: 4, background: '#2563eb', color: '#fff', cursor: 'pointer' }}>💾 Save</button>
+      <div className="flex gap-[6px] mb-3">
+        <button onClick={clearCanvas} className="flex-1 py-[6px] text-[11px] border border-[#3f3f46] rounded bg-transparent text-[#a1a1aa] cursor-pointer">🗑 Clear</button>
+        <button onClick={saveSketch} className="flex-1 py-[6px] text-[11px] border-none rounded bg-[#2563eb] text-white cursor-pointer">💾 Save</button>
       </div>
 
       {sketches.length > 0 && (
         <>
-          <p style={{ fontSize: 11, color: '#a1a1aa', marginBottom: 6 }}>Saved Sketches ({sketches.length})</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 200, overflowY: 'auto' }}>
+          <p className="text-[11px] text-[#a1a1aa] mb-[6px]">Saved Sketches ({sketches.length})</p>
+          <div className="flex flex-col gap-1 max-h-[200px] overflow-y-auto">
             {sketches.map((sketch) => (
-              <div key={sketch.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <img src={sketch.dataUrl} alt="sketch" style={{ width: 40, height: 40, borderRadius: 4, border: '1px solid #27272a' }} />
-                <div style={{ flex: 1, fontSize: 10, color: '#71717a' }}>{new Date(sketch.savedAt).toLocaleTimeString()}</div>
-                <button onClick={() => onDeleteSketch(sketch.id)} style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: 12 }}>✕</button>
+              <div key={sketch.id} className="flex gap-[6px] items-center">
+                <img src={sketch.dataUrl} alt="sketch" className="w-10 h-10 rounded border border-[#27272a]" />
+                <div className="flex-1 text-[10px] text-[#71717a]">{new Date(sketch.savedAt).toLocaleTimeString()}</div>
+                <button onClick={() => onDeleteSketch(sketch.id)} className="bg-transparent border-none text-[#f87171] cursor-pointer text-[12px]">✕</button>
               </div>
             ))}
           </div>
@@ -370,30 +356,31 @@ function PaintingCard({
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{ breakInside: 'avoid', marginBottom: 12, borderRadius: 8, overflow: 'hidden', position: 'relative', border: '1px solid #27272a' }}
+      className="mb-3 rounded-lg overflow-hidden relative border border-[#27272a]"
+      style={{ breakInside: 'avoid' }}
     >
       <img
         src={src}
         alt={painting.prompt}
         onClick={onView}
-        style={{ width: '100%', display: 'block', cursor: 'zoom-in' }}
+        className="w-full block cursor-zoom-in"
       />
       {hovered && (
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: 10, gap: 4 }}>
-          <p style={{ margin: 0, fontSize: 11, color: '#e4e4e7', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-transparent flex flex-col justify-end p-[10px] gap-1">
+          <p className="m-0 text-[11px] text-[#e4e4e7] overflow-hidden line-clamp-2">
             {painting.prompt}
           </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 10, color: '#71717a', flex: 1 }}>{painting.modelName} · {painting.width}×{painting.height} · {formatDate(painting.createdAt)}</span>
+          <div className="flex items-center gap-[6px] flex-wrap">
+            <span className="text-[10px] text-[#71717a] flex-1">{painting.modelName} · {painting.width}×{painting.height} · {formatDate(painting.createdAt)}</span>
             <button
               onClick={saveToDisk}
-              style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 4, color: '#93c5fd', cursor: 'pointer', fontSize: 11, padding: '2px 6px' }}
+              className="bg-white/10 border-none rounded text-[#93c5fd] cursor-pointer text-[11px] px-[6px] py-[2px]"
             >
               Save
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onDelete() }}
-              style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 4, color: '#fca5a5', cursor: 'pointer', fontSize: 11, padding: '2px 6px' }}
+              className="bg-white/10 border-none rounded text-[#fca5a5] cursor-pointer text-[11px] px-[6px] py-[2px]"
             >
               Delete
             </button>
@@ -402,17 +389,4 @@ function PaintingCard({
       )}
     </div>
   )
-}
-
-const labelStyle: React.CSSProperties = {
-  display: 'block', fontSize: 11, color: '#71717a', marginBottom: 4, marginTop: 10
-}
-
-const inputStyle: React.CSSProperties = {
-  background: '#18181b', border: '1px solid #3f3f46', borderRadius: 6, color: '#fafafa',
-  fontSize: 12, outline: 'none', padding: '6px 8px', width: '100%', boxSizing: 'border-box'
-}
-
-const selectStyle: React.CSSProperties = {
-  ...inputStyle, cursor: 'pointer'
 }

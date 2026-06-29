@@ -81,64 +81,64 @@ export function MiniAppsPage(): React.ReactElement {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#09090b', color: '#fafafa' }}>
+    <div className="flex flex-col h-full bg-[#09090b] text-[#fafafa]">
       {/* Header */}
-      <div style={{ padding: '16px 24px', borderBottom: '1px solid #27272a', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-        <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, flex: 'none' }}>🧩 Mini Apps</h2>
+      <div className="px-6 py-4 border-b border-[#27272a] flex items-center gap-3 shrink-0">
+        <h2 className="m-0 text-[15px] font-bold flex-none">🧩 Mini Apps</h2>
         <input
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Filter apps…"
-          style={inputStyle}
+          className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
         />
-        <button onClick={() => setShowAdd(true)} style={btnPrimaryStyle}>+ Add</button>
+        <button onClick={() => setShowAdd(true)} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-[14px] py-[6px] whitespace-nowrap shrink-0">+ Add</button>
       </div>
 
       {/* Add custom app form */}
       {showAdd && (
-        <div style={{ padding: '14px 24px', borderBottom: '1px solid #27272a', background: '#18181b', display: 'flex', gap: 10, alignItems: 'flex-end', flexShrink: 0 }}>
+        <div className="px-6 py-[14px] border-b border-[#27272a] bg-[#18181b] flex gap-[10px] items-end shrink-0">
           <div>
-            <label style={labelStyle}>Icon</label>
+            <label className="block text-[11px] text-[#71717a] mb-1">Icon</label>
             <input
               value={newIcon}
               onChange={(e) => setNewIcon(e.target.value)}
-              style={{ ...inputStyle, width: 52, textAlign: 'center', fontSize: 20, padding: '4px 6px' }}
+              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[20px] outline-none px-[6px] py-1 w-[52px] text-center box-border"
               maxLength={2}
             />
           </div>
-          <div style={{ flex: '0 0 160px' }}>
-            <label style={labelStyle}>Name</label>
+          <div className="flex-[0_0_160px]">
+            <label className="block text-[11px] text-[#71717a] mb-1">Name</label>
             <input
               autoFocus
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="My App"
-              style={inputStyle}
+              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
             />
           </div>
-          <div style={{ flex: 1 }}>
-            <label style={labelStyle}>URL</label>
+          <div className="flex-1">
+            <label className="block text-[11px] text-[#71717a] mb-1">URL</label>
             <input
               value={newUrl}
               onChange={(e) => setNewUrl(e.target.value)}
               placeholder="https://example.com"
               onKeyDown={(e) => { if (e.key === 'Enter') handleAddCustom(); if (e.key === 'Escape') setShowAdd(false) }}
-              style={inputStyle}
+              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
             />
           </div>
-          <button onClick={handleAddCustom} style={btnPrimaryStyle}>Add</button>
-          <button onClick={() => setShowAdd(false)} style={btnSecondaryStyle}>Cancel</button>
+          <button onClick={handleAddCustom} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-[14px] py-[6px] whitespace-nowrap shrink-0">Add</button>
+          <button onClick={() => setShowAdd(false)} className="bg-[#27272a] border-none rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-[14px] py-[6px] whitespace-nowrap shrink-0">Cancel</button>
         </div>
       )}
 
       {/* Grid */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
+      <div className="flex-1 overflow-y-auto p-5">
         {filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', marginTop: 60, color: '#52525b' }}>
-            <p style={{ fontSize: 14 }}>No apps found for "{filter}"</p>
+          <div className="text-center mt-[60px] text-[#52525b]">
+            <p className="text-[14px]">No apps found for "{filter}"</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
+          <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
             {filtered.map((app) => (
               <AppCard
                 key={app.id}
@@ -151,8 +151,8 @@ export function MiniAppsPage(): React.ReactElement {
         )}
       </div>
 
-      <div style={{ borderTop: '1px solid #18181b', padding: '6px 24px', flexShrink: 0 }}>
-        <span style={{ fontSize: 11, color: '#52525b' }}>{allApps.length} apps · {customApps.length} custom</span>
+      <div className="border-t border-[#18181b] px-6 py-[6px] shrink-0">
+        <span className="text-[11px] text-[#52525b]">{allApps.length} apps · {customApps.length} custom</span>
       </div>
     </div>
   )
@@ -172,34 +172,17 @@ function AppCard({
       onClick={onOpen}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{
-        borderRadius: 12,
-        border: `1px solid ${hovered ? '#3f3f46' : '#27272a'}`,
-        background: hovered ? '#18181b' : '#111113',
-        padding: '16px 14px',
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 8,
-        transition: 'all 0.12s',
-        position: 'relative',
-        userSelect: 'none'
-      }}
+      className={`rounded-xl border cursor-pointer flex flex-col items-center gap-2 p-4 transition-all duration-[120ms] relative select-none ${hovered ? 'border-[#3f3f46] bg-[#18181b]' : 'border-[#27272a] bg-[#111113]'}`}
     >
-      <span style={{ fontSize: 36, lineHeight: 1 }}>{app.icon}</span>
-      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#fafafa', textAlign: 'center' }}>{app.name}</p>
-      <p style={{ margin: 0, fontSize: 10, color: '#52525b', textAlign: 'center', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+      <span className="text-[36px] leading-none">{app.icon}</span>
+      <p className="m-0 text-[13px] font-semibold text-[#fafafa] text-center">{app.name}</p>
+      <p className="m-0 text-[10px] text-[#52525b] text-center leading-[1.4] overflow-hidden line-clamp-2">
         {app.description}
       </p>
       {app.isCustom && hovered && onDelete && (
         <button
           onClick={(e) => { e.stopPropagation(); onDelete() }}
-          style={{
-            position: 'absolute', top: 6, right: 6,
-            background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 4,
-            color: '#71717a', cursor: 'pointer', fontSize: 10, padding: '2px 5px'
-          }}
+          className="absolute top-[6px] right-[6px] bg-white/[0.08] border-none rounded text-[#71717a] cursor-pointer text-[10px] px-[5px] py-[2px]"
           title="Remove"
         >
           ✕
@@ -207,24 +190,4 @@ function AppCard({
       )}
     </div>
   )
-}
-
-const labelStyle: React.CSSProperties = {
-  display: 'block', fontSize: 11, color: '#71717a', marginBottom: 4
-}
-
-const inputStyle: React.CSSProperties = {
-  background: '#18181b', border: '1px solid #3f3f46', borderRadius: 6,
-  color: '#fafafa', fontSize: 13, outline: 'none', padding: '6px 10px',
-  width: '100%', boxSizing: 'border-box'
-}
-
-const btnPrimaryStyle: React.CSSProperties = {
-  background: '#2563eb', border: 'none', borderRadius: 6, color: 'white',
-  cursor: 'pointer', fontSize: 12, fontWeight: 600, padding: '6px 14px', whiteSpace: 'nowrap', flexShrink: 0
-}
-
-const btnSecondaryStyle: React.CSSProperties = {
-  background: '#27272a', border: 'none', borderRadius: 6, color: '#a1a1aa',
-  cursor: 'pointer', fontSize: 12, padding: '6px 14px', whiteSpace: 'nowrap', flexShrink: 0
 }

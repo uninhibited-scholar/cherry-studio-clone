@@ -69,25 +69,25 @@ export function AgentsPage(): React.ReactElement {
     : allModels
 
   return (
-    <div style={{ display: 'flex', height: '100%', background: '#09090b', color: '#fafafa' }}>
+    <div className="flex h-full bg-[#09090b] text-[#fafafa]">
       {/* ── Agent list ── */}
-      <aside style={{ width: 260, borderRight: '1px solid #27272a', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #27272a' }}>
-          <span style={{ fontSize: 13, fontWeight: 600 }}>My Agents</span>
+      <aside className="w-[260px] border-r border-[#27272a] flex flex-col shrink-0">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#27272a]">
+          <span className="text-[13px] font-semibold">My Agents</span>
           <button
             onClick={startNew}
-            style={{ background: 'none', border: 'none', color: '#a1a1aa', cursor: 'pointer', fontSize: 20, lineHeight: 1, padding: '0 2px' }}
+            className="bg-transparent border-none text-[#a1a1aa] cursor-pointer text-[20px] leading-none px-[2px]"
             title="New agent"
           >
             +
           </button>
         </div>
 
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div className="flex-1 overflow-y-auto">
           {agents.length === 0 ? (
-            <div style={{ padding: 32, textAlign: 'center', color: '#52525b' }}>
-              <p style={{ fontSize: 13 }}>No custom agents yet</p>
-              <button onClick={startNew} style={{ marginTop: 12, ...btnPrimaryStyle }}>+ New Agent</button>
+            <div className="p-8 text-center text-[#52525b]">
+              <p className="text-[13px]">No custom agents yet</p>
+              <button onClick={startNew} className="mt-3 bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-[14px] py-[6px]">+ New Agent</button>
             </div>
           ) : (
             agents.map((agent) => (
@@ -105,78 +105,78 @@ export function AgentsPage(): React.ReactElement {
 
       {/* ── Editor ── */}
       {editing ? (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div className="flex-1 flex flex-col overflow-hidden">
           {/* Editor header */}
-          <div style={{ padding: '14px 24px', borderBottom: '1px solid #27272a', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700 }}>{isNew ? 'New Agent' : 'Edit Agent'}</h2>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setEditing(null)} style={btnSecondaryStyle}>Cancel</button>
-              <button onClick={handleSave} style={btnPrimaryStyle}>Save</button>
+          <div className="px-6 py-[14px] border-b border-[#27272a] flex items-center justify-between">
+            <h2 className="m-0 text-[15px] font-bold">{isNew ? 'New Agent' : 'Edit Agent'}</h2>
+            <div className="flex gap-2">
+              <button onClick={() => setEditing(null)} className="bg-[#27272a] border-none rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-[14px] py-[6px]">Cancel</button>
+              <button onClick={handleSave} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-[14px] py-[6px]">Save</button>
             </div>
           </div>
 
-          <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
+          <div className="flex-1 overflow-y-auto px-6 py-5">
             {/* Emoji + Name */}
-            <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+            <div className="flex gap-[10px] mb-4">
               <div>
-                <label style={labelStyle}>Emoji</label>
+                <label className="block text-[11px] text-[#71717a] mb-1">Emoji</label>
                 <select
                   value={editing.emoji ?? '🤖'}
                   onChange={(e) => setEditing((p) => ({ ...p, emoji: e.target.value }))}
-                  style={{ ...inputStyle, width: 64, fontSize: 18, textAlign: 'center' }}
+                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[18px] outline-none px-[10px] py-[6px] w-16 text-center"
                 >
                   {EMOJI_OPTIONS.map((e) => <option key={e} value={e}>{e}</option>)}
                 </select>
               </div>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Name *</label>
+              <div className="flex-1">
+                <label className="block text-[11px] text-[#71717a] mb-1">Name *</label>
                 <input
                   value={editing.name ?? ''}
                   onChange={(e) => setEditing((p) => ({ ...p, name: e.target.value }))}
                   placeholder="Agent name"
-                  style={inputStyle}
+                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
                 />
               </div>
             </div>
 
             {/* Description */}
-            <label style={labelStyle}>Description</label>
+            <label className="block text-[11px] text-[#71717a] mb-1">Description</label>
             <input
               value={editing.description ?? ''}
               onChange={(e) => setEditing((p) => ({ ...p, description: e.target.value }))}
               placeholder="Short description of this agent's purpose"
-              style={{ ...inputStyle, marginBottom: 16 }}
+              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border mb-4"
             />
 
             {/* System Prompt */}
-            <label style={labelStyle}>System Prompt</label>
+            <label className="block text-[11px] text-[#71717a] mb-1">System Prompt</label>
             <textarea
               value={editing.prompt ?? ''}
               onChange={(e) => setEditing((p) => ({ ...p, prompt: e.target.value }))}
               placeholder="You are a helpful assistant that…"
               rows={8}
-              style={{ ...inputStyle, resize: 'vertical', fontFamily: 'ui-monospace, monospace', marginBottom: 16 }}
+              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border mb-4 resize-y font-mono"
             />
 
             {/* Provider + Model */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Default Provider</label>
+            <div className="flex gap-3 mb-4">
+              <div className="flex-1">
+                <label className="block text-[11px] text-[#71717a] mb-1">Default Provider</label>
                 <select
                   value={editing.providerId ?? ''}
                   onChange={(e) => setEditing((p) => ({ ...p, providerId: e.target.value, modelId: undefined }))}
-                  style={inputStyle}
+                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
                 >
                   <option value="">— any —</option>
                   {providers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
               </div>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Default Model</label>
+              <div className="flex-1">
+                <label className="block text-[11px] text-[#71717a] mb-1">Default Model</label>
                 <select
                   value={editing.modelId ?? ''}
                   onChange={(e) => setEditing((p) => ({ ...p, modelId: e.target.value }))}
-                  style={inputStyle}
+                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
                 >
                   <option value="">— any —</option>
                   {modelsForProvider.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
@@ -185,7 +185,7 @@ export function AgentsPage(): React.ReactElement {
             </div>
 
             {/* Temperature */}
-            <label style={labelStyle}>Temperature: {(editing.temperature ?? 1).toFixed(1)}</label>
+            <label className="block text-[11px] text-[#71717a] mb-1">Temperature: {(editing.temperature ?? 1).toFixed(1)}</label>
             <input
               type="range"
               min={0}
@@ -193,25 +193,25 @@ export function AgentsPage(): React.ReactElement {
               step={0.1}
               value={editing.temperature ?? 1}
               onChange={(e) => setEditing((p) => ({ ...p, temperature: parseFloat(e.target.value) }))}
-              style={{ width: '100%', marginBottom: 16 }}
+              className="w-full mb-4"
             />
 
             {/* Max tokens */}
-            <label style={labelStyle}>Max Tokens</label>
+            <label className="block text-[11px] text-[#71717a] mb-1">Max Tokens</label>
             <input
               type="number"
               value={editing.maxTokens ?? ''}
               onChange={(e) => setEditing((p) => ({ ...p, maxTokens: e.target.value ? parseInt(e.target.value) : undefined }))}
               placeholder="Unlimited"
-              style={{ ...inputStyle, marginBottom: 16 }}
+              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border mb-4"
             />
           </div>
         </div>
       ) : (
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, color: '#52525b' }}>
-          <span style={{ fontSize: 56 }}>🤖</span>
-          <p style={{ fontSize: 14, color: '#71717a' }}>Select an agent to edit, or create a new one</p>
-          <button onClick={startNew} style={btnPrimaryStyle}>+ New Agent</button>
+        <div className="flex-1 flex items-center justify-center flex-col gap-3 text-[#52525b]">
+          <span className="text-[56px]">🤖</span>
+          <p className="text-[14px] text-[#71717a]">Select an agent to edit, or create a new one</p>
+          <button onClick={startNew} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-[14px] py-[6px]">+ New Agent</button>
         </div>
       )}
     </div>
@@ -232,28 +232,20 @@ function AgentListItem({
       onClick={onSelect}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{
-        padding: '10px 16px',
-        borderBottom: '1px solid #18181b',
-        cursor: 'pointer',
-        background: isSelected ? 'rgba(255,255,255,0.06)' : hovered ? 'rgba(255,255,255,0.03)' : 'transparent',
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: 10
-      }}
+      className={`px-4 py-[10px] border-b border-[#18181b] cursor-pointer flex items-start gap-[10px] ${isSelected ? 'bg-white/[0.06]' : hovered ? 'bg-white/[0.03]' : 'bg-transparent'}`}
     >
-      <span style={{ fontSize: 22, flexShrink: 0, lineHeight: 1.4 }}>{agent.emoji ?? '🤖'}</span>
-      <div style={{ flex: 1, overflow: 'hidden' }}>
-        <p style={{ fontSize: 13, color: '#fafafa', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>
+      <span className="text-[22px] shrink-0 leading-[1.4]">{agent.emoji ?? '🤖'}</span>
+      <div className="flex-1 overflow-hidden">
+        <p className="text-[13px] text-[#fafafa] m-0 overflow-hidden text-ellipsis whitespace-nowrap font-medium">
           {agent.name}
         </p>
         {agent.description && (
-          <p style={{ fontSize: 11, color: '#52525b', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <p className="text-[11px] text-[#52525b] mt-[2px] mb-0 overflow-hidden text-ellipsis whitespace-nowrap">
             {agent.description}
           </p>
         )}
         {agent.prompt && (
-          <p style={{ fontSize: 10, color: '#3f3f46', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <p className="text-[10px] text-[#3f3f46] mt-[2px] mb-0 overflow-hidden text-ellipsis whitespace-nowrap">
             {agent.prompt.slice(0, 50)}
           </p>
         )}
@@ -261,7 +253,7 @@ function AgentListItem({
       {hovered && (
         <button
           onClick={(e) => { e.stopPropagation(); onDelete() }}
-          style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', fontSize: 12, padding: '2px 4px', flexShrink: 0 }}
+          className="bg-transparent border-none text-[#71717a] cursor-pointer text-[12px] px-[4px] py-[2px] shrink-0"
           title="Delete agent"
         >
           ✕
@@ -269,30 +261,4 @@ function AgentListItem({
       )}
     </div>
   )
-}
-
-const labelStyle: React.CSSProperties = {
-  display: 'block', fontSize: 11, color: '#71717a', marginBottom: 4, marginTop: 0
-}
-
-const inputStyle: React.CSSProperties = {
-  background: '#18181b',
-  border: '1px solid #3f3f46',
-  borderRadius: 6,
-  color: '#fafafa',
-  fontSize: 13,
-  outline: 'none',
-  padding: '6px 10px',
-  width: '100%',
-  boxSizing: 'border-box'
-}
-
-const btnPrimaryStyle: React.CSSProperties = {
-  background: '#2563eb', border: 'none', borderRadius: 6, color: 'white',
-  cursor: 'pointer', fontSize: 12, fontWeight: 600, padding: '6px 14px'
-}
-
-const btnSecondaryStyle: React.CSSProperties = {
-  background: '#27272a', border: 'none', borderRadius: 6, color: '#a1a1aa',
-  cursor: 'pointer', fontSize: 12, padding: '6px 14px'
 }

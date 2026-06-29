@@ -18,45 +18,20 @@ export function LaunchpadPage(): React.ReactElement {
   const navigate = useNavigate()
 
   return (
-    <div
-      style={{
-        height: '100%',
-        background: '#09090b',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 40,
-        overflow: 'auto'
-      }}
-    >
-      <h1 style={{ color: '#fafafa', fontSize: 28, fontWeight: 700, marginBottom: 8 }}>🍒 Cherry Studio</h1>
-      <p style={{ color: '#71717a', fontSize: 14, marginBottom: 48 }}>Quick launch</p>
+    <div className="h-full bg-[#09090b] flex flex-col items-center justify-center p-10 overflow-auto">
+      <h1 className="text-[#fafafa] text-[28px] font-bold mb-2">🍒 Cherry Studio</h1>
+      <p className="text-[#71717a] text-[14px] mb-12">Quick launch</p>
 
       <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(5, 120px)',
-          gap: 24,
-          justifyContent: 'center'
-        }}
+        className="grid gap-6 justify-center"
+        style={{ gridTemplateColumns: 'repeat(5, 120px)' }}
       >
         {APPS.map(({ path, icon, label, color }) => (
           <button
             key={path}
             onClick={() => navigate(path)}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 10,
-              padding: '20px 8px',
-              borderRadius: 16,
-              border: 'none',
-              background: `${color}22`,
-              cursor: 'pointer',
-              transition: 'transform 0.12s, background 0.12s'
-            }}
+            className="flex flex-col items-center gap-[10px] px-2 py-5 rounded-2xl border-none cursor-pointer transition-[transform,background] duration-[120ms]"
+            style={{ background: `${color}22` }}
             onMouseEnter={(e) => {
               ;(e.currentTarget as HTMLButtonElement).style.background = `${color}44`
               ;(e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.06)'
@@ -66,8 +41,8 @@ export function LaunchpadPage(): React.ReactElement {
               ;(e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'
             }}
           >
-            <span style={{ fontSize: 36 }}>{icon}</span>
-            <span style={{ color: '#e4e4e7', fontSize: 12, fontWeight: 500 }}>{label}</span>
+            <span className="text-[36px]">{icon}</span>
+            <span className="text-[#e4e4e7] text-[12px] font-medium">{label}</span>
           </button>
         ))}
       </div>
