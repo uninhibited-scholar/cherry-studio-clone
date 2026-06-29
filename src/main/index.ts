@@ -27,6 +27,9 @@ if (!gotLock) {
 }
 
 app.whenReady().then(async () => {
+  process.on('unhandledRejection', (reason) => {
+    console.error('[Unhandled Rejection]', reason)
+  })
   buildAndSetAppMenu()
   await application.bootstrap()
   createTray()

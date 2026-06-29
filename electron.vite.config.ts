@@ -5,7 +5,12 @@ import { resolve } from 'path'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [externalizeDepsPlugin({ exclude: ['nanoid'] })],
+    build: {
+      rollupOptions: {
+        external: []
+      }
+    },
     resolve: {
       alias: {
         '@main': resolve('src/main'),
