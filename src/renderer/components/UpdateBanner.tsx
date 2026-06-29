@@ -54,35 +54,13 @@ export function UpdateBanner(): React.ReactElement | null {
   }
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 9999,
-        background: 'var(--accent, #7c3aed)',
-        color: '#fff',
-        padding: '8px 16px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        fontSize: '13px'
-      }}
-    >
+    <div className="fixed top-0 left-0 right-0 z-[9999] bg-[var(--accent,#7c3aed)] text-white px-4 py-2 flex items-center gap-3 text-[13px]">
       {state === 'available' && (
         <>
           <span>Update available: v{version}</span>
           <button
             onClick={handleDownload}
-            style={{
-              background: 'rgba(255,255,255,0.2)',
-              border: 'none',
-              borderRadius: '4px',
-              color: '#fff',
-              padding: '2px 10px',
-              cursor: 'pointer'
-            }}
+            className="bg-white/20 border-none rounded text-white px-[10px] py-[2px] cursor-pointer"
           >
             Download
           </button>
@@ -91,23 +69,10 @@ export function UpdateBanner(): React.ReactElement | null {
       {state === 'downloading' && (
         <>
           <span>Downloading update… {Math.round(progress)}%</span>
-          <div
-            style={{
-              flex: 1,
-              maxWidth: '200px',
-              height: '4px',
-              background: 'rgba(255,255,255,0.3)',
-              borderRadius: '2px',
-              overflow: 'hidden'
-            }}
-          >
+          <div className="flex-1 max-w-[200px] h-1 bg-white/30 rounded overflow-hidden">
             <div
-              style={{
-                width: `${progress}%`,
-                height: '100%',
-                background: '#fff',
-                transition: 'width 0.2s'
-              }}
+              className="h-full bg-white transition-[width] duration-200"
+              style={{ width: `${progress}%` }}
             />
           </div>
         </>
@@ -117,14 +82,7 @@ export function UpdateBanner(): React.ReactElement | null {
           <span>v{version} ready to install</span>
           <button
             onClick={handleInstall}
-            style={{
-              background: 'rgba(255,255,255,0.2)',
-              border: 'none',
-              borderRadius: '4px',
-              color: '#fff',
-              padding: '2px 10px',
-              cursor: 'pointer'
-            }}
+            className="bg-white/20 border-none rounded text-white px-[10px] py-[2px] cursor-pointer"
           >
             Restart to install
           </button>
@@ -132,15 +90,7 @@ export function UpdateBanner(): React.ReactElement | null {
       )}
       <button
         onClick={() => setDismissed(true)}
-        style={{
-          marginLeft: 'auto',
-          background: 'transparent',
-          border: 'none',
-          color: '#fff',
-          cursor: 'pointer',
-          fontSize: '16px',
-          lineHeight: 1
-        }}
+        className="ml-auto bg-transparent border-none text-white cursor-pointer text-[16px] leading-none"
         aria-label="Dismiss"
       >
         ×

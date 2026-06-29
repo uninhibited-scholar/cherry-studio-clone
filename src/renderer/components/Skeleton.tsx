@@ -16,11 +16,7 @@ function ensurePulseKeyframe(): void {
   document.head.appendChild(style)
 }
 
-const pulseStyle: React.CSSProperties = {
-  animation: 'skeleton-pulse 1.5s ease-in-out infinite',
-  background: 'var(--color-skeleton, rgba(128,128,128,0.15))',
-  borderRadius: '6px'
-}
+const pulseCls = '[animation:skeleton-pulse_1.5s_ease-in-out_infinite] bg-[var(--color-skeleton,rgba(128,128,128,0.15))] rounded-[6px]'
 
 interface SkeletonTextProps {
   lines?: number
@@ -32,12 +28,12 @@ export function SkeletonText({ lines = 3, width }: SkeletonTextProps): React.Rea
   if (!ref.current) { ensurePulseKeyframe(); ref.current = true }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <div className="flex flex-col gap-2">
       {Array.from({ length: lines }).map((_, i) => (
         <div
           key={i}
+          className={pulseCls}
           style={{
-            ...pulseStyle,
             height: '14px',
             width: width ?? (i === lines - 1 ? '65%' : '100%'),
             animationDelay: `${i * 0.1}s`
@@ -57,11 +53,8 @@ export function SkeletonBlock({ width = '100%', height = '40px' }: SkeletonBlock
   useEffect(() => { ensurePulseKeyframe() }, [])
   return (
     <div
-      style={{
-        ...pulseStyle,
-        width,
-        height
-      }}
+      className={pulseCls}
+      style={{ width, height }}
     />
   )
 }
@@ -69,11 +62,11 @@ export function SkeletonBlock({ width = '100%', height = '40px' }: SkeletonBlock
 export function MessageSkeleton(): React.ReactElement {
   useEffect(() => { ensurePulseKeyframe() }, [])
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px 0' }}>
+    <div className="flex flex-col gap-4 py-4">
       {[0, 1, 2].map((i) => (
-        <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-          <div style={{ ...pulseStyle, width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }} />
-          <div style={{ flex: 1 }}>
+        <div key={i} className="flex gap-3 items-start">
+          <div className={`${pulseCls} w-8 h-8 rounded-full shrink-0`} />
+          <div className="flex-1">
             <SkeletonText lines={i === 1 ? 1 : 3} />
           </div>
         </div>
@@ -85,18 +78,9 @@ export function MessageSkeleton(): React.ReactElement {
 export function ProviderCardSkeleton(): React.ReactElement {
   useEffect(() => { ensurePulseKeyframe() }, [])
   return (
-    <div
-      style={{
-        padding: '16px',
-        borderRadius: '10px',
-        border: '1px solid var(--color-border, rgba(128,128,128,0.2))',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px'
-      }}
-    >
-      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-        <div style={{ ...pulseStyle, width: '36px', height: '36px', borderRadius: '8px', flexShrink: 0 }} />
+    <div className="p-4 rounded-[10px] border border-[var(--color-border,rgba(128,128,128,0.2))] flex flex-col gap-3">
+      <div className="flex gap-3 items-center">
+        <div className={`${pulseCls} w-9 h-9 rounded-lg shrink-0`} />
         <SkeletonBlock width="160px" height="16px" />
       </div>
       <SkeletonText lines={2} />

@@ -43,51 +43,48 @@ export function StorageSettings(): React.ReactElement {
 
   return (
     <div>
-      <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#fafafa' }}>Storage</h2>
+      <h2 className="text-[16px] font-semibold mb-4 text-[#fafafa]">Storage</h2>
 
       {info ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className="flex flex-col gap-3">
           <Row label="App Data Folder">
-            <span style={{ fontSize: 12, color: '#a1a1aa', fontFamily: 'monospace', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <span className="text-[12px] text-[#a1a1aa] font-mono flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
               {info.userData}
             </span>
-            <button onClick={() => openFolder(info.userData)} style={btnStyle}>Open</button>
+            <button onClick={() => openFolder(info.userData)} className={btnCls}>Open</button>
           </Row>
           <Row label="Database">
-            <span style={{ fontSize: 12, color: '#a1a1aa', fontFamily: 'monospace', flex: 1 }}>
+            <span className="text-[12px] text-[#a1a1aa] font-mono flex-1">
               {info.dbPath.split('/').pop()} — {fmt(info.dbSize)}
             </span>
-            <button onClick={() => openFolder(info.userData)} style={btnStyle}>Open Folder</button>
+            <button onClick={() => openFolder(info.userData)} className={btnCls}>Open Folder</button>
           </Row>
           <Row label="Browser Cache">
-            <span style={{ fontSize: 12, color: '#a1a1aa', flex: 1 }}>
+            <span className="text-[12px] text-[#a1a1aa] flex-1">
               {cacheSize !== null ? fmt(cacheSize) : '…'}
             </span>
             <button
               onClick={clearCache}
               disabled={clearing || cacheSize === 0}
-              style={{ ...btnStyle, color: clearing ? '#52525b' : '#f87171', borderColor: clearing ? '#27272a' : '#7f1d1d' }}
+              className={`${btnCls} ${clearing ? 'text-[#52525b] border-[#27272a]' : 'text-[#f87171] border-[#7f1d1d]'}`}
             >
               {clearing ? 'Clearing…' : 'Clear Cache'}
             </button>
           </Row>
         </div>
       ) : (
-        <p style={{ color: '#52525b', fontSize: 13 }}>Loading…</p>
+        <p className="text-[#52525b] text-[13px]">Loading…</p>
       )}
     </div>
   )
 }
 
-const btnStyle: React.CSSProperties = {
-  background: 'none', border: '1px solid #3f3f46', borderRadius: 6,
-  color: '#a1a1aa', cursor: 'pointer', fontSize: 12, padding: '4px 12px', flexShrink: 0
-}
+const btnCls = 'bg-none border border-[#3f3f46] rounded-[6px] text-[#a1a1aa] cursor-pointer text-[12px] px-3 py-1 shrink-0'
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: '#18181b', borderRadius: 8, border: '1px solid #27272a' }}>
-      <span style={{ fontSize: 13, color: '#71717a', width: 130, flexShrink: 0 }}>{label}</span>
+    <div className="flex items-center gap-3 px-[14px] py-[10px] bg-[#18181b] rounded-lg border border-[#27272a]">
+      <span className="text-[13px] text-[#71717a] w-[130px] shrink-0">{label}</span>
       {children}
     </div>
   )

@@ -14,55 +14,22 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, title, description, action }: EmptyStateProps): React.ReactElement {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '48px 24px',
-        gap: '12px',
-        textAlign: 'center'
-      }}
-    >
+    <div className="flex flex-col items-center justify-center px-6 py-12 gap-3 text-center">
       {icon && (
-        <div style={{ fontSize: '40px', lineHeight: 1 }}>{icon}</div>
+        <div className="text-[40px] leading-none">{icon}</div>
       )}
-      <div
-        style={{
-          fontWeight: 600,
-          fontSize: '15px',
-          color: 'var(--color-text, #1a1a1a)'
-        }}
-      >
+      <div className="font-semibold text-[15px] text-[var(--color-text,#1a1a1a)]">
         {title}
       </div>
       {description && (
-        <div
-          style={{
-            fontSize: '13px',
-            color: 'var(--color-text-secondary, #888)',
-            maxWidth: '320px',
-            lineHeight: 1.5
-          }}
-        >
+        <div className="text-[13px] text-[var(--color-text-secondary,#888)] max-w-[320px] leading-[1.5]">
           {description}
         </div>
       )}
       {action && (
         <button
           onClick={action.onClick}
-          style={{
-            marginTop: '8px',
-            padding: '8px 20px',
-            borderRadius: '8px',
-            border: 'none',
-            background: 'var(--color-primary, #6366f1)',
-            color: '#fff',
-            fontSize: '14px',
-            cursor: 'pointer',
-            fontWeight: 500
-          }}
+          className="mt-2 px-5 py-2 rounded-lg border-none bg-[var(--color-primary,#6366f1)] text-white text-[14px] cursor-pointer font-medium"
         >
           {action.label}
         </button>

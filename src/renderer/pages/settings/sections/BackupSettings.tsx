@@ -36,45 +36,40 @@ export function BackupSettings(): React.ReactElement {
     }
   }
 
-  const btn: React.CSSProperties = {
-    padding: '9px 20px', borderRadius: 6, border: 'none',
-    cursor: 'pointer', fontSize: 13, fontWeight: 500
-  }
-
   return (
     <div>
-      <h2 style={{ color: '#fafafa', fontSize: 18, marginBottom: 4 }}>Backup & Restore</h2>
-      <p style={{ color: '#71717a', fontSize: 13, marginBottom: 28 }}>
+      <h2 className="text-[#fafafa] text-[18px] mb-1">Backup & Restore</h2>
+      <p className="text-[#71717a] text-[13px] mb-7">
         Export your providers, assistants, topics, messages, and notes to a JSON file; restore them from any backup.
       </p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 10, padding: '20px 24px' }}>
-          <p style={{ color: '#fafafa', fontWeight: 500, margin: '0 0 6px' }}>Export Backup</p>
-          <p style={{ color: '#71717a', fontSize: 12, margin: '0 0 16px' }}>
+      <div className="flex flex-col gap-4">
+        <div className="bg-[#18181b] border border-[#27272a] rounded-[10px] px-6 py-5">
+          <p className="text-[#fafafa] font-medium mb-[6px]">Export Backup</p>
+          <p className="text-[#71717a] text-[12px] mb-4">
             All your data will be saved to a single JSON file you can keep as a snapshot or transfer to another machine.
           </p>
           <button
             onClick={handleExport}
             disabled={exporting}
-            style={{ ...btn, background: '#2563eb', color: 'white', opacity: exporting ? 0.6 : 1 }}
+            className={`px-5 py-[9px] rounded-[6px] border-none bg-[#2563eb] text-white cursor-pointer text-[13px] font-medium ${exporting ? 'opacity-60' : ''}`}
           >
             {exporting ? 'Exporting…' : '↓ Export Backup'}
           </button>
         </div>
 
-        <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 10, padding: '20px 24px' }}>
-          <p style={{ color: '#fafafa', fontWeight: 500, margin: '0 0 6px' }}>Restore from Backup</p>
-          <p style={{ color: '#71717a', fontSize: 12, margin: '0 0 6px' }}>
+        <div className="bg-[#18181b] border border-[#27272a] rounded-[10px] px-6 py-5">
+          <p className="text-[#fafafa] font-medium mb-[6px]">Restore from Backup</p>
+          <p className="text-[#71717a] text-[12px] mb-[6px]">
             Imports providers, assistants, and notes from a previously exported JSON file. Existing data is not erased.
           </p>
-          <p style={{ color: '#ef4444', fontSize: 11, margin: '0 0 16px' }}>
+          <p className="text-[#ef4444] text-[11px] mb-4">
             ⚠ Restart the app after importing to see all changes reflected.
           </p>
           <button
             onClick={handleImport}
             disabled={importing}
-            style={{ ...btn, background: '#18181b', color: '#fafafa', border: '1px solid #3f3f46', opacity: importing ? 0.6 : 1 }}
+            className={`px-5 py-[9px] rounded-[6px] border border-[#3f3f46] bg-[#18181b] text-[#fafafa] cursor-pointer text-[13px] font-medium ${importing ? 'opacity-60' : ''}`}
           >
             {importing ? 'Importing…' : '↑ Import Backup…'}
           </button>
@@ -82,12 +77,7 @@ export function BackupSettings(): React.ReactElement {
       </div>
 
       {message && (
-        <div style={{
-          marginTop: 20, padding: '10px 16px', borderRadius: 8,
-          background: message.ok ? '#14532d' : '#450a0a',
-          border: `1px solid ${message.ok ? '#16a34a' : '#dc2626'}`,
-          color: message.ok ? '#4ade80' : '#f87171', fontSize: 13
-        }}>
+        <div className={`mt-5 px-4 py-[10px] rounded-lg text-[13px] border ${message.ok ? 'bg-[#14532d] border-[#16a34a] text-[#4ade80]' : 'bg-[#450a0a] border-[#dc2626] text-[#f87171]'}`}>
           {message.text}
         </div>
       )}

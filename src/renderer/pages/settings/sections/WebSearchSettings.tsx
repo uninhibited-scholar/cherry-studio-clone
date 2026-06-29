@@ -25,25 +25,22 @@ export function WebSearchSettings(): React.ReactElement {
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const input: React.CSSProperties = {
-    background: '#18181b', border: '1px solid #3f3f46', borderRadius: 6,
-    color: '#fafafa', padding: '6px 10px', fontSize: 13, width: '100%', boxSizing: 'border-box'
-  }
-  const label: React.CSSProperties = { fontSize: 12, color: '#a1a1aa', marginBottom: 4, display: 'block' }
+  const inputCls = 'bg-[#18181b] border border-[#3f3f46] rounded-[6px] text-[#fafafa] px-[10px] py-[6px] text-[13px] w-full box-border'
+  const labelCls = 'text-[12px] text-[#a1a1aa] mb-1 block'
 
   return (
     <div>
-      <h2 style={{ color: '#fafafa', fontSize: 18, marginBottom: 4 }}>Web Search</h2>
-      <p style={{ color: '#71717a', fontSize: 13, marginBottom: 24 }}>
+      <h2 className="text-[#fafafa] text-[18px] mb-1">Web Search</h2>
+      <p className="text-[#71717a] text-[13px] mb-6">
         Configure the search provider used when AI queries the web.
       </p>
 
-      <div style={{ marginBottom: 20 }}>
-        <label style={label}>Provider</label>
+      <div className="mb-5">
+        <label className={labelCls}>Provider</label>
         <select
           value={config.provider}
           onChange={(e) => setConfig({ ...config, provider: e.target.value as Provider })}
-          style={{ ...input, cursor: 'pointer' }}
+          className={`${inputCls} cursor-pointer`}
         >
           <option value="duckduckgo">DuckDuckGo (no key required)</option>
           <option value="tavily">Tavily (API key required)</option>
@@ -52,32 +49,32 @@ export function WebSearchSettings(): React.ReactElement {
       </div>
 
       {config.provider === 'tavily' && (
-        <div style={{ marginBottom: 20 }}>
-          <label style={label}>Tavily API Key</label>
+        <div className="mb-5">
+          <label className={labelCls}>Tavily API Key</label>
           <input
             type="password"
             value={config.tavilyApiKey ?? ''}
             onChange={(e) => setConfig({ ...config, tavilyApiKey: e.target.value })}
             placeholder="tvly-..."
-            style={input}
+            className={inputCls}
           />
-          <p style={{ fontSize: 11, color: '#52525b', marginTop: 4 }}>
+          <p className="text-[11px] text-[#52525b] mt-1">
             Get a key at tavily.com/dashboard
           </p>
         </div>
       )}
 
       {config.provider === 'searxng' && (
-        <div style={{ marginBottom: 20 }}>
-          <label style={label}>SearXNG Base URL</label>
+        <div className="mb-5">
+          <label className={labelCls}>SearXNG Base URL</label>
           <input
             type="text"
             value={config.searxngUrl ?? ''}
             onChange={(e) => setConfig({ ...config, searxngUrl: e.target.value })}
             placeholder="http://localhost:8080"
-            style={input}
+            className={inputCls}
           />
-          <p style={{ fontSize: 11, color: '#52525b', marginTop: 4 }}>
+          <p className="text-[11px] text-[#52525b] mt-1">
             Your self-hosted SearXNG instance with JSON format enabled.
           </p>
         </div>
@@ -85,11 +82,7 @@ export function WebSearchSettings(): React.ReactElement {
 
       <button
         onClick={save}
-        style={{
-          padding: '8px 20px', borderRadius: 6, border: 'none',
-          background: saved ? '#16a34a' : '#2563eb', color: 'white',
-          cursor: 'pointer', fontSize: 13, transition: 'background 0.2s'
-        }}
+        className={`px-5 py-2 rounded-[6px] border-none text-white cursor-pointer text-[13px] transition-colors duration-200 ${saved ? 'bg-[#16a34a]' : 'bg-[#2563eb]'}`}
       >
         {saved ? '✓ Saved' : 'Save'}
       </button>

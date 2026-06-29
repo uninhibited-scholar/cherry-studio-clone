@@ -66,45 +66,36 @@ export function GeneralSettings(): React.ReactElement {
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const label: React.CSSProperties = { fontSize: 13, color: '#e4e4e7', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }
-  const sublabel: React.CSSProperties = { fontSize: 11, color: '#71717a', marginTop: 2 }
-  const row: React.CSSProperties = { marginBottom: 20, padding: '14px 16px', background: '#18181b', borderRadius: 10, border: '1px solid #27272a' }
+  const rowCls = 'mb-5 px-4 py-[14px] bg-[#18181b] rounded-[10px] border border-[#27272a]'
+  const labelCls = 'text-[13px] text-[#e4e4e7] flex items-center gap-[10px] cursor-pointer'
+  const sublabelCls = 'text-[11px] text-[#71717a] mt-[2px]'
 
   return (
     <div>
-      <h2 style={{ color: '#fafafa', fontSize: 18, marginBottom: 4 }}>General</h2>
-      <p style={{ color: '#71717a', fontSize: 13, marginBottom: 24 }}>App-wide preferences stored locally.</p>
+      <h2 className="text-[#fafafa] text-[18px] mb-1">General</h2>
+      <p className="text-[#71717a] text-[13px] mb-6">App-wide preferences stored locally.</p>
 
-      <div style={row}>
-        <p style={{ ...label, cursor: 'default', marginBottom: 10 }}>Chat Font Size: {prefs.fontSize}px</p>
+      <div className={rowCls}>
+        <p className="text-[13px] text-[#e4e4e7] flex items-center gap-[10px] cursor-default mb-[10px]">Chat Font Size: {prefs.fontSize}px</p>
         <input
           type="range" min={11} max={20} value={prefs.fontSize}
           onChange={(e) => update('fontSize', Number(e.target.value))}
-          style={{ width: '100%' }}
+          className="w-full"
         />
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={sublabel}>11px</span>
-          <span style={sublabel}>20px</span>
+        <div className="flex justify-between">
+          <span className={sublabelCls}>11px</span>
+          <span className={sublabelCls}>20px</span>
         </div>
       </div>
 
-      <div style={row}>
-        <p style={{ ...label, cursor: 'default', marginBottom: 10 }}>Theme</p>
-        <div style={{ display: 'flex', gap: 8 }}>
+      <div className={rowCls}>
+        <p className="text-[13px] text-[#e4e4e7] flex items-center gap-[10px] cursor-default mb-[10px]">Theme</p>
+        <div className="flex gap-2">
           {(['dark', 'light'] as const).map((t) => (
             <button
               key={t}
               onClick={() => update('theme', t)}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 6,
-                border: prefs.theme === t ? '2px solid #2563eb' : '1px solid #3f3f46',
-                background: prefs.theme === t ? 'rgba(37,99,235,0.1)' : '#27272a',
-                color: prefs.theme === t ? '#60a5fa' : '#a1a1aa',
-                cursor: 'pointer',
-                fontSize: 12,
-                textTransform: 'capitalize'
-              }}
+              className={`px-[14px] py-[6px] rounded-[6px] cursor-pointer text-[12px] capitalize ${prefs.theme === t ? 'border-2 border-[#2563eb] bg-[rgba(37,99,235,0.1)] text-[#60a5fa]' : 'border border-[#3f3f46] bg-[#27272a] text-[#a1a1aa]'}`}
             >
               {t === 'dark' ? '🌙' : '☀️'} {t}
             </button>
@@ -112,22 +103,14 @@ export function GeneralSettings(): React.ReactElement {
         </div>
       </div>
 
-      <div style={row}>
-        <p style={{ ...label, cursor: 'default', marginBottom: 10 }}>Language</p>
-        <div style={{ display: 'flex', gap: 8 }}>
+      <div className={rowCls}>
+        <p className="text-[13px] text-[#e4e4e7] flex items-center gap-[10px] cursor-default mb-[10px]">Language</p>
+        <div className="flex gap-2">
           {(['en', 'zh'] as const).map((lang) => (
             <button
               key={lang}
               onClick={() => update('language', lang)}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 6,
-                border: prefs.language === lang ? '2px solid #2563eb' : '1px solid #3f3f46',
-                background: prefs.language === lang ? 'rgba(37,99,235,0.1)' : '#27272a',
-                color: prefs.language === lang ? '#60a5fa' : '#a1a1aa',
-                cursor: 'pointer',
-                fontSize: 12
-              }}
+              className={`px-[14px] py-[6px] rounded-[6px] cursor-pointer text-[12px] ${prefs.language === lang ? 'border-2 border-[#2563eb] bg-[rgba(37,99,235,0.1)] text-[#60a5fa]' : 'border border-[#3f3f46] bg-[#27272a] text-[#a1a1aa]'}`}
             >
               {lang === 'en' ? '🇬🇧 English' : '🇨🇳 中文'}
             </button>
@@ -135,30 +118,30 @@ export function GeneralSettings(): React.ReactElement {
         </div>
       </div>
 
-      <div style={row}>
-        <label style={label}>
+      <div className={rowCls}>
+        <label className={labelCls}>
           <input
             type="checkbox" checked={prefs.sendOnEnter}
             onChange={(e) => update('sendOnEnter', e.target.checked)}
           />
           Send on Enter
         </label>
-        <p style={sublabel}>Press Enter to send; Shift+Enter for newline.</p>
+        <p className={sublabelCls}>Press Enter to send; Shift+Enter for newline.</p>
       </div>
 
-      <div style={row}>
-        <label style={label}>
+      <div className={rowCls}>
+        <label className={labelCls}>
           <input
             type="checkbox" checked={prefs.showTimestamps}
             onChange={(e) => update('showTimestamps', e.target.checked)}
           />
           Show message timestamps
         </label>
-        <p style={sublabel}>Display time sent beneath each message bubble.</p>
+        <p className={sublabelCls}>Display time sent beneath each message bubble.</p>
       </div>
 
-      <div style={row}>
-        <label style={label}>
+      <div className={rowCls}>
+        <label className={labelCls}>
           <input
             type="checkbox" checked={prefs.autoScrollToBottom}
             onChange={(e) => update('autoScrollToBottom', e.target.checked)}
@@ -167,48 +150,40 @@ export function GeneralSettings(): React.ReactElement {
         </label>
       </div>
 
-      <div style={row}>
-        <label style={label}>
+      <div className={rowCls}>
+        <label className={labelCls}>
           <input
             type="checkbox" checked={launchOnBoot}
             onChange={(e) => toggleLaunchOnBoot(e.target.checked)}
           />
           Launch on system startup
         </label>
-        <p style={sublabel}>Start Cherry Studio automatically when you log in.</p>
+        <p className={sublabelCls}>Start Cherry Studio automatically when you log in.</p>
       </div>
 
-      <div style={row}>
-        <label style={label}>
+      <div className={rowCls}>
+        <label className={labelCls}>
           <input
             type="checkbox" checked={prefs.useProxy}
             onChange={(e) => update('useProxy', e.target.checked)}
           />
           Use HTTP Proxy
         </label>
-        <p style={sublabel}>Enable proxy for API requests (optional).</p>
+        <p className={sublabelCls}>Enable proxy for API requests (optional).</p>
         {prefs.useProxy && (
           <input
             type="text"
             value={prefs.proxyUrl}
             onChange={(e) => update('proxyUrl', e.target.value)}
             placeholder="http://proxy.example.com:8080"
-            style={{
-              marginTop: 8, width: '100%', background: '#27272a', border: '1px solid #3f3f46',
-              borderRadius: 6, color: '#fafafa', fontSize: 12, padding: '6px 10px', outline: 'none',
-              boxSizing: 'border-box'
-            }}
+            className="mt-2 w-full bg-[#27272a] border border-[#3f3f46] rounded-[6px] text-[#fafafa] text-[12px] px-[10px] py-[6px] outline-none box-border"
           />
         )}
       </div>
 
       <button
         onClick={save}
-        style={{
-          padding: '8px 20px', borderRadius: 6, border: 'none',
-          background: saved ? '#16a34a' : '#2563eb', color: 'white',
-          cursor: 'pointer', fontSize: 13, transition: 'background 0.2s'
-        }}
+        className={`px-5 py-2 rounded-[6px] border-none text-white cursor-pointer text-[13px] transition-colors duration-200 ${saved ? 'bg-[#16a34a]' : 'bg-[#2563eb]'}`}
       >
         {saved ? '✓ Saved' : 'Save'}
       </button>

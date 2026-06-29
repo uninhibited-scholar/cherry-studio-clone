@@ -33,45 +33,19 @@ export class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) return this.props.fallback
 
       return (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '40px 24px',
-            gap: '16px',
-            textAlign: 'center'
-          }}
-        >
-          <div style={{ fontSize: '40px' }}>⚠️</div>
-          <div style={{ fontWeight: 600, fontSize: '16px', color: 'var(--color-text, #1a1a1a)' }}>
+        <div className="flex flex-col items-center justify-center px-6 py-10 gap-4 text-center">
+          <div className="text-[40px]">⚠️</div>
+          <div className="font-semibold text-[16px] text-[var(--color-text,#1a1a1a)]">
             Something went wrong
           </div>
           {this.state.error && (
-            <div
-              style={{
-                fontSize: '12px',
-                color: 'var(--color-text-secondary, #666)',
-                maxWidth: '400px',
-                wordBreak: 'break-word'
-              }}
-            >
+            <div className="text-[12px] text-[var(--color-text-secondary,#666)] max-w-[400px] break-words">
               {this.state.error.message}
             </div>
           )}
           <button
             onClick={this.handleRetry}
-            style={{
-              padding: '8px 20px',
-              borderRadius: '8px',
-              border: 'none',
-              background: 'var(--color-primary, #6366f1)',
-              color: '#fff',
-              fontSize: '14px',
-              cursor: 'pointer',
-              fontWeight: 500
-            }}
+            className="px-5 py-2 rounded-lg border-none bg-[var(--color-primary,#6366f1)] text-white text-[14px] cursor-pointer font-medium"
           >
             Retry
           </button>

@@ -121,33 +121,33 @@ export function ProvidersSettings() {
 
   return (
     <div>
-      <h2 style={{ color: '#fafafa', fontSize: 18, marginBottom: 4 }}>AI Providers</h2>
-      <p style={{ color: '#71717a', fontSize: 13, marginBottom: 20 }}>
+      <h2 className="text-[#fafafa] text-[18px] mb-1">AI Providers</h2>
+      <p className="text-[#71717a] text-[13px] mb-5">
         Manage provider API keys and models. Keys are stored locally.
       </p>
 
       {/* Local Models Info */}
-      <div style={{ marginBottom: 20, padding: 12, background: 'rgba(96,165,250,0.05)', border: '1px solid #2563eb', borderRadius: 8 }}>
-        <p style={{ color: '#60a5fa', fontSize: 12, fontWeight: 600, margin: '0 0 8px' }}>💡 Running Local Models?</p>
-        <p style={{ color: '#a1a1aa', fontSize: 12, margin: '0 0 8px', lineHeight: 1.6 }}>
-          Use <strong>Ollama</strong> to run models locally. <a href="https://ollama.com" target="_blank" rel="noopener noreferrer" style={{ color: '#60a5fa', textDecoration: 'underline' }}>Install Ollama</a>, run <code style={{ background: '#09090b', padding: '2px 6px', borderRadius: 4, fontSize: 11 }}>ollama pull llama2</code>, then add as provider with API host <code style={{ background: '#09090b', padding: '2px 6px', borderRadius: 4, fontSize: 11 }}>http://localhost:11434</code>
+      <div className="mb-5 p-3 bg-[rgba(96,165,250,0.05)] border border-[#2563eb] rounded-lg">
+        <p className="text-[#60a5fa] text-[12px] font-semibold mb-2">💡 Running Local Models?</p>
+        <p className="text-[#a1a1aa] text-[12px] mb-2 leading-relaxed">
+          Use <strong>Ollama</strong> to run models locally. <a href="https://ollama.com" target="_blank" rel="noopener noreferrer" className="text-[#60a5fa] underline">Install Ollama</a>, run <code className="bg-[#09090b] px-[6px] py-[2px] rounded text-[11px]">ollama pull llama2</code>, then add as provider with API host <code className="bg-[#09090b] px-[6px] py-[2px] rounded text-[11px]">http://localhost:11434</code>
         </p>
       </div>
 
       {/* Model Presets Section */}
       {presets.length > 0 && (
-        <div style={{ marginBottom: 24, padding: 12, background: '#111113', borderRadius: 8, border: '1px solid #27272a' }}>
-          <p style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 10, fontWeight: 600 }}>⚡ Quick Model Presets</p>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div className="mb-6 p-3 bg-[#111113] rounded-lg border border-[#27272a]">
+          <p className="text-[#a1a1aa] text-[12px] mb-[10px] font-semibold">⚡ Quick Model Presets</p>
+          <div className="flex gap-2 flex-wrap">
             {presets.map((preset) => {
               const prov = providers.find((p) => p.id === preset.providerId)
               return (
-                <div key={preset.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px', background: 'rgba(37,99,235,0.1)', border: '1px solid #2563eb', borderRadius: 6 }}>
-                  <span style={{ color: '#60a5fa', fontSize: 12 }}>{preset.name}</span>
-                  <span style={{ color: '#52525b', fontSize: 11 }}>({prov?.name ?? 'unknown'} / {preset.modelId})</span>
+                <div key={preset.id} className="flex items-center gap-[6px] px-[10px] py-1 bg-[rgba(37,99,235,0.1)] border border-[#2563eb] rounded-[6px]">
+                  <span className="text-[#60a5fa] text-[12px]">{preset.name}</span>
+                  <span className="text-[#52525b] text-[11px]">({prov?.name ?? 'unknown'} / {preset.modelId})</span>
                   <button
                     onClick={() => deletePreset(preset.id)}
-                    style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '0 2px' }}
+                    className="bg-none border-none text-[#71717a] cursor-pointer text-[11px] px-[2px]"
                   >
                     ✕
                   </button>
@@ -159,9 +159,9 @@ export function ProvidersSettings() {
       )}
 
       {/* Save New Preset */}
-      <div style={{ marginBottom: 20, padding: 12, background: '#111113', borderRadius: 8, border: '1px solid #27272a' }}>
-        <p style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 10, fontWeight: 600 }}>💾 Save Current Selection as Preset</p>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+      <div className="mb-5 p-3 bg-[#111113] rounded-lg border border-[#27272a]">
+        <p className="text-[#a1a1aa] text-[12px] mb-[10px] font-semibold">💾 Save Current Selection as Preset</p>
+        <div className="flex gap-2 mb-[10px]">
           <select
             value={selectedForPreset?.providerId ?? ''}
             onChange={(e) => {
@@ -173,7 +173,7 @@ export function ProvidersSettings() {
                 }
               }
             }}
-            style={{ flex: 1, ...inputSty }}
+            className={inputCls}
           >
             <option value="">Select Provider</option>
             {providers.map((p) => (
@@ -184,7 +184,7 @@ export function ProvidersSettings() {
             <select
               value={selectedForPreset.modelId}
               onChange={(e) => setSelectedForPreset({ ...selectedForPreset, modelId: e.target.value })}
-              style={{ flex: 1, ...inputSty }}
+              className={inputCls}
             >
               {(models[selectedForPreset.providerId] ?? []).map((m) => (
                 <option key={m.id} value={m.id}>{m.displayName ?? m.name}</option>
@@ -192,15 +192,15 @@ export function ProvidersSettings() {
             </select>
           )}
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className="flex gap-2">
           <input
             value={presetName}
             onChange={(e) => setPresetName(e.target.value)}
             placeholder="Preset name (e.g. 'Fast Drafts', 'Research')"
             onKeyDown={(e) => e.key === 'Enter' && savePreset()}
-            style={{ flex: 1, ...inputSty }}
+            className={inputCls}
           />
-          <button onClick={savePreset} disabled={!presetName.trim() || !selectedForPreset} style={btnSty}>Save</button>
+          <button onClick={savePreset} disabled={!presetName.trim() || !selectedForPreset} className={btnCls}>Save</button>
         </div>
       </div>
 
@@ -208,14 +208,14 @@ export function ProvidersSettings() {
       {BUILTIN_PROVIDERS.filter(
         (b) => !providers.some((p) => p.name === b.name)
       ).length > 0 && (
-        <div style={{ marginBottom: 20 }}>
-          <p style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 8 }}>Quick add:</p>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div className="mb-5">
+          <p className="text-[#a1a1aa] text-[12px] mb-2">Quick add:</p>
+          <div className="flex gap-2 flex-wrap">
             {BUILTIN_PROVIDERS.filter((b) => !providers.some((p) => p.name === b.name)).map((b) => (
               <button
                 key={b.name}
                 onClick={() => addBuiltinProvider(b)}
-                style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid #3f3f46', background: 'transparent', color: '#a1a1aa', cursor: 'pointer', fontSize: 12 }}
+                className="px-[14px] py-[6px] rounded-lg border border-[#3f3f46] bg-transparent text-[#a1a1aa] cursor-pointer text-[12px]"
               >
                 + {b.name}
               </button>
@@ -225,83 +225,83 @@ export function ProvidersSettings() {
       )}
 
       {/* Provider list */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div className="flex flex-col gap-[10px]">
         {providers.map((p) => (
-          <div key={p.id} style={{ border: '1px solid #27272a', borderRadius: 10, overflow: 'hidden' }}>
+          <div key={p.id} className="border border-[#27272a] rounded-[10px] overflow-hidden">
             {/* Header */}
             <div
-              style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', cursor: 'pointer', gap: 10 }}
+              className="flex items-center px-4 py-3 cursor-pointer gap-[10px]"
               onClick={() => setExpanded(expanded === p.id ? null : p.id)}
             >
-              <span style={{ color: '#fafafa', fontSize: 14, fontWeight: 500, flex: 1 }}>{p.name}</span>
-              <span style={{ color: '#52525b', fontSize: 12 }}>{(models[p.id] ?? []).length} models</span>
+              <span className="text-[#fafafa] text-[14px] font-medium flex-1">{p.name}</span>
+              <span className="text-[#52525b] text-[12px]">{(models[p.id] ?? []).length} models</span>
               {testStatus[p.id] && testStatus[p.id] !== 'testing' && (
-                <span style={{ fontSize: 11, color: (testStatus[p.id] as { ok: boolean }).ok ? '#4ade80' : '#f87171' }}>
+                <span className={`text-[11px] ${(testStatus[p.id] as { ok: boolean }).ok ? 'text-[#4ade80]' : 'text-[#f87171]'}`}>
                   {(testStatus[p.id] as { ok: boolean }).ok ? '✓ Connected' : '✗ Failed'}
                 </span>
               )}
               <button
                 onClick={(e) => { e.stopPropagation(); testProvider(p) }}
                 disabled={testStatus[p.id] === 'testing'}
-                style={{ background: 'none', border: '1px solid #3f3f46', borderRadius: 4, color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px' }}
+                className="bg-none border border-[#3f3f46] rounded text-[#71717a] cursor-pointer text-[11px] px-2 py-[2px]"
               >
                 {testStatus[p.id] === 'testing' ? '…' : 'Test'}
               </button>
-              <span style={{ color: '#71717a', fontSize: 12 }}>{expanded === p.id ? '▲' : '▼'}</span>
+              <span className="text-[#71717a] text-[12px]">{expanded === p.id ? '▲' : '▼'}</span>
               <button
                 onClick={(e) => { e.stopPropagation(); deleteProvider(p.id) }}
-                style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', fontSize: 13 }}
+                className="bg-none border-none text-[#71717a] cursor-pointer text-[13px]"
               >
                 🗑
               </button>
             </div>
 
             {expanded === p.id && (
-              <div style={{ borderTop: '1px solid #27272a', padding: 16, background: '#111113' }}>
+              <div className="border-t border-[#27272a] p-4 bg-[#111113]">
                 {/* API Key */}
-                <label style={{ display: 'block', marginBottom: 12 }}>
-                  <span style={{ color: '#a1a1aa', fontSize: 12, display: 'block', marginBottom: 4 }}>API Key</span>
-                  <div style={{ display: 'flex', gap: 8 }}>
+                <label className="block mb-3">
+                  <span className="text-[#a1a1aa] text-[12px] block mb-1">API Key</span>
+                  <div className="flex gap-2">
                     <input
                       type="password"
                       defaultValue={p.apiKey ?? ''}
                       onChange={(e) => setEditingKey((prev) => ({ ...prev, [p.id]: e.target.value }))}
                       placeholder="sk-…"
-                      style={{ flex: 1, ...inputSty }}
+                      className={`flex-1 ${inputCls}`}
                     />
-                    <button onClick={() => saveProviderKey(p)} style={btnSty}>Save</button>
+                    <button onClick={() => saveProviderKey(p)} className={btnCls}>Save</button>
                   </div>
                 </label>
 
                 {/* API Host (optional for custom / Ollama) */}
-                <label style={{ display: 'block', marginBottom: 16 }}>
-                  <span style={{ color: '#a1a1aa', fontSize: 12, display: 'block', marginBottom: 4 }}>
-                    API Host <span style={{ color: '#52525b' }}>(optional)</span>
+                <label className="block mb-4">
+                  <span className="text-[#a1a1aa] text-[12px] block mb-1">
+                    API Host <span className="text-[#52525b]">(optional)</span>
                   </span>
-                  <div style={{ display: 'flex', gap: 8 }}>
+                  <div className="flex gap-2">
                     <input
                       type="text"
                       defaultValue={p.apiHost ?? ''}
                       onChange={(e) => setEditingHost((prev) => ({ ...prev, [p.id]: e.target.value }))}
                       placeholder="https://api.openai.com/v1"
-                      style={{ flex: 1, ...inputSty }}
+                      className={`flex-1 ${inputCls}`}
                     />
-                    <button onClick={() => saveProviderKey(p)} style={btnSty}>Save</button>
+                    <button onClick={() => saveProviderKey(p)} className={btnCls}>Save</button>
                   </div>
                 </label>
 
                 {/* Models */}
-                <p style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 8 }}>Models</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 12 }}>
+                <p className="text-[#a1a1aa] text-[12px] mb-2">Models</p>
+                <div className="flex flex-col gap-1 mb-3">
                   {(models[p.id] ?? []).map((m) => (
-                    <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div key={m.id} className="flex items-center gap-2">
                       <input
                         type="checkbox"
                         checked={m.isEnabled}
                         onChange={() => toggleModel(m)}
-                        style={{ accentColor: '#2563eb' }}
+                        className="accent-[#2563eb]"
                       />
-                      <span style={{ color: m.isEnabled ? '#fafafa' : '#52525b', fontSize: 13 }}>
+                      <span className={`text-[13px] ${m.isEnabled ? 'text-[#fafafa]' : 'text-[#52525b]'}`}>
                         {m.displayName ?? m.name}
                       </span>
                     </div>
@@ -309,15 +309,15 @@ export function ProvidersSettings() {
                 </div>
 
                 {/* Add custom model */}
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div className="flex gap-2">
                   <input
                     value={newModelName[p.id] ?? ''}
                     onChange={(e) => setNewModelName((prev) => ({ ...prev, [p.id]: e.target.value }))}
                     placeholder="Add model ID (e.g. gpt-4o)"
                     onKeyDown={(e) => e.key === 'Enter' && addModel(p.id)}
-                    style={{ flex: 1, ...inputSty }}
+                    className={`flex-1 ${inputCls}`}
                   />
-                  <button onClick={() => addModel(p.id)} style={btnSty}>Add</button>
+                  <button onClick={() => addModel(p.id)} className={btnCls}>Add</button>
                 </div>
               </div>
             )}
@@ -328,23 +328,6 @@ export function ProvidersSettings() {
   )
 }
 
-const inputSty: React.CSSProperties = {
-  background: '#27272a',
-  border: '1px solid #3f3f46',
-  borderRadius: 8,
-  padding: '8px 12px',
-  color: '#fafafa',
-  fontSize: 13,
-  outline: 'none'
-}
+const inputCls = 'bg-[#27272a] border border-[#3f3f46] rounded-lg px-3 py-2 text-[#fafafa] text-[13px] outline-none'
 
-const btnSty: React.CSSProperties = {
-  padding: '8px 14px',
-  borderRadius: 8,
-  border: 'none',
-  background: '#2563eb',
-  color: '#fafafa',
-  fontSize: 13,
-  cursor: 'pointer',
-  whiteSpace: 'nowrap'
-}
+const btnCls = 'px-[14px] py-2 rounded-lg border-none bg-[#2563eb] text-[#fafafa] text-[13px] cursor-pointer whitespace-nowrap'

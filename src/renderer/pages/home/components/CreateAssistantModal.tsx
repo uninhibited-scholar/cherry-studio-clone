@@ -51,43 +51,32 @@ export function CreateAssistantModal({ open, onClose, onCreated }: Props) {
     onClose()
   }
 
+  const canCreate = providers.length > 0 && !!selectedModelId
+
   return (
     <div
-      style={{
-        position: 'fixed', inset: 0, zIndex: 100,
-        background: 'rgba(0,0,0,0.6)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center'
-      }}
+      className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center"
       onClick={onClose}
     >
       <form
         onSubmit={handleSubmit}
         onClick={(e) => e.stopPropagation()}
-        style={{
-          background: '#18181b',
-          border: '1px solid #3f3f46',
-          borderRadius: 12,
-          padding: 24,
-          width: 440,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 14
-        }}
+        className="bg-[#18181b] border border-[#3f3f46] rounded-xl p-6 w-[440px] flex flex-col gap-[14px]"
       >
-        <h2 style={{ color: '#fafafa', margin: 0, fontSize: 16 }}>New Assistant</h2>
+        <h2 className="text-[#fafafa] m-0 text-[16px]">New Assistant</h2>
 
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className="flex gap-2">
           <input
             value={emoji}
             onChange={(e) => setEmoji(e.target.value)}
-            style={{ ...inputStyle, width: 48, flexShrink: 0, textAlign: 'center', padding: '8px 4px' }}
+            className={`${inputCls} w-12 shrink-0 text-center px-1`}
           />
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="助手名称"
             required
-            style={{ ...inputStyle, flex: 1, width: 'auto' }}
+            className={`${inputCls} flex-1 w-auto`}
           />
         </div>
 
@@ -96,16 +85,16 @@ export function CreateAssistantModal({ open, onClose, onCreated }: Props) {
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="System prompt (optional)"
           rows={3}
-          style={{ ...inputStyle, resize: 'vertical' }}
+          className={`${inputCls} resize-y`}
         />
 
         {providers.length === 0 ? (
-          <div style={{ background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.4)', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#fbbf24' }}>
+          <div className="bg-[rgba(234,179,8,0.1)] border border-[rgba(234,179,8,0.4)] rounded-lg px-[14px] py-[10px] text-[13px] text-[#fbbf24]">
             ⚠️ 还没有可用的 Provider。请先到{' '}
             <button
               type="button"
               onClick={() => { onClose(); window.location.hash = '#/settings' }}
-              style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: 0, fontSize: 13, textDecoration: 'underline' }}
+              className="bg-none border-none text-[#60a5fa] cursor-pointer p-0 text-[13px] underline"
             >
               设置 → Providers
             </button>
@@ -116,7 +105,7 @@ export function CreateAssistantModal({ open, onClose, onCreated }: Props) {
             <select
               value={selectedProviderId}
               onChange={(e) => setSelectedProviderId(e.target.value)}
-              style={inputStyle}
+              className={inputCls}
             >
               {providers.map((p) => (
                 <option key={p.id} value={p.id}>{p.name}</option>
@@ -124,12 +113,12 @@ export function CreateAssistantModal({ open, onClose, onCreated }: Props) {
             </select>
 
             {models.length === 0 ? (
-              <div style={{ background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.4)', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#fbbf24' }}>
+              <div className="bg-[rgba(234,179,8,0.1)] border border-[rgba(234,179,8,0.4)] rounded-lg px-[14px] py-[10px] text-[13px] text-[#fbbf24]">
                 ⚠️ 该 Provider 下没有启用的模型。请到{' '}
                 <button
                   type="button"
                   onClick={() => { onClose(); window.location.hash = '#/settings' }}
-                  style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: 0, fontSize: 13, textDecoration: 'underline' }}
+                  className="bg-none border-none text-[#60a5fa] cursor-pointer p-0 text-[13px] underline"
                 >
                   设置 → Providers
                 </button>
@@ -139,7 +128,7 @@ export function CreateAssistantModal({ open, onClose, onCreated }: Props) {
               <select
                 value={selectedModelId}
                 onChange={(e) => setSelectedModelId(e.target.value)}
-                style={inputStyle}
+                className={inputCls}
               >
                 {models.map((m) => (
                   <option key={m.id} value={m.id}>{m.displayName ?? m.name}</option>
@@ -149,33 +138,13 @@ export function CreateAssistantModal({ open, onClose, onCreated }: Props) {
           </>
         )}
 
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button type="button" onClick={onClose} style={btnStyle('#27272a')}>取消</button>
-          <button type="submit" disabled={providers.length === 0 || !selectedModelId} style={btnStyle(providers.length === 0 || !selectedModelId ? '#374151' : '#2563eb')}>创建</button>
+        <div className="flex gap-2 justify-end">
+          <button type="button" onClick={onClose} className="px-[18px] py-2 rounded-lg border-none bg-[#27272a] text-[#fafafa] text-[13px] cursor-pointer">取消</button>
+          <button type="submit" disabled={!canCreate} className={`px-[18px] py-2 rounded-lg border-none text-[#fafafa] text-[13px] cursor-pointer ${canCreate ? 'bg-[#2563eb]' : 'bg-[#374151]'}`}>创建</button>
         </div>
       </form>
     </div>
   )
 }
 
-const inputStyle: React.CSSProperties = {
-  background: '#27272a',
-  border: '1px solid #3f3f46',
-  borderRadius: 8,
-  padding: '8px 12px',
-  color: '#fafafa',
-  fontSize: 13,
-  outline: 'none',
-  width: '100%',
-  boxSizing: 'border-box'
-}
-
-const btnStyle = (bg: string): React.CSSProperties => ({
-  padding: '8px 18px',
-  borderRadius: 8,
-  border: 'none',
-  background: bg,
-  color: '#fafafa',
-  fontSize: 13,
-  cursor: 'pointer'
-})
+const inputCls = 'bg-[#27272a] border border-[#3f3f46] rounded-lg px-3 py-2 text-[#fafafa] text-[13px] outline-none w-full box-border'

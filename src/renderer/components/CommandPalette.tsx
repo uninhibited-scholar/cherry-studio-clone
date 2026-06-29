@@ -46,51 +46,25 @@ export function CommandPalette({ commands, isOpen, onClose }: Props) {
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0,0,0,0.5)',
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        paddingTop: '20vh'
-      }}
+      className="fixed inset-0 bg-black/50 z-[1000] flex items-start justify-center pt-[20vh]"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{
-          background: '#18181b',
-          borderRadius: 12,
-          border: '1px solid #27272a',
-          width: '90%',
-          maxWidth: 500,
-          boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
-        }}
+        className="bg-[#18181b] rounded-xl border border-[#27272a] w-[90%] max-w-[500px] shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
       >
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid #27272a' }}>
+        <div className="px-4 py-3 border-b border-[#27272a]">
           <input
             autoFocus
             value={search}
             onChange={(e) => { setSearch(e.target.value); setSelected(0) }}
             placeholder="Type a command…"
-            style={{
-              width: '100%',
-              background: 'none',
-              border: 'none',
-              outline: 'none',
-              color: '#fafafa',
-              fontSize: 16
-            }}
+            className="w-full bg-transparent border-none outline-none text-[#fafafa] text-[16px]"
           />
         </div>
-        <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+        <div className="max-h-[300px] overflow-y-auto">
           {filtered.length === 0 ? (
-            <div style={{ padding: '20px', textAlign: 'center', color: '#52525b', fontSize: 13 }}>
+            <div className="p-5 text-center text-[#52525b] text-[13px]">
               No commands found
             </div>
           ) : (
@@ -99,25 +73,12 @@ export function CommandPalette({ commands, isOpen, onClose }: Props) {
                 key={cmd.id}
                 onClick={() => { cmd.onSelect(); onClose() }}
                 onMouseEnter={() => setSelected(idx)}
-                style={{
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '10px 16px',
-                  border: 'none',
-                  background: idx === selected ? 'rgba(255,255,255,0.08)' : 'transparent',
-                  color: '#fafafa',
-                  cursor: 'pointer',
-                  fontSize: 13,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  borderBottom: '1px solid #27272a'
-                }}
+                className={`w-full text-left px-4 py-[10px] border-none text-[#fafafa] cursor-pointer text-[13px] flex items-center gap-[10px] border-b border-[#27272a] ${idx === selected ? 'bg-white/8' : 'bg-transparent'}`}
               >
-                {cmd.icon && <span style={{ fontSize: 14 }}>{cmd.icon}</span>}
+                {cmd.icon && <span className="text-[14px]">{cmd.icon}</span>}
                 <div>
-                  <div style={{ fontWeight: 500 }}>{cmd.label}</div>
-                  {cmd.description && <div style={{ fontSize: 11, color: '#71717a', marginTop: 2 }}>{cmd.description}</div>}
+                  <div className="font-medium">{cmd.label}</div>
+                  {cmd.description && <div className="text-[11px] text-[#71717a] mt-[2px]">{cmd.description}</div>}
                 </div>
               </button>
             ))
