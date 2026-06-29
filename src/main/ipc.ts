@@ -1,6 +1,9 @@
 import { ipcMain, BrowserWindow, shell } from 'electron'
 import { IpcChannel } from '@shared/IpcChannel'
 import { quickAssistantWindow } from './core/window/QuickAssistantWindow'
+import { selectionAssistantWindow } from './core/window/SelectionAssistantWindow'
+import { themeService } from './services/ThemeService'
+import { updaterService } from './services/UpdaterService'
 import { loggerService } from '@logger'
 import { topic as topicSchema } from './data/db/schemas/topic'
 import { message as messageSchema } from './data/db/schemas/message'
@@ -548,6 +551,37 @@ export function registerIpcHandlers(): void {
   // ── OCR ─────────────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.OCR_EXTRACT, async (_event, imagePath: string) => {
     return ocrService.extractText(imagePath)
+  })
+
+  // ── Theme ────────────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.THEME_GET, () => {
+    return themeService.getTheme()
+  })
+
+  ipcMain.handle(IpcChannel.THEME_SET, (_event, theme: 'dark' | 'light' | 'system') => {
+    themeService.setTheme(theme)
+  })
+
+  // ── Auto-updater ─────────────────────────────────────────────────────────
+  ipcMain.handle(IpcChannel.UPDATE_CHECK, () => {
+    return updaterService.checkForUpdates()
+  })
+
+  ipcMain.handle(IpcChannel.UPDATE_DOWNLOAD, () => {
+    return updaterService.downloadUpdate()
+  })
+
+  ipcMain.handle(IpcChannel.UPDATE_INSTALL, () => {
+    updaterService.quitAndInstall()
+  })
+
+  // ── Selection Assistant ──────────────────────────────────────────────────
+  ipcMain.on(IpcChannel.SELECTION_ASSISTANT_HIDE, () => {
+    selectionAssistantWindow.hide()
+  })
+
+  ipcMain.on(IpcChannel.SELECTION_ASSISTANT_SHOW, () => {
+    selectionAssistantWindow.show()
   })
 
   logger.info('All IPC handlers registered')

@@ -3,6 +3,9 @@ import { application } from './core/application'
 import { createTray, destroyTray } from './services/TrayService'
 import { buildAndSetAppMenu } from './services/AppMenuService'
 import { quickAssistantWindow } from './core/window/QuickAssistantWindow'
+import { selectionAssistantWindow } from './core/window/SelectionAssistantWindow'
+import { selectionService } from './services/selection/SelectionService'
+import { updaterService } from './services/UpdaterService'
 
 // Enforce single instance
 const gotLock = app.requestSingleInstanceLock()
@@ -17,6 +20,18 @@ app.whenReady().then(async () => {
   createTray()
   quickAssistantWindow.create()
   quickAssistantWindow.registerShortcut()
+
+  // Selection Assistant
+  selectionAssistantWindow.create()
+  selectionService.registerShortcut()
+
+  // Auto-updater
+  updaterService.init()
+  const mainWin = BrowserWindow.getAllWindows()[0]
+  if (mainWin) updaterService.setMainWindow(mainWin)
+  if (app.isPackaged) {
+    setTimeout(() => updaterService.checkForUpdates(), 5000)
+  }
 
   // Register zoom shortcuts
   const registerZoomShortcuts = () => {
@@ -47,6 +62,7 @@ app.on('window-all-closed', () => {
 
 app.on('will-quit', () => {
   quickAssistantWindow.unregisterShortcut()
+  selectionService.unregisterShortcut()
 })
 
 app.on('before-quit', () => {

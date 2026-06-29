@@ -112,29 +112,29 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
 
   if (messages.length === 0 && !streaming) {
     return (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#52525b' }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>💬</div>
-        <p style={{ fontSize: 15, color: '#71717a' }}>Start the conversation</p>
-        <p style={{ fontSize: 13, marginTop: 4 }}>Type a message below</p>
+      <div className="flex-1 flex flex-col items-center justify-center text-[#52525b]">
+        <div className="text-5xl mb-4">💬</div>
+        <p className="text-[15px] text-[#71717a]">Start the conversation</p>
+        <p className="text-sm mt-1">Type a message below</p>
       </div>
     )
   }
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: '16px 0', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+    <div className="flex-1 overflow-y-auto py-4 flex flex-col relative">
       {/* Multi-select toolbar */}
       {selected.size > 0 && (
-        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(37,99,235,0.15)', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid #2563eb' }}>
-          <span style={{ fontSize: 12, color: '#60a5fa' }}>{selected.size} selected</span>
+        <div className="sticky top-0 z-10 bg-[rgba(37,99,235,0.15)] px-4 py-2 flex items-center gap-3 border-b border-b-[#2563eb]">
+          <span className="text-xs text-[#60a5fa]">{selected.size} selected</span>
           <button
             onClick={deleteSelected}
-            style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: 12, textDecoration: 'underline' }}
+            className="bg-transparent border-0 text-[#f87171] cursor-pointer text-xs underline"
           >
             Delete Selected
           </button>
           <button
             onClick={() => setSelected(new Set())}
-            style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#a1a1aa', cursor: 'pointer', fontSize: 12 }}
+            className="ml-auto bg-transparent border-0 text-[#a1a1aa] cursor-pointer text-xs"
           >
             ✕ Cancel
           </button>
@@ -143,29 +143,29 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
 
       {/* In-thread search nav */}
       {q && matchedIds.length > 0 && (
-        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(9,9,11,0.9)', padding: '4px 16px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid #27272a' }}>
-          <span style={{ fontSize: 12, color: '#71717a' }}>{matchedIds.length} result{matchedIds.length > 1 ? 's' : ''}</span>
-          <button onClick={() => setMatchIdx((i) => Math.max(0, i - 1))} disabled={matchIdx === 0} style={navBtn}>↑</button>
-          <span style={{ fontSize: 12, color: '#a1a1aa' }}>{matchIdx + 1} / {matchedIds.length}</span>
-          <button onClick={() => setMatchIdx((i) => Math.min(matchedIds.length - 1, i + 1))} disabled={matchIdx === matchedIds.length - 1} style={navBtn}>↓</button>
+        <div className="sticky top-0 z-10 bg-[rgba(9,9,11,0.9)] px-4 py-1 flex items-center gap-2 border-b border-b-[#27272a]">
+          <span className="text-xs text-[#71717a]">{matchedIds.length} result{matchedIds.length > 1 ? 's' : ''}</span>
+          <button onClick={() => setMatchIdx((i) => Math.max(0, i - 1))} disabled={matchIdx === 0} className={navBtnClass}>↑</button>
+          <span className="text-xs text-[#a1a1aa]">{matchIdx + 1} / {matchedIds.length}</span>
+          <button onClick={() => setMatchIdx((i) => Math.min(matchedIds.length - 1, i + 1))} disabled={matchIdx === matchedIds.length - 1} className={navBtnClass}>↓</button>
         </div>
       )}
       {q && matchedIds.length === 0 && (
-        <div style={{ padding: '6px 16px', fontSize: 12, color: '#71717a', background: 'rgba(9,9,11,0.9)', borderBottom: '1px solid #27272a' }}>No results</div>
+        <div className="px-4 py-1.5 text-xs text-[#71717a] bg-[rgba(9,9,11,0.9)] border-b border-b-[#27272a]">No results</div>
       )}
       {messages.map((msg, idx) => {
         const matchPos = matchedIds.indexOf(msg.id)
         const isCurrentMatch = matchPos === matchIdx
         const isSelected = selected.has(msg.id)
         return (
-          <div key={msg.id} ref={(el) => { if (matchPos >= 0) matchRefs.current[matchPos] = el }} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, paddingLeft: 8, ...(isCurrentMatch ? { outline: '2px solid #2563eb', outlineOffset: -2, borderRadius: 8 } : {}) }}>
+          <div key={msg.id} ref={(el) => { if (matchPos >= 0) matchRefs.current[matchPos] = el }} className={`flex items-start gap-2 pl-2 ${isCurrentMatch ? 'outline outline-2 outline-[#2563eb] -outline-offset-2 rounded-lg' : ''}`}>
             <input
               type="checkbox"
               checked={isSelected}
               onChange={() => toggleSelect(msg.id)}
-              style={{ marginTop: 6, accentColor: '#2563eb', cursor: 'pointer' }}
+              className="mt-1.5 cursor-pointer accent-[#2563eb]"
             />
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <MessageBubble
               message={msg}
               onDelete={onDelete}
@@ -199,10 +199,7 @@ function formatTime(ts: number) {
   return new Date(ts).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
 }
 
-const navBtn: React.CSSProperties = {
-  background: 'none', border: '1px solid #3f3f46', borderRadius: 4, color: '#a1a1aa',
-  cursor: 'pointer', fontSize: 12, padding: '1px 7px'
-}
+const navBtnClass = 'bg-transparent border border-[#3f3f46] rounded text-[#a1a1aa] cursor-pointer text-xs px-[7px] py-[1px]'
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '🔥', '👀', '🎉']
 
@@ -287,17 +284,17 @@ function MessageBubble({
 
   return (
     <div
-      style={{ display: 'flex', flexDirection: 'column', padding: '4px 20px', alignItems: isUser ? 'flex-end' : 'flex-start' }}
+      className={`flex flex-col px-5 py-1 ${isUser ? 'items-end' : 'items-start'}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, maxWidth: '80%', width: isUser ? 'auto' : '100%' }}>
+      <div className={`flex items-start gap-2.5 max-w-[80%] ${isUser ? 'w-auto' : 'w-full'}`}>
         {!isUser && (
-          <div style={{ width: 28, height: 28, borderRadius: 6, background: '#3f3f46', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, marginTop: 2 }}>
+          <div className="w-7 h-7 rounded-md bg-[#3f3f46] flex items-center justify-center text-sm shrink-0 mt-0.5">
             🤖
           </div>
         )}
-        <div style={{ flex: isUser ? undefined : 1 }}>
+        <div className={isUser ? undefined : 'flex-1'}>
           {isUser ? (
             editing ? (
               <div>
@@ -306,14 +303,14 @@ function MessageBubble({
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   rows={3}
-                  style={{ width: '100%', background: '#18181b', border: '1px solid #3f3f46', borderRadius: 8, color: '#fafafa', fontSize: 14, lineHeight: 1.6, outline: 'none', padding: '8px 12px', resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                  className="w-full bg-[#18181b] border border-[#3f3f46] rounded-lg text-[#fafafa] text-sm leading-[1.6] outline-none px-3 py-2 resize-y font-[inherit] box-border"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onEditResend?.(message.id, editValue.trim()); setEditing(false) }
                     if (e.key === 'Escape') { setEditing(false); setEditValue(message.content) }
                   }}
                 />
-                <div style={{ display: 'flex', gap: 6, marginTop: 6, justifyContent: 'flex-end' }}>
-                  <button onClick={() => { setEditing(false); setEditValue(message.content) }} style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 12, padding: '3px 10px', borderRadius: 4 }}>Cancel</button>
+                <div className="flex gap-1.5 mt-1.5 justify-end">
+                  <button onClick={() => { setEditing(false); setEditValue(message.content) }} className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-xs px-2.5 py-[3px] rounded">Cancel</button>
                   <button onClick={() => {
                     if (editValue.trim() !== message.content) {
                       const newHistory = [...editHistory, { content: message.content, editedAt: Date.now() }]
@@ -322,41 +319,35 @@ function MessageBubble({
                     }
                     onEditResend?.(message.id, editValue.trim())
                     setEditing(false)
-                  }} style={{ background: '#2563eb', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 12, padding: '3px 10px', borderRadius: 4 }}>Resend</button>
+                  }} className="bg-[#2563eb] border-0 text-white cursor-pointer text-xs px-2.5 py-[3px] rounded">Resend</button>
                 </div>
               </div>
             ) : (
-            <div style={{
-              padding: '10px 14px',
-              borderRadius: '16px 16px 4px 16px',
-              background: '#2563eb', color: '#fafafa',
-              fontSize: 'var(--chat-font-size, 14px)', lineHeight: 1.6,
-              whiteSpace: 'pre-wrap', wordBreak: 'break-word'
-            }}>
+            <div className="px-[14px] py-[10px] rounded-[16px_16px_4px_16px] bg-[#2563eb] text-[#fafafa] text-[length:var(--chat-font-size,14px)] leading-[1.6] whitespace-pre-wrap break-words">
               {message.content}
             </div>
             )
           ) : (
-            <div style={{ color: '#e4e4e7', fontSize: 14 }}>
+            <div className="text-[#e4e4e7] text-sm">
               <MarkdownContent content={message.content || (isStreaming ? '…' : '')} />
               {isStreaming && (
-                <span style={{ display: 'inline-block', width: 8, height: 14, background: '#a1a1aa', borderRadius: 2, marginLeft: 2, animation: 'blink 1s step-end infinite', verticalAlign: 'text-bottom' }} />
+                <span className="inline-block w-2 h-3.5 bg-[#a1a1aa] rounded-sm ml-0.5 align-text-bottom" style={{ animation: 'blink 1s step-end infinite' }} />
               )}
             </div>
           )}
 
           {/* Action bar */}
           {!isStreaming && hovered && (
-            <div style={{ display: 'flex', gap: 4, marginTop: 4, justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
+            <div className={`flex gap-1 mt-1 ${isUser ? 'justify-end' : 'justify-start'}`}>
               <button
                 onClick={toggleStar}
-                style={{ background: 'none', border: '1px solid #3f3f46', color: starred ? '#fbbf24' : '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                className={`bg-transparent border border-[#3f3f46] cursor-pointer text-[11px] px-2 py-0.5 rounded ${starred ? 'text-[#fbbf24]' : 'text-[#71717a]'}`}
               >
                 {starred ? '★' : '☆'} Star
               </button>
               <button
                 onClick={copy}
-                style={{ background: 'none', border: '1px solid #3f3f46', color: copied ? '#4ade80' : '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                className={`bg-transparent border border-[#3f3f46] cursor-pointer text-[11px] px-2 py-0.5 rounded ${copied ? 'text-[#4ade80]' : 'text-[#71717a]'}`}
               >
                 {copied ? '✓' : '⎘ Copy'}
               </button>
@@ -371,13 +362,13 @@ function MessageBubble({
                   a.click()
                   URL.revokeObjectURL(url)
                 }}
-                style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
               >
                 ↓ MD
               </button>
               <button
                 onClick={generateShareLink}
-                style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
                 title="Copy shareable link"
               >
                 🔗 Share
@@ -385,7 +376,7 @@ function MessageBubble({
               {onQuote && (
                 <button
                   onClick={() => onQuote(message)}
-                  style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                  className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
                 >
                   💬 Quote
                 </button>
@@ -393,21 +384,21 @@ function MessageBubble({
               {editHistory.length > 0 && (
                 <button
                   onClick={() => setShowHistory((v) => !v)}
-                  style={{ background: 'none', border: '1px solid #3f3f46', color: '#a78bfa', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                  className="bg-transparent border border-[#3f3f46] text-[#a78bfa] cursor-pointer text-[11px] px-2 py-0.5 rounded"
                 >
                   📝 History ({editHistory.length})
                 </button>
               )}
               <button
                 onClick={() => setShowTagInput((v) => !v)}
-                style={{ background: 'none', border: '1px solid #3f3f46', color: tags.length > 0 ? '#60a5fa' : '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                className={`bg-transparent border border-[#3f3f46] cursor-pointer text-[11px] px-2 py-0.5 rounded ${tags.length > 0 ? 'text-[#60a5fa]' : 'text-[#71717a]'}`}
               >
                 🏷️ Tag{tags.length > 0 ? `(${tags.length})` : ''}
               </button>
               {onEditResend && !editing && (
                 <button
                   onClick={() => { setEditing(true); setEditValue(message.content) }}
-                  style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                  className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
                 >
                   ✎ Edit
                 </button>
@@ -415,7 +406,7 @@ function MessageBubble({
               {onRegenerate && (
                 <button
                   onClick={onRegenerate}
-                  style={{ background: 'none', border: '1px solid #3f3f46', color: '#71717a', cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 4 }}
+                  className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
                 >
                   ↺ Regenerate
                 </button>
@@ -425,7 +416,7 @@ function MessageBubble({
                   onClick={() => canDelete && onDelete(message.id)}
                   disabled={!canDelete}
                   title={canDelete ? 'Delete this message' : `Delete unavailable (${deleteTimeRemaining}s remaining)`}
-                  style={{ background: 'none', border: '1px solid #3f3f46', color: canDelete ? '#f87171' : '#52525b', cursor: canDelete ? 'pointer' : 'not-allowed', fontSize: 11, padding: '2px 8px', borderRadius: 4, opacity: canDelete ? 1 : 0.5 }}
+                  className={`bg-transparent border border-[#3f3f46] cursor-pointer text-[11px] px-2 py-0.5 rounded ${canDelete ? 'text-[#f87171] opacity-100' : 'text-[#52525b] cursor-not-allowed opacity-50'}`}
                 >
                   ✕ {canDelete ? 'Delete' : `${deleteTimeRemaining}s`}
                 </button>
@@ -435,41 +426,41 @@ function MessageBubble({
 
           {/* Tags */}
           {tags.length > 0 && (
-            <div style={{ marginTop: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+            <div className="mt-2 flex gap-1 flex-wrap">
               {tags.map((tag) => (
-                <div key={tag} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 8px', background: 'rgba(96,165,250,0.1)', border: '1px solid #2563eb', borderRadius: 12, fontSize: 11, color: '#60a5fa' }}>
+                <div key={tag} className="flex items-center gap-1 px-2 py-0.5 bg-[rgba(96,165,250,0.1)] border border-[#2563eb] rounded-xl text-[11px] text-[#60a5fa]">
                   <span>{tag}</span>
-                  <button onClick={() => removeTag(tag)} style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: 0, fontSize: 10 }}>✕</button>
+                  <button onClick={() => removeTag(tag)} className="bg-transparent border-0 text-[#60a5fa] cursor-pointer p-0 text-[10px]">✕</button>
                 </div>
               ))}
             </div>
           )}
 
           {showTagInput && (
-            <div style={{ marginTop: 8, display: 'flex', gap: 4 }}>
+            <div className="mt-2 flex gap-1">
               <input
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') addTag(newTag); if (e.key === 'Escape') { setShowTagInput(false); setNewTag('') } }}
                 placeholder="Add tag…"
-                style={{ flex: 1, fontSize: 11, padding: '4px 8px', background: '#27272a', border: '1px solid #3f3f46', borderRadius: 4, color: '#fafafa', outline: 'none' }}
+                className="flex-1 text-[11px] px-2 py-1 bg-[#27272a] border border-[#3f3f46] rounded text-[#fafafa] outline-none"
                 autoFocus
               />
-              <button onClick={() => addTag(newTag)} style={{ fontSize: 11, padding: '4px 10px', background: '#2563eb', border: 'none', borderRadius: 4, color: '#fff', cursor: 'pointer' }}>Add</button>
+              <button onClick={() => addTag(newTag)} className="text-[11px] px-2.5 py-1 bg-[#2563eb] border-0 rounded text-white cursor-pointer">Add</button>
             </div>
           )}
 
           {/* Edit History */}
           {showHistory && editHistory.length > 0 && (
-            <div style={{ marginTop: 8, padding: 8, background: '#18181b', borderRadius: 6, border: '1px solid #27272a' }}>
-              <p style={{ fontSize: 11, color: '#a1a1aa', margin: '0 0 6px', fontWeight: 600 }}>Edit History ({editHistory.length})</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 200, overflowY: 'auto' }}>
+            <div className="mt-2 p-2 bg-[#18181b] rounded-md border border-[#27272a]">
+              <p className="text-[11px] text-[#a1a1aa] m-0 mb-1.5 font-semibold">Edit History ({editHistory.length})</p>
+              <div className="flex flex-col gap-1 max-h-[200px] overflow-y-auto">
                 {editHistory.map((edit, idx) => (
-                  <div key={idx} style={{ padding: 6, background: '#27272a', borderRadius: 4, fontSize: 11 }}>
-                    <p style={{ color: '#a1a1aa', margin: '0 0 4px' }}>
+                  <div key={idx} className="p-1.5 bg-[#27272a] rounded text-[11px]">
+                    <p className="text-[#a1a1aa] m-0 mb-1">
                       {new Date(edit.editedAt).toLocaleTimeString()}
                     </p>
-                    <p style={{ color: '#e4e4e7', margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: 60, overflow: 'hidden' }}>
+                    <p className="text-[#e4e4e7] m-0 whitespace-pre-wrap break-words max-h-[60px] overflow-hidden">
                       {edit.content.slice(0, 100)}{edit.content.length > 100 ? '…' : ''}
                     </p>
                   </div>
@@ -480,31 +471,24 @@ function MessageBubble({
 
           {/* Reactions */}
           {reactions && Object.keys(reactions).length > 0 && (
-            <div style={{ display: 'flex', gap: 4, marginTop: 6, flexWrap: 'wrap' }}>
+            <div className="flex gap-1 mt-1.5 flex-wrap">
               {Object.entries(reactions).map(([emoji, count]) => (
                 <button
                   key={emoji}
                   onClick={() => onToggleReaction?.(emoji)}
-                  style={{
-                    background: 'rgba(37,99,235,0.1)', border: '1px solid #2563eb', borderRadius: 12, padding: '2px 8px',
-                    fontSize: 12, color: '#60a5fa', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3
-                  }}
+                  className="bg-[rgba(37,99,235,0.1)] border border-[#2563eb] rounded-xl px-2 py-0.5 text-xs text-[#60a5fa] cursor-pointer flex items-center gap-[3px]"
                 >
                   <span>{emoji}</span>
-                  <span style={{ fontSize: 10 }}>{count}</span>
+                  <span className="text-[10px]">{count}</span>
                 </button>
               ))}
               {onToggleReaction && hovered && (
-                <div style={{ display: 'flex', gap: 2 }}>
+                <div className="flex gap-0.5">
                   {QUICK_REACTIONS.map((emoji) => (
                     <button
                       key={emoji}
                       onClick={() => onToggleReaction(emoji)}
-                      style={{
-                        background: 'transparent', border: 'none', fontSize: 14, cursor: 'pointer', opacity: 0.6, transition: 'opacity 0.15s'
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-                      onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
+                      className="bg-transparent border-0 text-sm cursor-pointer opacity-60 transition-opacity hover:opacity-100"
                     >
                       {emoji}
                     </button>
@@ -514,16 +498,12 @@ function MessageBubble({
             </div>
           )}
           {reactions && Object.keys(reactions).length === 0 && hovered && onToggleReaction && (
-            <div style={{ display: 'flex', gap: 2, marginTop: 6 }}>
+            <div className="flex gap-0.5 mt-1.5">
               {QUICK_REACTIONS.map((emoji) => (
                 <button
                   key={emoji}
                   onClick={() => onToggleReaction(emoji)}
-                  style={{
-                    background: 'transparent', border: 'none', fontSize: 14, cursor: 'pointer', opacity: 0.5, transition: 'opacity 0.15s'
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.5')}
+                  className="bg-transparent border-0 text-sm cursor-pointer opacity-50 transition-opacity hover:opacity-100"
                 >
                   {emoji}
                 </button>
@@ -532,10 +512,10 @@ function MessageBubble({
           )}
 
           {showTimestamp && message.createdAt && (
-            <p style={{ fontSize: 10, color: '#52525b', margin: '3px 0 0', textAlign: isUser ? 'right' : 'left' }}>
+            <p className={`text-[10px] text-[#52525b] mt-[3px] mb-0 ${isUser ? 'text-right' : 'text-left'}`}>
               {formatTime(message.createdAt)}
               {!isUser && message.usage && (message.usage.inputTokens || message.usage.outputTokens) && (
-                <span style={{ marginLeft: 8 }}>
+                <span className="ml-2">
                   {message.usage.inputTokens ? `↑${message.usage.inputTokens}` : ''}
                   {message.usage.inputTokens && message.usage.outputTokens ? ' ' : ''}
                   {message.usage.outputTokens ? `↓${message.usage.outputTokens}` : ''} tokens
@@ -544,7 +524,7 @@ function MessageBubble({
             </p>
           )}
           {!showTimestamp && !isUser && !isStreaming && hovered && message.usage && (message.usage.inputTokens || message.usage.outputTokens) && (
-            <p style={{ fontSize: 10, color: '#3f3f46', margin: '3px 0 0' }}>
+            <p className="text-[10px] text-[#3f3f46] mt-[3px] mb-0">
               {message.usage.inputTokens ? `↑${message.usage.inputTokens}` : ''}
               {message.usage.inputTokens && message.usage.outputTokens ? ' ' : ''}
               {message.usage.outputTokens ? `↓${message.usage.outputTokens}` : ''} tokens

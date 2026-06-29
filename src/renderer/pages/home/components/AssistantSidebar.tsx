@@ -66,57 +66,41 @@ export function AssistantSidebar({
   }
 
   return (
-    <aside
-      style={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        borderRight: '1px solid #27272a',
-        background: '#09090b',
-        overflow: 'hidden'
-      }}
-    >
+    <aside className="w-full flex flex-col border-r border-r-[#27272a] bg-[#09090b] overflow-hidden">
       {/* Search */}
-      <div style={{ padding: '8px 8px 0' }}>
+      <div className="px-2 pt-2">
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search…"
-          style={{ width: '100%', boxSizing: 'border-box', background: '#18181b', border: '1px solid #27272a', borderRadius: 6, color: '#fafafa', fontSize: 12, outline: 'none', padding: '5px 10px' }}
+          className="w-full bg-[#18181b] border border-[#27272a] rounded-md text-[#fafafa] text-xs outline-none px-2.5 py-[5px]"
         />
       </div>
 
       {/* Assistants */}
-      <div style={{ padding: '8px 8px 4px', borderBottom: '1px solid #27272a' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-          <span style={{ fontSize: 11, color: '#71717a', fontWeight: 600, letterSpacing: 1 }}>ASSISTANTS</span>
+      <div className="px-2 pt-2 pb-1 border-b border-b-[#27272a]">
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-xs text-[#71717a] font-semibold tracking-widest">ASSISTANTS</span>
           <button
             onClick={onCreateAssistant}
             title="New Assistant"
-            style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: '0 2px' }}
+            className="bg-transparent border-0 text-[#71717a] cursor-pointer text-base leading-none px-0.5"
           >
             +
           </button>
         </div>
-        <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+        <div className="max-h-[200px] overflow-y-auto">
           {filteredAssistants.length === 0 ? (
-            <p style={{ color: '#52525b', fontSize: 12, padding: '4px 8px' }}>{assistants.length === 0 ? 'No assistants yet' : 'No match'}</p>
+            <p className="text-[#52525b] text-xs px-2 py-1">{assistants.length === 0 ? 'No assistants yet' : 'No match'}</p>
           ) : (
             filteredAssistants.map((a) => (
               <button
                 key={a.id}
                 onClick={() => onSelectAssistant(a)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  width: '100%', padding: '6px 8px', borderRadius: 6, border: 'none',
-                  cursor: 'pointer',
-                  background: selectedAssistantId === a.id ? 'rgba(255,255,255,0.08)' : 'transparent',
-                  color: selectedAssistantId === a.id ? '#fafafa' : '#a1a1aa',
-                  fontSize: 13, textAlign: 'left', overflow: 'hidden'
-                }}
+                className={`flex items-center gap-2 w-full px-2 py-1.5 rounded-md border-0 cursor-pointer text-sm text-left overflow-hidden ${selectedAssistantId === a.id ? 'bg-white/[0.08] text-[#fafafa]' : 'bg-transparent text-[#a1a1aa]'}`}
               >
-                <span style={{ fontSize: 16 }}>{a.emoji ?? '🤖'}</span>
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</span>
+                <span className="text-base">{a.emoji ?? '🤖'}</span>
+                <span className="overflow-hidden text-ellipsis whitespace-nowrap">{a.name}</span>
               </button>
             ))
           )}
@@ -124,22 +108,22 @@ export function AssistantSidebar({
       </div>
 
       {/* Topics */}
-      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 8px 4px' }}>
-          <span style={{ fontSize: 11, color: '#71717a', fontWeight: 600, letterSpacing: 1 }}>TOPICS</span>
+      <div className="flex-1 overflow-hidden flex flex-col">
+        <div className="flex items-center justify-between px-2 pt-2.5 pb-1">
+          <span className="text-xs text-[#71717a] font-semibold tracking-widest">TOPICS</span>
           {selectedAssistantId && (
             <button
               onClick={onNewTopic}
               title="New Topic"
-              style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: '0 2px' }}
+              className="bg-transparent border-0 text-[#71717a] cursor-pointer text-base leading-none px-0.5"
             >
               +
             </button>
           )}
         </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 8px' }}>
+        <div className="flex-1 overflow-y-auto px-2 pb-2">
           {filteredTopics.length === 0 ? (
-            <p style={{ color: '#52525b', fontSize: 12, padding: '4px 0' }}>
+            <p className="text-[#52525b] text-xs py-1">
               {!selectedAssistantId ? 'Select an assistant' : topics.length === 0 ? 'No topics yet' : 'No match'}
             </p>
           ) : (
@@ -148,10 +132,7 @@ export function AssistantSidebar({
                 key={t.id}
                 onMouseEnter={() => setHoveredTopic(t.id)}
                 onMouseLeave={() => setHoveredTopic(null)}
-                style={{
-                  display: 'flex', alignItems: 'center', borderRadius: 6,
-                  background: selectedTopicId === t.id ? 'rgba(255,255,255,0.08)' : 'transparent'
-                }}
+                className={`flex items-center rounded-md ${selectedTopicId === t.id ? 'bg-white/[0.08]' : 'bg-transparent'}`}
               >
                 {editingTopicId === t.id ? (
                   <input
@@ -163,24 +144,14 @@ export function AssistantSidebar({
                       if (e.key === 'Enter') commitEdit(t.id)
                       if (e.key === 'Escape') cancelEdit()
                     }}
-                    style={{
-                      flex: 1, padding: '5px 8px', border: '1px solid #3f3f46',
-                      borderRadius: 4, background: '#18181b', color: '#fafafa',
-                      fontSize: 12, outline: 'none'
-                    }}
+                    className="flex-1 px-2 py-[5px] border border-[#3f3f46] rounded bg-[#18181b] text-[#fafafa] text-xs outline-none"
                   />
                 ) : (
                   <button
                     onClick={() => onSelectTopic(t)}
                     onDoubleClick={() => startEdit(t)}
                     title="Double-click to rename"
-                    style={{
-                      flex: 1, padding: '6px 8px', border: 'none', background: 'none',
-                      cursor: 'pointer',
-                      color: selectedTopicId === t.id ? '#fafafa' : '#a1a1aa',
-                      fontSize: 12, textAlign: 'left',
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
-                    }}
+                    className={`flex-1 px-2 py-1.5 border-0 bg-transparent cursor-pointer text-xs text-left overflow-hidden text-ellipsis whitespace-nowrap ${selectedTopicId === t.id ? 'text-[#fafafa]' : 'text-[#a1a1aa]'}`}
                   >
                     {t.title}
                   </button>
@@ -188,7 +159,7 @@ export function AssistantSidebar({
                 {hoveredTopic === t.id && editingTopicId !== t.id && (
                   <button
                     onClick={(e) => { e.stopPropagation(); onDeleteTopic(t.id) }}
-                    style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', padding: '4px 6px', fontSize: 12 }}
+                    className="bg-transparent border-0 text-[#71717a] cursor-pointer px-1.5 py-1 text-xs"
                   >
                     ✕
                   </button>

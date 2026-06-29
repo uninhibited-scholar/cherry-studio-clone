@@ -331,8 +331,8 @@ export function HomePage(): React.ReactElement {
   return (
     <>
       <CommandPalette commands={commands} isOpen={cmdPaletteOpen} onClose={() => setCmdPaletteOpen(false)} />
-      <div style={{ display: 'flex', height: '100%', background: '#09090b' }}>
-      <div style={{ width: sidebarWidth, flexShrink: 0, display: 'flex' }}>
+      <div className="flex h-full bg-[#09090b]">
+      <div style={{ width: sidebarWidth }} className="shrink-0 flex">
         <AssistantSidebar
           assistants={assistants}
           selectedAssistantId={selectedAssistant?.id ?? null}
@@ -349,48 +349,38 @@ export function HomePage(): React.ReactElement {
       {/* Drag handle */}
       <div
         onMouseDown={onDividerMouseDown}
-        style={{ width: 4, cursor: 'col-resize', background: 'transparent', flexShrink: 0, zIndex: 10 }}
+        className="w-1 cursor-col-resize bg-transparent shrink-0 z-10"
         onMouseEnter={(e) => (e.currentTarget.style.background = '#3f3f46')}
         onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
       />
 
       {/* Chat panel */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <div
-          style={{
-            height: 48,
-            borderBottom: '1px solid #27272a',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 16px',
-            gap: 10,
-            flexShrink: 0
-          }}
-        >
+        <div className="h-12 border-b border-b-[#27272a] flex items-center px-4 gap-2.5 shrink-0">
           {selectedAssistant ? (
             <>
-              <span style={{ fontSize: 18 }}>{selectedAssistant.emoji ?? '🤖'}</span>
-              <span style={{ color: '#fafafa', fontSize: 14, fontWeight: 500 }}>{selectedAssistant.name}</span>
+              <span className="text-lg">{selectedAssistant.emoji ?? '🤖'}</span>
+              <span className="text-[#fafafa] text-sm font-medium">{selectedAssistant.name}</span>
               {selectedTopic && (
                 <>
-                  <span style={{ color: '#52525b' }}>›</span>
-                  <span style={{ color: '#71717a', fontSize: 13 }}>{selectedTopic.title}</span>
-                  <span style={{ marginLeft: 8, fontSize: 11, color: '#3f3f46' }}>
+                  <span className="text-[#52525b]">›</span>
+                  <span className="text-[#71717a] text-sm">{selectedTopic.title}</span>
+                  <span className="ml-2 text-xs text-[#3f3f46]">
                     {messages.length} msg{messages.length !== 1 ? 's' : ''} · {messages.reduce((sum, m) => sum + m.content.split(/\s+/).filter(Boolean).length, 0)} words
                   </span>
                 </>
               )}
               {selectedAssistant.modelId && (
-                <div style={{ position: 'relative' }}>
+                <div className="relative">
                   <button
                     onClick={() => setShowModelMenu((v) => !v)}
-                    style={{ marginLeft: 4, fontSize: 11, background: showModelMenu ? '#2563eb' : '#18181b', border: '1px solid #27272a', borderRadius: 4, padding: '1px 7px', cursor: 'pointer', color: showModelMenu ? '#fff' : '#3f3f46' }}
+                    className={`ml-1 text-xs border border-[#27272a] rounded px-1.5 py-px cursor-pointer ${showModelMenu ? 'bg-[#2563eb] text-white' : 'bg-[#18181b] text-[#3f3f46]'}`}
                   >
                     {selectedAssistant.modelId?.includes('/') ? selectedAssistant.modelId.split('/').slice(1).join('/') : selectedAssistant.modelId} ▼
                   </button>
                   {showModelMenu && (
-                    <div style={{ position: 'absolute', top: 24, left: 0, background: '#18181b', border: '1px solid #27272a', borderRadius: 4, zIndex: 100, minWidth: 200, maxHeight: 300, overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
+                    <div className="absolute top-6 left-0 bg-[#18181b] border border-[#27272a] rounded z-[100] min-w-[200px] max-h-[300px] overflow-y-auto shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
                       {availableModels.map((m) => (
                         <div
                           key={m.id}
@@ -399,7 +389,7 @@ export function HomePage(): React.ReactElement {
                             setSelectedAssistant({ ...selectedAssistant, modelId: m.id })
                             setShowModelMenu(false)
                           }}
-                          style={{ padding: '8px 12px', fontSize: 12, color: selectedAssistant.modelId === m.id ? '#60a5fa' : '#a1a1aa', background: selectedAssistant.modelId === m.id ? 'rgba(96,165,250,0.1)' : 'transparent', cursor: 'pointer', borderBottom: '1px solid #27272a' }}
+                          className={`px-3 py-2 text-xs cursor-pointer border-b border-b-[#27272a] ${selectedAssistant.modelId === m.id ? 'text-[#60a5fa] bg-[rgba(96,165,250,0.1)]' : 'text-[#a1a1aa] bg-transparent'}`}
                         >
                           {selectedAssistant.modelId === m.id ? '✓' : ' '} {m.displayName || m.name}
                         </div>
@@ -410,9 +400,9 @@ export function HomePage(): React.ReactElement {
               )}
             </>
           ) : (
-            <span style={{ color: '#52525b', fontSize: 13 }}>Select an assistant to start</span>
+            <span className="text-[#52525b] text-sm">Select an assistant to start</span>
           )}
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div className="ml-auto flex items-center gap-2">
             {showMsgSearch && selectedTopic && (
               <input
                 autoFocus
@@ -420,7 +410,7 @@ export function HomePage(): React.ReactElement {
                 onChange={(e) => setMsgSearch(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Escape') { setShowMsgSearch(false); setMsgSearch('') } }}
                 placeholder="Search messages…"
-                style={{ background: '#18181b', border: '1px solid #3f3f46', borderRadius: 6, color: '#fafafa', fontSize: 12, outline: 'none', padding: '4px 10px', width: 200 }}
+                className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-xs outline-none px-2.5 py-1 w-[200px]"
               />
             )}
             {selectedTopic && (
@@ -428,28 +418,28 @@ export function HomePage(): React.ReactElement {
                 <button
                   onClick={() => setSysPromptEdit((v) => !v)}
                   title="Edit system prompt for this conversation"
-                  style={{ background: sysPromptEdit ? 'rgba(37,99,235,0.15)' : 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: sysPromptEdit ? '#60a5fa' : '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px' }}
+                  className={`border border-[#3f3f46] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${sysPromptEdit ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
                 >
                   📝
                 </button>
                 <button
                   onClick={() => { setShowMsgSearch((v) => !v); if (showMsgSearch) setMsgSearch('') }}
                   title="Search messages"
-                  style={{ background: showMsgSearch ? 'rgba(37,99,235,0.15)' : 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: showMsgSearch ? '#60a5fa' : '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px' }}
+                  className={`border border-[#3f3f46] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${showMsgSearch ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
                 >
                   🔍
                 </button>
               </>
             )}
             {searching && (
-              <span style={{ color: '#60a5fa', fontSize: 12 }}>🔍 Searching…</span>
+              <span className="text-[#60a5fa] text-xs">🔍 Searching…</span>
             )}
             {selectedTopic && stats && (
               <>
                 <button
                   onClick={() => setShowStats((v) => !v)}
                   title="Toggle statistics"
-                  style={{ background: showStats ? 'rgba(37,99,235,0.15)' : 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: showStats ? '#60a5fa' : '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px' }}
+                  className={`border border-[#3f3f46] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${showStats ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
                 >
                   📊 {stats.totalMessages}
                 </button>
@@ -457,7 +447,7 @@ export function HomePage(): React.ReactElement {
                   onClick={generateSummary}
                   disabled={generatingSummary || messages.length === 0}
                   title="Generate AI summary of this conversation"
-                  style={{ background: 'transparent', border: '1px solid #3f3f46', borderRadius: 6, color: generatingSummary ? '#60a5fa' : '#a1a1aa', cursor: generatingSummary ? 'wait' : 'pointer', fontSize: 13, padding: '3px 10px', opacity: generatingSummary || messages.length === 0 ? 0.5 : 1 }}
+                  className={`bg-transparent border border-[#3f3f46] rounded-md text-sm px-2.5 py-[3px] ${generatingSummary ? 'text-[#60a5fa] cursor-wait' : 'text-[#a1a1aa] cursor-pointer'} ${generatingSummary || messages.length === 0 ? 'opacity-50' : 'opacity-100'}`}
                 >
                   {generatingSummary ? '✨ …' : '✨ Summary'}
                 </button>
@@ -467,32 +457,26 @@ export function HomePage(): React.ReactElement {
               <button
                 title="Import topic from JSON file"
                 onClick={importTopic}
-                style={{
-                  background: 'transparent', border: '1px solid #3f3f46', borderRadius: 6,
-                  color: '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px'
-                }}
+                className="bg-transparent border border-[#3f3f46] rounded-md text-[#a1a1aa] cursor-pointer text-sm px-2.5 py-[3px]"
               >
                 ↑ Import
               </button>
             )}
             {selectedTopic && (
-              <div style={{ display: 'flex', gap: 6, position: 'relative' }}>
+              <div className="flex gap-1.5 relative">
                 <div>
                   <button
                     title="Share and export this conversation"
                     onClick={() => setShowSharePanel((v) => !v)}
-                    style={{
-                      background: showSharePanel ? 'rgba(37,99,235,0.15)' : 'transparent', border: '1px solid #3f3f46', borderRadius: 6,
-                      color: showSharePanel ? '#60a5fa' : '#a1a1aa', cursor: 'pointer', fontSize: 13, padding: '3px 10px'
-                    }}
+                    className={`border border-[#3f3f46] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${showSharePanel ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
                   >
                     📤 Share
                   </button>
                   {showSharePanel && (
-                    <div style={{ position: 'absolute', top: 32, right: 0, background: '#18181b', border: '1px solid #27272a', borderRadius: 8, zIndex: 100, minWidth: 180, boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
-                      <button onClick={() => { exportAsFormat('json'); setShowSharePanel(false) }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 12, background: 'transparent', border: 'none', color: '#a1a1aa', cursor: 'pointer', borderBottom: '1px solid #27272a' }}>📄 Export as JSON</button>
-                      <button onClick={() => { exportAsFormat('markdown'); setShowSharePanel(false) }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 12, background: 'transparent', border: 'none', color: '#a1a1aa', cursor: 'pointer', borderBottom: '1px solid #27272a' }}>📝 Export as Markdown</button>
-                      <button onClick={() => { exportAsFormat('html'); setShowSharePanel(false) }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 12, background: 'transparent', border: 'none', color: '#a1a1aa', cursor: 'pointer' }}>🌐 Export as HTML</button>
+                    <div className="absolute top-8 right-0 bg-[#18181b] border border-[#27272a] rounded-lg z-[100] min-w-[180px] shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+                      <button onClick={() => { exportAsFormat('json'); setShowSharePanel(false) }} className="block w-full text-left px-3 py-2 text-xs bg-transparent border-0 border-b border-b-[#27272a] text-[#a1a1aa] cursor-pointer">📄 Export as JSON</button>
+                      <button onClick={() => { exportAsFormat('markdown'); setShowSharePanel(false) }} className="block w-full text-left px-3 py-2 text-xs bg-transparent border-0 border-b border-b-[#27272a] text-[#a1a1aa] cursor-pointer">📝 Export as Markdown</button>
+                      <button onClick={() => { exportAsFormat('html'); setShowSharePanel(false) }} className="block w-full text-left px-3 py-2 text-xs bg-transparent border-0 text-[#a1a1aa] cursor-pointer">🌐 Export as HTML</button>
                     </div>
                   )}
                 </div>
@@ -503,10 +487,7 @@ export function HomePage(): React.ReactElement {
                       Promise.all(messages.map((m) => deleteMessage(m.id)))
                     }
                   }}
-                  style={{
-                    background: 'transparent', border: '1px solid #7f1d1d', borderRadius: 6,
-                    color: '#f87171', cursor: 'pointer', fontSize: 13, padding: '3px 10px'
-                  }}
+                  className="bg-transparent border border-[#7f1d1d] rounded-md text-[#f87171] cursor-pointer text-sm px-2.5 py-[3px]"
                 >
                   🗑 Clear
                 </button>
@@ -518,50 +499,50 @@ export function HomePage(): React.ReactElement {
         {selectedTopic ? (
           <>
             {topicSummary && selectedTopic && (
-              <div style={{ background: '#18181b', borderBottom: '1px solid #27272a', padding: '12px 16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#fafafa' }}>✨ AI Summary</span>
-                  <button onClick={() => setTopicSummary('')} style={{ marginLeft: 'auto', fontSize: 11, background: 'none', border: 'none', color: '#52525b', cursor: 'pointer' }}>Close</button>
+              <div className="bg-[#18181b] border-b border-b-[#27272a] px-4 py-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-semibold text-[#fafafa]">✨ AI Summary</span>
+                  <button onClick={() => setTopicSummary('')} className="ml-auto text-xs bg-transparent border-0 text-[#52525b] cursor-pointer">Close</button>
                 </div>
-                <div style={{ fontSize: 13, color: '#e4e4e7', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{topicSummary}</div>
+                <div className="text-sm text-[#e4e4e7] leading-relaxed whitespace-pre-wrap break-words">{topicSummary}</div>
               </div>
             )}
 
             {showStats && stats && selectedTopic && (
-              <div style={{ background: '#18181b', borderBottom: '1px solid #27272a', padding: '12px 16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#fafafa' }}>📊 Conversation Statistics</span>
-                  <button onClick={() => setShowStats(false)} style={{ marginLeft: 'auto', fontSize: 11, background: 'none', border: 'none', color: '#52525b', cursor: 'pointer' }}>Close</button>
+              <div className="bg-[#18181b] border-b border-b-[#27272a] px-4 py-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-semibold text-[#fafafa]">📊 Conversation Statistics</span>
+                  <button onClick={() => setShowStats(false)} className="ml-auto text-xs bg-transparent border-0 text-[#52525b] cursor-pointer">Close</button>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
-                  <div style={{ background: '#27272a', padding: '8px 12px', borderRadius: 6, textAlign: 'center' }}>
-                    <div style={{ fontSize: 18, fontWeight: 600, color: '#fafafa' }}>{stats.totalMessages}</div>
-                    <div style={{ fontSize: 11, color: '#71717a', marginTop: 2 }}>Total Messages</div>
+                <div className="grid grid-cols-5 gap-3">
+                  <div className="bg-[#27272a] px-3 py-2 rounded-md text-center">
+                    <div className="text-lg font-semibold text-[#fafafa]">{stats.totalMessages}</div>
+                    <div className="text-xs text-[#71717a] mt-0.5">Total Messages</div>
                   </div>
-                  <div style={{ background: '#27272a', padding: '8px 12px', borderRadius: 6, textAlign: 'center' }}>
-                    <div style={{ fontSize: 18, fontWeight: 600, color: '#60a5fa' }}>{stats.userMessages}</div>
-                    <div style={{ fontSize: 11, color: '#71717a', marginTop: 2 }}>Your Messages</div>
+                  <div className="bg-[#27272a] px-3 py-2 rounded-md text-center">
+                    <div className="text-lg font-semibold text-[#60a5fa]">{stats.userMessages}</div>
+                    <div className="text-xs text-[#71717a] mt-0.5">Your Messages</div>
                   </div>
-                  <div style={{ background: '#27272a', padding: '8px 12px', borderRadius: 6, textAlign: 'center' }}>
-                    <div style={{ fontSize: 18, fontWeight: 600, color: '#a78bfa' }}>{stats.assistantMessages}</div>
-                    <div style={{ fontSize: 11, color: '#71717a', marginTop: 2 }}>AI Responses</div>
+                  <div className="bg-[#27272a] px-3 py-2 rounded-md text-center">
+                    <div className="text-lg font-semibold text-[#a78bfa]">{stats.assistantMessages}</div>
+                    <div className="text-xs text-[#71717a] mt-0.5">AI Responses</div>
                   </div>
-                  <div style={{ background: '#27272a', padding: '8px 12px', borderRadius: 6, textAlign: 'center' }}>
-                    <div style={{ fontSize: 18, fontWeight: 600, color: '#4ade80' }}>{stats.totalWords}</div>
-                    <div style={{ fontSize: 11, color: '#71717a', marginTop: 2 }}>Total Words</div>
+                  <div className="bg-[#27272a] px-3 py-2 rounded-md text-center">
+                    <div className="text-lg font-semibold text-[#4ade80]">{stats.totalWords}</div>
+                    <div className="text-xs text-[#71717a] mt-0.5">Total Words</div>
                   </div>
-                  <div style={{ background: '#27272a', padding: '8px 12px', borderRadius: 6, textAlign: 'center' }}>
-                    <div style={{ fontSize: 18, fontWeight: 600, color: '#fbbf24' }}>{stats.totalTokens}</div>
-                    <div style={{ fontSize: 11, color: '#71717a', marginTop: 2 }}>Total Tokens</div>
+                  <div className="bg-[#27272a] px-3 py-2 rounded-md text-center">
+                    <div className="text-lg font-semibold text-[#fbbf24]">{stats.totalTokens}</div>
+                    <div className="text-xs text-[#71717a] mt-0.5">Total Tokens</div>
                   </div>
                 </div>
               </div>
             )}
 
             {sysPromptEdit && selectedAssistant && (
-              <div style={{ background: '#18181b', borderBottom: '1px solid #27272a', padding: '12px 16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#fafafa' }}>System Prompt</span>
+              <div className="bg-[#18181b] border-b border-b-[#27272a] px-4 py-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-semibold text-[#fafafa]">System Prompt</span>
                   <button
                     onClick={async () => {
                       const text = tempSysPrompt || selectedAssistant.prompt || ''
@@ -575,18 +556,18 @@ export function HomePage(): React.ReactElement {
                       }
                     }}
                     title="Save this system prompt to Library"
-                    style={{ marginLeft: 'auto', fontSize: 11, background: 'none', border: '1px solid #3f3f46', color: '#a1a1aa', cursor: 'pointer', padding: '2px 8px', borderRadius: 4 }}
+                    className="ml-auto text-xs bg-transparent border border-[#3f3f46] text-[#a1a1aa] cursor-pointer px-2 py-0.5 rounded"
                   >
                     💾 Save
                   </button>
-                  <button onClick={() => setSysPromptEdit(false)} style={{ fontSize: 11, background: 'none', border: 'none', color: '#52525b', cursor: 'pointer' }}>Close</button>
+                  <button onClick={() => setSysPromptEdit(false)} className="text-xs bg-transparent border-0 text-[#52525b] cursor-pointer">Close</button>
                 </div>
                 <textarea
                   value={tempSysPrompt || selectedAssistant.prompt || ''}
                   onChange={(e) => setTempSysPrompt(e.target.value)}
                   placeholder="System prompt (affects this conversation only)"
                   rows={3}
-                  style={{ width: '100%', background: '#27272a', border: '1px solid #3f3f46', borderRadius: 6, color: '#fafafa', padding: '8px 12px', fontFamily: 'monospace', fontSize: 12, outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
+                  className="w-full bg-[#27272a] border border-[#3f3f46] rounded-md text-[#fafafa] px-3 py-2 font-mono text-xs outline-none resize-y"
                 />
               </div>
             )}
@@ -604,14 +585,14 @@ export function HomePage(): React.ReactElement {
               onQuote={(msg) => setQuotedMessage(msg)}
             />
             {quotedMessage && (
-              <div style={{ background: '#27272a', borderLeft: '3px solid #2563eb', padding: '8px 12px', marginBottom: 8, borderRadius: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ flex: 1, fontSize: 12, color: '#a1a1aa' }}>
-                  <div style={{ color: '#71717a', fontSize: 11, marginBottom: 2 }}>Replying to {quotedMessage.role === 'user' ? 'your message' : 'assistant'}</div>
-                  <div style={{ color: '#fafafa', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{quotedMessage.content.slice(0, 100)}{quotedMessage.content.length > 100 ? '…' : ''}</div>
+              <div className="bg-[#27272a] border-l-[3px] border-l-[#2563eb] px-3 py-2 mb-2 rounded flex items-center gap-2">
+                <div className="flex-1 text-xs text-[#a1a1aa]">
+                  <div className="text-[#71717a] text-xs mb-0.5">Replying to {quotedMessage.role === 'user' ? 'your message' : 'assistant'}</div>
+                  <div className="text-[#fafafa] whitespace-pre-wrap break-words">{quotedMessage.content.slice(0, 100)}{quotedMessage.content.length > 100 ? '…' : ''}</div>
                 </div>
                 <button
                   onClick={() => setQuotedMessage(null)}
-                  style={{ background: 'none', border: 'none', color: '#52525b', cursor: 'pointer', fontSize: 16 }}
+                  className="bg-transparent border-0 text-[#52525b] cursor-pointer text-base"
                 >
                   ✕
                 </button>
@@ -632,33 +613,15 @@ export function HomePage(): React.ReactElement {
             />
           </>
         ) : (
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#52525b'
-            }}
-          >
-            <div style={{ fontSize: 56, marginBottom: 16 }}>🍒</div>
-            <p style={{ fontSize: 16, color: '#71717a' }}>
+          <div className="flex-1 flex flex-col items-center justify-center text-[#52525b]">
+            <div className="text-[56px] mb-4">🍒</div>
+            <p className="text-base text-[#71717a]">
               {selectedAssistant ? 'Create a new topic →' : 'Choose an assistant from the sidebar'}
             </p>
             {!selectedAssistant && (
               <button
                 onClick={() => setShowCreateModal(true)}
-                style={{
-                  marginTop: 16,
-                  padding: '10px 20px',
-                  borderRadius: 8,
-                  border: 'none',
-                  background: '#2563eb',
-                  color: 'white',
-                  cursor: 'pointer',
-                  fontSize: 13
-                }}
+                className="mt-4 px-5 py-2.5 rounded-lg border-0 bg-[#2563eb] text-white cursor-pointer text-sm"
               >
                 + New Assistant
               </button>
@@ -666,16 +629,7 @@ export function HomePage(): React.ReactElement {
             {selectedAssistant && (
               <button
                 onClick={handleNewTopic}
-                style={{
-                  marginTop: 16,
-                  padding: '10px 20px',
-                  borderRadius: 8,
-                  border: 'none',
-                  background: '#2563eb',
-                  color: 'white',
-                  cursor: 'pointer',
-                  fontSize: 13
-                }}
+                className="mt-4 px-5 py-2.5 rounded-lg border-0 bg-[#2563eb] text-white cursor-pointer text-sm"
               >
                 + New Topic
               </button>

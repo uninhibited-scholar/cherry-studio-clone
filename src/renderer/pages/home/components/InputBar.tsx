@@ -147,32 +147,28 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
 
   const selectedKb = knowledgeBases.find((kb) => kb.id === selectedKnowledgeBaseId)
 
-  const pickerStyle: React.CSSProperties = {
-    position: 'absolute', bottom: '100%', left: 0, marginBottom: 6,
-    background: '#18181b', border: '1px solid #3f3f46', borderRadius: 8,
-    padding: 6, minWidth: 240, maxWidth: 340, zIndex: 50,
-    boxShadow: '0 4px 20px rgba(0,0,0,0.5)', maxHeight: 320, overflowY: 'auto'
-  }
+  const pickerClass = 'absolute bottom-full left-0 mb-1.5 bg-[#18181b] border border-[#3f3f46] rounded-lg p-1.5 min-w-[240px] max-w-[340px] z-50 max-h-[320px] overflow-y-auto'
+  const pickerShadow = { boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }
 
   return (
-    <div style={{ borderTop: '1px solid #27272a', padding: '12px 16px', background: '#09090b' }}>
+    <div className="border-t border-t-[#27272a] px-4 py-3 bg-[#09090b]">
       {/* Toolbar row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+      <div className="flex items-center gap-1.5 mb-2 flex-wrap">
 
         {/* Web Search */}
         <ToolToggle active={webSearchEnabled} onClick={() => setWebSearchEnabled((v) => !v)} icon="🔍" label="Web" tooltip="Inject web search results as context" />
 
         {/* Knowledge base picker */}
-        <div style={{ position: 'relative' }} ref={kbRef}>
+        <div className="relative" ref={kbRef}>
           <ToolToggle active={!!selectedKnowledgeBaseId} onClick={() => setShowKbPicker((v) => !v)} icon="📚" label={selectedKb ? selectedKb.name : 'Knowledge'} tooltip="Attach a knowledge base" />
           {showKbPicker && (
-            <div style={pickerStyle}>
-              <p style={{ fontSize: 10, color: '#71717a', padding: '2px 8px 6px', margin: 0 }}>KNOWLEDGE BASE</p>
+            <div className={pickerClass} style={pickerShadow}>
+              <p className="text-[10px] text-[#71717a] px-2 pt-0.5 pb-1.5 m-0">KNOWLEDGE BASE</p>
               <PickerItem active={!selectedKnowledgeBaseId} onClick={() => { onSelectKnowledgeBase(null); setShowKbPicker(false) }}>None</PickerItem>
-              {knowledgeBases.length === 0 && <p style={{ fontSize: 11, color: '#52525b', padding: '4px 10px', margin: 0 }}>No knowledge bases yet</p>}
+              {knowledgeBases.length === 0 && <p className="text-[11px] text-[#52525b] px-2.5 py-1 m-0">No knowledge bases yet</p>}
               {knowledgeBases.map((kb) => (
                 <PickerItem key={kb.id} active={selectedKnowledgeBaseId === kb.id} onClick={() => { onSelectKnowledgeBase(kb.id); setShowKbPicker(false) }}>
-                  📚 {kb.name} <span style={{ color: '#52525b' }}>({kb.documentCount})</span>
+                  📚 {kb.name} <span className="text-[#52525b]">({kb.documentCount})</span>
                 </PickerItem>
               ))}
             </div>
@@ -180,23 +176,23 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
         </div>
 
         {/* Prompt template picker */}
-        <div style={{ position: 'relative' }} ref={tplRef}>
+        <div className="relative" ref={tplRef}>
           <ToolToggle active={showTemplatePicker} onClick={() => { setShowTemplatePicker((v) => !v); setTemplateSearch('') }} icon="📋" label="Templates" tooltip="Insert a prompt template" />
           {showTemplatePicker && (
-            <div style={pickerStyle}>
-              <p style={{ fontSize: 10, color: '#71717a', padding: '2px 8px 4px', margin: 0 }}>PROMPT TEMPLATES</p>
+            <div className={pickerClass} style={pickerShadow}>
+              <p className="text-[10px] text-[#71717a] px-2 pt-0.5 pb-1 m-0">PROMPT TEMPLATES</p>
               <input
                 autoFocus
                 value={templateSearch}
                 onChange={(e) => setTemplateSearch(e.target.value)}
                 placeholder="Search templates…"
-                style={{ width: '100%', background: '#27272a', border: 'none', borderRadius: 6, color: '#fafafa', fontSize: 12, outline: 'none', padding: '5px 8px', boxSizing: 'border-box', marginBottom: 4 }}
+                className="w-full bg-[#27272a] border-0 rounded-md text-[#fafafa] text-xs outline-none px-2 py-[5px] box-border mb-1"
               />
-              {filteredTemplates.length === 0 && <p style={{ fontSize: 11, color: '#52525b', padding: '4px 10px', margin: 0 }}>No templates found</p>}
+              {filteredTemplates.length === 0 && <p className="text-[11px] text-[#52525b] px-2.5 py-1 m-0">No templates found</p>}
               {filteredTemplates.map((t) => (
                 <PickerItem key={t.id} active={false} onClick={() => insertTemplate(t)}>
-                  <span style={{ fontWeight: 500 }}>{t.title}</span>
-                  <span style={{ color: '#52525b', fontSize: 11, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span className="font-medium">{t.title}</span>
+                  <span className="text-[#52525b] text-[11px] block overflow-hidden text-ellipsis whitespace-nowrap">
                     {t.content.slice(0, 60)}…
                   </span>
                 </PickerItem>
@@ -207,20 +203,20 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
 
         {/* MCP tools picker */}
         {allMcpTools.length > 0 && (
-          <div style={{ position: 'relative' }} ref={mcpRef}>
+          <div className="relative" ref={mcpRef}>
             <ToolToggle active={mcpTools.length > 0} onClick={() => setShowMcpPicker((v) => !v)} icon="🔧" label={mcpTools.length > 0 ? `${mcpTools.length} tool${mcpTools.length > 1 ? 's' : ''}` : 'MCP Tools'} tooltip="Select MCP tools to include" />
             {showMcpPicker && (
-              <div style={pickerStyle}>
-                <p style={{ fontSize: 10, color: '#71717a', padding: '2px 8px 6px', margin: 0 }}>MCP TOOLS</p>
+              <div className={pickerClass} style={pickerShadow}>
+                <p className="text-[10px] text-[#71717a] px-2 pt-0.5 pb-1.5 m-0">MCP TOOLS</p>
                 {allMcpTools.map((tool) => {
                   const active = mcpTools.some((t) => t.serverId === tool.serverId && t.name === tool.name)
                   return (
                     <PickerItem key={`${tool.serverId}:${tool.name}`} active={active} onClick={() => toggleMcpTool(tool)}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ fontSize: 12 }}>{active ? '✓' : '○'}</span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="text-xs">{active ? '✓' : '○'}</span>
                         <span>
-                          <span style={{ fontWeight: 500 }}>{tool.name}</span>
-                          {tool.description && <span style={{ color: '#52525b', fontSize: 11, display: 'block' }}>{tool.description.slice(0, 60)}</span>}
+                          <span className="font-medium">{tool.name}</span>
+                          {tool.description && <span className="text-[#52525b] text-[11px] block">{tool.description.slice(0, 60)}</span>}
                         </span>
                       </span>
                     </PickerItem>
@@ -234,7 +230,7 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
 
       {/* Input row */}
       <div
-        style={{ display: 'flex', alignItems: 'flex-end', gap: 8, background: '#18181b', border: '1px solid #3f3f46', borderRadius: 12, padding: '8px 12px' }}
+        className="flex items-end gap-2 bg-[#18181b] border border-[#3f3f46] rounded-xl px-3 py-2"
         onDragOver={(e) => e.preventDefault()}
         onDrop={async (e) => {
           e.preventDefault()
@@ -259,21 +255,13 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
           disabled={disabled}
           placeholder={disabled ? 'Configure an assistant with a provider and model first…' : 'Message… (Enter to send, Shift+Enter for newline, drag .txt/.md to attach)'}
           rows={1}
-          style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: '#fafafa', fontSize: 14, lineHeight: 1.6, resize: 'none', fontFamily: 'inherit', overflowY: 'hidden', minHeight: 24, maxHeight: 200 }}
+          className="flex-1 bg-transparent border-0 outline-none text-[#fafafa] text-sm leading-[1.6] resize-none font-[inherit] overflow-y-hidden min-h-6 max-h-[200px]"
         />
         <button
           onClick={streaming ? onAbort : handleSend}
           disabled={!streaming && (disabled || !text.trim())}
           title={streaming ? 'Stop' : 'Send'}
-          style={{
-            width: 32, height: 32, borderRadius: 8, border: 'none',
-            cursor: streaming || (!disabled && text.trim()) ? 'pointer' : 'default',
-            background: streaming ? '#dc2626' : '#2563eb',
-            color: 'white', fontSize: 14,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            opacity: !streaming && (disabled || !text.trim()) ? 0.4 : 1,
-            transition: 'opacity 0.15s, background 0.15s'
-          }}
+          className={`w-8 h-8 rounded-lg border-0 flex items-center justify-center shrink-0 text-sm text-white transition-[opacity,background] duration-150 ${streaming ? 'bg-[#dc2626]' : 'bg-[#2563eb]'} ${!streaming && (disabled || !text.trim()) ? 'opacity-40 cursor-default' : 'cursor-pointer'}`}
         >
           {streaming ? '⏹' : '↑'}
         </button>
@@ -281,24 +269,13 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
 
       {/* Quick replies */}
       {quickReplies.length > 0 && !disabled && (
-        <div style={{ marginTop: 8, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <div className="mt-2 flex gap-1.5 flex-wrap">
           {quickReplies.map((reply, idx) => (
             <button
               key={idx}
               onClick={() => updateText(reply)}
               title={`Quick reply: ${reply}`}
-              style={{
-                fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid #3f3f46',
-                background: 'transparent', color: '#a1a1aa', cursor: 'pointer', transition: 'all 0.15s'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(37,99,235,0.1)'
-                e.currentTarget.style.color = '#60a5fa'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent'
-                e.currentTarget.style.color = '#a1a1aa'
-              }}
+              className="text-[11px] px-2.5 py-1 rounded-md border border-[#3f3f46] bg-transparent text-[#a1a1aa] cursor-pointer transition-all duration-150 hover:bg-[rgba(37,99,235,0.1)] hover:text-[#60a5fa]"
             >
               {reply.length > 20 ? reply.slice(0, 17) + '…' : reply}
             </button>
@@ -306,9 +283,9 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
         </div>
       )}
 
-      <p style={{ fontSize: 11, color: '#52525b', marginTop: 6, display: 'flex', justifyContent: 'space-between' }}>
+      <p className="text-[11px] text-[#52525b] mt-1.5 flex justify-between">
         <span>Enter to send · Shift+Enter for newline{webSearchEnabled ? ' · 🔍 Web on' : ''}{selectedKb ? ` · 📚 ${selectedKb.name}` : ''}{mcpTools.length > 0 ? ` · 🔧 ${mcpTools.length} tool${mcpTools.length > 1 ? 's' : ''}` : ''}</span>
-        <span style={{ color: '#3f3f46' }}>{text.length > 0 ? `${text.length}` : ''}</span>
+        <span className="text-[#3f3f46]">{text.length > 0 ? `${text.length}` : ''}</span>
       </p>
     </div>
   )
@@ -318,13 +295,7 @@ function PickerItem({ active, onClick, children }: { active: boolean; onClick: (
   return (
     <button
       onClick={onClick}
-      style={{
-        display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px',
-        background: active ? 'rgba(37,99,235,0.2)' : 'transparent',
-        border: 'none', borderRadius: 6,
-        color: active ? '#60a5fa' : '#fafafa',
-        cursor: 'pointer', fontSize: 12, marginBottom: 2
-      }}
+      className={`block w-full text-left px-2.5 py-1.5 border-0 rounded-md cursor-pointer text-xs mb-0.5 ${active ? 'bg-[rgba(37,99,235,0.2)] text-[#60a5fa]' : 'bg-transparent text-[#fafafa]'}`}
     >
       {children}
     </button>
@@ -336,18 +307,10 @@ function ToolToggle({ active, onClick, icon, label, tooltip }: { active: boolean
     <button
       onClick={onClick}
       title={tooltip}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 4,
-        padding: '4px 10px', borderRadius: 6,
-        border: `1px solid ${active ? '#2563eb' : '#3f3f46'}`,
-        background: active ? 'rgba(37,99,235,0.15)' : 'transparent',
-        color: active ? '#60a5fa' : '#71717a',
-        cursor: 'pointer', fontSize: 12, transition: 'all 0.15s',
-        maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
-      }}
+      className={`flex items-center gap-1 px-2.5 py-1 rounded-md border cursor-pointer text-xs transition-all duration-150 max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap ${active ? 'border-[#2563eb] bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'border-[#3f3f46] bg-transparent text-[#71717a]'}`}
     >
       <span>{icon}</span>
-      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
+      <span className="overflow-hidden text-ellipsis">{label}</span>
     </button>
   )
 }

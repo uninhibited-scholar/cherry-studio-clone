@@ -27,7 +27,8 @@ export default defineConfig({
   renderer: {
     input: {
       index: resolve(__dirname, 'src/renderer/index.html'),
-      'quick-assistant': resolve(__dirname, 'src/renderer/windows/quick-assistant.html')
+      'quick-assistant': resolve(__dirname, 'src/renderer/windows/quick-assistant.html'),
+      'selection-assistant': resolve(__dirname, 'src/renderer/windows/selection-assistant.html')
     },
     plugins: [react(), tailwindcss()],
     resolve: {

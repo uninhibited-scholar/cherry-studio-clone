@@ -29,83 +29,47 @@ export function AppLayout(): React.ReactElement {
   const closeFindBar = () => { setFindOpen(false); setFindText('') }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <aside
-        style={{
-          width: 64,
-          background: '#18181b',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          paddingTop: 16,
-          gap: 4,
-          flexShrink: 0
-        }}
-      >
+      <aside className="w-16 bg-[#18181b] flex flex-col items-center pt-4 gap-1 shrink-0">
         {NAV_ITEMS.map(({ to, icon, label }) => (
           <NavLink
             key={to}
             to={to}
             title={label}
-            style={({ isActive }) => ({
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 48,
-              height: 48,
-              borderRadius: 10,
-              fontSize: 20,
-              textDecoration: 'none',
-              background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
-              transition: 'background 0.15s'
-            })}
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center w-12 h-12 rounded-xl text-xl no-underline transition-colors duration-150 ${isActive ? 'bg-white/12' : 'bg-transparent hover:bg-white/6'}`
+            }
           >
             {icon}
           </NavLink>
         ))}
 
         {/* Settings pinned at bottom */}
-        <div style={{ flexGrow: 1 }} />
+        <div className="flex-1" />
         <NavLink
           to="/settings"
           title="Settings"
-          style={({ isActive }) => ({
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 48,
-            height: 48,
-            borderRadius: 10,
-            fontSize: 20,
-            textDecoration: 'none',
-            marginBottom: 12,
-            background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent'
-          })}
+          className={({ isActive }) =>
+            `flex items-center justify-center w-12 h-12 rounded-xl text-xl no-underline mb-3 transition-colors duration-150 ${isActive ? 'bg-white/12' : 'bg-transparent hover:bg-white/6'}`
+          }
         >
           ⚙️
         </NavLink>
       </aside>
 
       {/* Main content */}
-      <main style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <main className="flex-1 overflow-hidden flex flex-col relative">
         <Outlet />
 
         {/* Find in page bar */}
         {findOpen && (
-          <div style={{
-            position: 'absolute', top: 8, right: 16, zIndex: 100,
-            background: '#18181b', border: '1px solid #3f3f46', borderRadius: 8,
-            display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.4)'
-          }}>
+          <div className="absolute top-2 right-4 z-[100] bg-[#18181b] border border-[#3f3f46] rounded-lg flex items-center gap-1.5 px-2.5 py-1.5 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
             <input
               ref={findInputRef}
               value={findText}
               onChange={(e) => {
                 setFindText(e.target.value)
-                // Use browser's built-in find-in-page via window.find (Chrome/Electron)
                 if (e.target.value) (window as unknown as Record<string, unknown>).find?.(e.target.value, false, false, true, false, true, false)
               }}
               onKeyDown={(e) => {
@@ -113,10 +77,10 @@ export function AppLayout(): React.ReactElement {
                 if (e.key === 'Enter') (window as unknown as Record<string, unknown>).find?.(findText, e.shiftKey, false, true, false, true, false)
               }}
               placeholder="Find in page…"
-              style={{ background: 'transparent', border: 'none', outline: 'none', color: '#fafafa', fontSize: 13, width: 200 }}
+              className="bg-transparent border-0 outline-none text-[#fafafa] text-sm w-[200px]"
             />
-            <span style={{ fontSize: 10, color: '#52525b' }}>Enter↵ · Esc</span>
-            <button onClick={closeFindBar} style={{ background: 'none', border: 'none', color: '#71717a', cursor: 'pointer', padding: 2 }}>✕</button>
+            <span className="text-[10px] text-[#52525b]">Enter↵ · Esc</span>
+            <button onClick={closeFindBar} className="bg-transparent border-0 text-[#71717a] cursor-pointer p-0.5">✕</button>
           </div>
         )}
       </main>
