@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow, shell } from 'electron'
+import { ipcMain, BrowserWindow, shell, app as electronApp, session, Notification } from 'electron'
 import { IpcChannel } from '@shared/IpcChannel'
 import { quickAssistantWindow } from './core/window/QuickAssistantWindow'
 import { selectionAssistantWindow } from './core/window/SelectionAssistantWindow'
@@ -338,13 +338,11 @@ export function registerIpcHandlers(): void {
 
   // ── File utilities ────────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.APP_LAUNCH_ON_BOOT_GET, () => {
-    const { app } = require('electron')
-    return app.getLoginItemSettings().openAtLogin
+    return electronApp.getLoginItemSettings().openAtLogin
   })
 
   ipcMain.handle(IpcChannel.APP_LAUNCH_ON_BOOT_SET, (_event, enabled: boolean) => {
-    const { app } = require('electron')
-    app.setLoginItemSettings({ openAtLogin: enabled })
+    electronApp.setLoginItemSettings({ openAtLogin: enabled })
   })
 
   ipcMain.handle(IpcChannel.APP_CACHE_SIZE, async () => {
@@ -462,7 +460,6 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle(IpcChannel.NOTIFY, (_event, { title, body }: { title: string; body: string }) => {
-    const { Notification } = require('electron') as typeof import('electron')
     if (Notification.isSupported()) {
       const notif = new Notification({ title, body })
       notif.on('click', () => {

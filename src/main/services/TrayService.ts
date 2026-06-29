@@ -7,7 +7,6 @@ const logger = loggerService.withContext('TrayService')
 let tray: Tray | null = null
 
 function getMainWindow() {
-  const { BrowserWindow } = require('electron') as typeof import('electron')
   return BrowserWindow.getAllWindows()[0] ?? null
 }
 

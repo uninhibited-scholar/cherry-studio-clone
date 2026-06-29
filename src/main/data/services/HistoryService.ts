@@ -103,7 +103,6 @@ export class HistoryService {
 
     return results.sort((a, b) => b.updatedAt - a.updatedAt)
   }
-}
 
   async searchMessages(query: string, limit = 20): Promise<Array<{
     messageId: string

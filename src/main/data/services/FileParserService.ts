@@ -36,8 +36,9 @@ export class FileParserService {
   }
 
   private async parsePdf(filePath: string): Promise<string> {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js')
+    // dynamic import to avoid ESM/CJS issues in Electron main process
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pdfjsLib: any = await import('pdfjs-dist/legacy/build/pdf.js')
     pdfjsLib.GlobalWorkerOptions.workerSrc = false
     const data = await readFile(filePath)
     const doc = await pdfjsLib.getDocument({ data: new Uint8Array(data) }).promise
