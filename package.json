@@ -26,7 +26,7 @@
     "highlight.js": "^11.11.1",
     "i18next": "^24.2.2",
     "ml-distance": "^4.0.1",
-    "nanoid": "^5.1.11",
+    "nanoid": "^3.3.12",
     "pdfjs-dist": "^4.4.168",
     "react-i18next": "^15.5.1",
     "react-markdown": "^10.1.0",

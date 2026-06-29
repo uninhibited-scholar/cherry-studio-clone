@@ -5,12 +5,14 @@ import { resolve } from 'path'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin({ exclude: ['nanoid'] })],
-    build: {
-      rollupOptions: {
-        external: []
-      }
-    },
+    // Exclude ESM-only packages from externalization so rollup bundles them as CJS
+    plugins: [externalizeDepsPlugin({
+      exclude: [
+        'ai', '@ai-sdk/openai', '@ai-sdk/anthropic', '@ai-sdk/google', '@ai-sdk/azure',
+        '@ai-sdk/provider', '@ai-sdk/provider-utils', '@ai-sdk/ui-utils',
+        'nanoid', 'ml-distance'
+      ]
+    })],
     resolve: {
       alias: {
         '@main': resolve('src/main'),
