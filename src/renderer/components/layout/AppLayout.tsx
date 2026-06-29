@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { to: '/library',    icon: '📖', label: 'Library' },
   { to: '/history',    icon: '🕐', label: 'History' },
   { to: '/files',      icon: '📁', label: 'Files' },
+  { to: '/search',     icon: '🔎', label: 'Search' },
   { to: '/mini-apps',  icon: '🧩', label: 'Mini Apps' },
   { to: '/launchpad',  icon: '🚀', label: 'Launchpad' },
 ] as const

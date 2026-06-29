@@ -19,6 +19,8 @@ type Props = {
 
 export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, onEditResend, showTimestamps = false, searchQuery = '', autoScroll = true, onMultiDelete, onQuote }: Props) {
   const { speak, isSpeaking, isSupported: ttsSupported, currentText: ttsCurrent } = useTTS()
+  // activeBranchMap: parentId → active branchIndex
+  const [activeBranchMap, setActiveBranchMap] = useState<Record<string, number>>({})
   const bottomRef = useRef<HTMLDivElement>(null)
   const matchRefs = useRef<Array<HTMLDivElement | null>>([])
   const [matchIdx, setMatchIdx] = useState(0)
@@ -155,10 +157,29 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
       {q && matchedIds.length === 0 && (
         <div className="px-4 py-1.5 text-xs text-[#71717a] bg-[rgba(9,9,11,0.9)] border-b border-b-[#27272a]">No results</div>
       )}
+      {(() => {
+        // Build sibling groups: parentId → sorted list of message ids in order
+        const siblingGroups: Record<string, string[]> = {}
+        for (const msg of messages) {
+          if (msg.parentId) {
+            if (!siblingGroups[msg.parentId]) siblingGroups[msg.parentId] = []
+            siblingGroups[msg.parentId].push(msg.id)
+          }
+        }
+        return null
+      })()}
       {messages.map((msg, idx) => {
         const matchPos = matchedIds.indexOf(msg.id)
         const isCurrentMatch = matchPos === matchIdx
         const isSelected = selected.has(msg.id)
+        // Find siblings for this message (messages sharing the same parentId)
+        const siblings = msg.parentId
+          ? messages.filter((m) => m.parentId === msg.parentId).sort((a, b) => (a.branchIndex ?? 0) - (b.branchIndex ?? 0))
+          : []
+        const activeBranchIdx = msg.parentId ? (activeBranchMap[msg.parentId] ?? siblings.findIndex((s) => s.id === msg.id)) : -1
+        const isActiveBranch = siblings.length === 0 || (msg.parentId ? siblings[activeBranchIdx]?.id === msg.id : true)
+        // Hide non-active branches
+        if (!isActiveBranch) return null
         return (
           <div key={msg.id} ref={(el) => { if (matchPos >= 0) matchRefs.current[matchPos] = el }} className={`flex items-start gap-2 pl-2 ${isCurrentMatch ? 'outline outline-2 outline-[#2563eb] -outline-offset-2 rounded-lg' : ''}`}>
             <input
@@ -184,6 +205,27 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
               onSpeak={speak}
               isSpeakingThis={isSpeaking && ttsCurrent === msg.content}
             />
+            {siblings.length > 1 && msg.parentId && (
+              <div className="flex items-center gap-1 mt-1 ml-1">
+                <button
+                  onClick={() => {
+                    const newIdx = Math.max(0, activeBranchIdx - 1)
+                    setActiveBranchMap((prev) => ({ ...prev, [msg.parentId!]: newIdx }))
+                  }}
+                  disabled={activeBranchIdx === 0}
+                  className={navBtnClass}
+                >‹</button>
+                <span className="text-[11px] text-[#71717a]">{activeBranchIdx + 1}/{siblings.length}</span>
+                <button
+                  onClick={() => {
+                    const newIdx = Math.min(siblings.length - 1, activeBranchIdx + 1)
+                    setActiveBranchMap((prev) => ({ ...prev, [msg.parentId!]: newIdx }))
+                  }}
+                  disabled={activeBranchIdx === siblings.length - 1}
+                  className={navBtnClass}
+                >›</button>
+              </div>
+            )}
             </div>
           </div>
         )

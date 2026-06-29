@@ -20,6 +20,7 @@
   "dependencies": {
     "@ai-sdk/azure": "^4.0.0",
     "adm-zip": "^0.5.16",
+    "pdfjs-dist": "^4.4.168",
     "@libsql/client": "^0.14.0",
     "drizzle-orm": "^0.44.2",
     "electron-updater": "^6.3.9",

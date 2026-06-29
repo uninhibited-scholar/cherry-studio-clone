@@ -146,6 +146,10 @@ export function registerIpcHandlers(): void {
     return { parentId, branchIndex }
   })
 
+  ipcMain.handle(IpcChannel.MESSAGES_SEARCH_GLOBAL, async (_event, { query, limit }: { query: string; limit?: number }) => {
+    return historyService.searchMessages(query, limit)
+  })
+
   // ── Notes ───────────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.NOTES_LIST, async () => noteService.list())
 

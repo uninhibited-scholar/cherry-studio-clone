@@ -16,6 +16,7 @@ import { HistoryPage } from './pages/history/HistoryPage'
 import { LibraryPage } from './pages/library/LibraryPage'
 import { LaunchpadPage } from './pages/launchpad/LaunchpadPage'
 import { FilesPage } from './pages/files/FilesPage'
+import { SearchPage } from './pages/search/SearchPage'
 
 export function App(): React.ReactElement {
   useTheme()
@@ -41,6 +42,7 @@ export function App(): React.ReactElement {
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/launchpad" element={<LaunchpadPage />} />
           <Route path="/files" element={<FilesPage />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Routes>

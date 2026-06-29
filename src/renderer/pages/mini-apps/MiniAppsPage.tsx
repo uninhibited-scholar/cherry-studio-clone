@@ -61,14 +61,16 @@ export function MiniAppsPage(): React.ReactElement {
   const [newName, setNewName] = useState('')
   const [newUrl, setNewUrl] = useState('')
   const [newIcon, setNewIcon] = useState('🔗')
+  const [newCategory, setNewCategory] = useState('Custom')
   const [filter, setFilter] = useState('')
+  const [activeCategory, setActiveCategory] = useState('All')
 
   useEffect(() => { saveCustomApps(customApps) }, [customApps])
 
-  const allApps = [...BUILTIN_APPS, ...customApps]
-  const filtered = filter.trim()
-    ? allApps.filter((a) => a.name.toLowerCase().includes(filter.toLowerCase()) || a.description.toLowerCase().includes(filter.toLowerCase()))
-    : allApps
+  const allApps = [...BUILTIN_APPS, ...customApps.map((a) => ({ ...a, category: a.category ?? 'Custom' }))]
+  const filtered = allApps
+    .filter((a) => activeCategory === 'All' || a.category === activeCategory)
+    .filter((a) => !filter.trim() || a.name.toLowerCase().includes(filter.toLowerCase()) || a.description.toLowerCase().includes(filter.toLowerCase()))
 
   const openApp = (app: MiniApp) => {
     window.api.invoke(IpcChannel.MINI_APPS_OPEN, { url: app.url, title: app.name })
@@ -83,12 +85,14 @@ export function MiniAppsPage(): React.ReactElement {
       url,
       icon: newIcon,
       description: url,
+      category: newCategory.trim() || 'Custom',
       isCustom: true
     }
     setCustomApps((prev) => [...prev, app])
     setNewName('')
     setNewUrl('')
     setNewIcon('🔗')
+    setNewCategory('Custom')
     setShowAdd(false)
   }
 
@@ -110,6 +114,19 @@ export function MiniAppsPage(): React.ReactElement {
         <button onClick={() => setShowAdd(true)} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-[14px] py-[6px] whitespace-nowrap shrink-0">+ Add</button>
       </div>
 
+      {/* Category tabs */}
+      <div className="px-5 pt-2 pb-0 border-b border-[#27272a] flex gap-1 flex-wrap shrink-0">
+        {ALL_CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setActiveCategory(cat)}
+            className={`px-[10px] py-[4px] mb-2 rounded-[20px] border-none cursor-pointer text-[11px] font-medium ${activeCategory === cat ? 'bg-[#2563eb] text-white' : 'bg-[#27272a] text-[#a1a1aa]'}`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
       {/* Add custom app form */}
       {showAdd && (
         <div className="px-6 py-[14px] border-b border-[#27272a] bg-[#18181b] flex gap-[10px] items-end shrink-0">
@@ -122,13 +139,22 @@ export function MiniAppsPage(): React.ReactElement {
               maxLength={2}
             />
           </div>
-          <div className="flex-[0_0_160px]">
+          <div className="flex-[0_0_140px]">
             <label className="block text-[11px] text-[#71717a] mb-1">Name</label>
             <input
               autoFocus
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="My App"
+              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
+            />
+          </div>
+          <div className="flex-[0_0_110px]">
+            <label className="block text-[11px] text-[#71717a] mb-1">Category</label>
+            <input
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              placeholder="Custom"
               className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
             />
           </div>
