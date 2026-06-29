@@ -22,6 +22,7 @@ import { paintingService } from './data/services/PaintingService'
 import { mcpService } from './services/McpService'
 import { topicNamingService } from './services/TopicNamingService'
 import { historyService } from './data/services/HistoryService'
+import { backupService } from './services/BackupService'
 import { libraryService } from './data/services/LibraryService'
 import { ocrService } from './services/ocr'
 
@@ -394,46 +395,13 @@ export function registerIpcHandlers(): void {
 
   // ── Backup ───────────────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.BACKUP_EXPORT, async () => {
-    const [providers, assistants, notes] = await Promise.all([
-      providerService.listProviders(),
-      assistantService.list(),
-      noteService.list()
-    ])
-
-    // Gather all messages for all topics across all assistants
-    const topicsAll: unknown[] = []
-    const messagesAll: unknown[] = []
-    for (const a of assistants) {
-      const topics = await topicService.listByAssistant(a.id)
-      for (const t of topics) {
-        topicsAll.push(t)
-        const msgs = await messageService.listByTopic(t.id)
-        messagesAll.push(...msgs)
-      }
+    const result = await backupService.export()
+    if (result.success && result.path) {
+      shell.showItemInFolder(result.path)
+      return result.path
     }
-
-    const backup = {
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      providers,
-      assistants,
-      topics: topicsAll,
-      messages: messagesAll,
-      notes
-    }
-
-    const { dialog } = await import('electron')
-    const { writeFile } = await import('fs/promises')
-
-    const result = await dialog.showSaveDialog({
-      defaultPath: `cherry-studio-backup-${new Date().toISOString().slice(0, 10)}.json`,
-      filters: [{ name: 'JSON Backup', extensions: ['json'] }]
-    })
-    if (result.canceled || !result.filePath) return null
-
-    await writeFile(result.filePath, JSON.stringify(backup, null, 2), 'utf8')
-    shell.showItemInFolder(result.filePath)
-    return result.filePath
+    if (result.error && result.error !== 'Cancelled') throw new Error(result.error)
+    return null
   })
 
   ipcMain.handle(IpcChannel.BACKUP_IMPORT, async () => {

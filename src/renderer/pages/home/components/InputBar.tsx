@@ -3,6 +3,9 @@ import { IpcChannel } from '@shared/IpcChannel'
 import type { KnowledgeBase } from '@shared/data/types/knowledge'
 import type { PromptTemplate } from '@shared/data/types/library'
 import type { McpTool } from '@shared/data/types/mcp'
+import { useVoiceInput } from '../../../hooks/useVoiceInput'
+import { parseVariables } from '@shared/utils/promptTemplate'
+import { TemplateVariableDialog } from '@renderer/components/TemplateVariableDialog'
 
 type Props = {
   onSend: (text: string, options: { webSearch: boolean }) => void
@@ -20,6 +23,10 @@ type Props = {
 
 export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowledgeBaseId, onSelectKnowledgeBase, mcpTools, setMcpTools, sendOnEnter = true, draftText = '', onDraftChange }: Props) {
   const [text, setText] = useState(draftText)
+
+  const { isListening, startListening, stopListening, isSupported: voiceSupported } = useVoiceInput((transcript) => {
+    setText((prev) => prev ? `${prev} ${transcript}` : transcript)
+  })
   const [history, setHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
 
@@ -62,6 +69,7 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
   const [showMcpPicker, setShowMcpPicker] = useState(false)
   const [allMcpTools, setAllMcpTools] = useState<McpTool[]>([])
   const [templateSearch, setTemplateSearch] = useState('')
+  const [variableDialogTemplate, setVariableDialogTemplate] = useState<PromptTemplate | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [quickReplies, setQuickReplies] = useState<string[]>(() => {
     const saved = localStorage.getItem('cherry-clone:quick-replies')
@@ -123,10 +131,8 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
     el.style.height = `${Math.min(el.scrollHeight, 200)}px`
   }
 
-  const insertTemplate = (tpl: PromptTemplate) => {
-    setText(tpl.content)
-    setShowTemplatePicker(false)
-    setTemplateSearch('')
+  const applyTemplateContent = (content: string) => {
+    setText(content)
     setTimeout(() => {
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto'
@@ -134,6 +140,17 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
         textareaRef.current.focus()
       }
     }, 50)
+  }
+
+  const insertTemplate = (tpl: PromptTemplate) => {
+    setShowTemplatePicker(false)
+    setTemplateSearch('')
+    const vars = parseVariables(tpl.content)
+    if (vars.length > 0) {
+      setVariableDialogTemplate(tpl)
+    } else {
+      applyTemplateContent(tpl.content)
+    }
   }
 
   const toggleMcpTool = (tool: McpTool) => {
@@ -152,6 +169,13 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
 
   return (
     <div className="border-t border-t-[#27272a] px-4 py-3 bg-[#09090b]">
+      {variableDialogTemplate && (
+        <TemplateVariableDialog
+          template={variableDialogTemplate.content}
+          onFill={(result) => { setVariableDialogTemplate(null); applyTemplateContent(result) }}
+          onClose={() => setVariableDialogTemplate(null)}
+        />
+      )}
       {/* Toolbar row */}
       <div className="flex items-center gap-1.5 mb-2 flex-wrap">
 
@@ -257,6 +281,17 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
           rows={1}
           className="flex-1 bg-transparent border-0 outline-none text-[#fafafa] text-sm leading-[1.6] resize-none font-[inherit] overflow-y-hidden min-h-6 max-h-[200px]"
         />
+        {voiceSupported && (
+          <button
+            onClick={isListening ? stopListening : startListening}
+            title={isListening ? 'Stop recording' : 'Voice input'}
+            className={`w-8 h-8 rounded-lg border-0 flex items-center justify-center shrink-0 text-sm transition-[opacity,background] duration-150 cursor-pointer ${isListening ? 'bg-[#dc2626] text-white' : 'bg-[#27272a] text-[#a1a1aa]'}`}
+          >
+            {isListening ? (
+              <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: '#fff', animation: 'blink 1s step-end infinite' }} />
+            ) : '🎤'}
+          </button>
+        )}
         <button
           onClick={streaming ? onAbort : handleSend}
           disabled={!streaming && (disabled || !text.trim())}

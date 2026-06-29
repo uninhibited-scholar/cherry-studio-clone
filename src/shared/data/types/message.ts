@@ -24,6 +24,10 @@ export const MessageSchema = z.object({
     .optional(),
   /** Attached file ids */
   fileIds: z.array(z.string()).default([]),
+  /** Branching: id of parent message (null = root) */
+  parentId: z.string().optional(),
+  /** Branch index among siblings */
+  branchIndex: z.number().default(0),
   createdAt: z.number(),
   updatedAt: z.number()
 })

@@ -43,6 +43,9 @@ export const IpcChannel = {
   MESSAGES_LIST: 'messages:list',
   MESSAGES_CREATE: 'messages:create',
   MESSAGES_DELETE: 'messages:delete',
+  MESSAGES_SEARCH_GLOBAL: 'messages:search-global',
+  MESSAGES_GET_BRANCHES: 'messages:get-branches',
+  MESSAGES_SET_ACTIVE_BRANCH: 'messages:set-active-branch',
 
   // Knowledge
   KNOWLEDGE_LIST: 'knowledge:list',

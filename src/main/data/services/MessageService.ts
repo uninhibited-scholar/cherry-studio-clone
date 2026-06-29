@@ -70,6 +70,56 @@ export class MessageService {
     const db = getDb()
     await db.delete(message).where(eq(message.topicId, topicId))
   }
+
+  async createBranch(parentId: string, data: {
+    topicId: string
+    role: Message['role']
+    content: string
+    modelId?: string
+    providerId?: string
+  }): Promise<Message> {
+    const db = getDb()
+    const siblings = await this.getBranches(parentId)
+    const branchIndex = siblings.length
+    const now = Date.now()
+    const id = nanoid()
+
+    await db.insert(message).values({
+      id,
+      topicId: data.topicId,
+      role: data.role,
+      content: data.content,
+      modelId: data.modelId,
+      providerId: data.providerId,
+      usage: null,
+      fileIds: [],
+      thinkingContent: null,
+      parentId,
+      branchIndex,
+      createdAt: now,
+      updatedAt: now
+    })
+
+    logger.debug(`Created branch message: ${id} from parent ${parentId} (index ${branchIndex})`)
+    return (await this.get(id))!
+  }
+
+  async getBranches(parentId: string): Promise<Message[]> {
+    const db = getDb()
+    const rows = await db
+      .select()
+      .from(message)
+      .where(eq(message.parentId, parentId))
+      .orderBy(asc(message.branchIndex))
+    return rows.map(rowToMessage)
+  }
+
+  async getActiveBranch(parentId: string): Promise<number> {
+    const branches = await this.getBranches(parentId)
+    if (branches.length === 0) return 0
+    // Return the highest branch index as the "active" one (most recent fork)
+    return branches[branches.length - 1].branchIndex ?? 0
+  }
 }
 
 function rowToMessage(row: typeof message.$inferSelect): Message {

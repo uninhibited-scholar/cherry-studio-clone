@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import type { Message } from '@shared/data/types/message'
 import { MarkdownContent } from '../../../components/MarkdownContent'
+import { useTTS } from '../../../hooks/useTTS'
 
 type Props = {
   messages: Message[]
@@ -17,6 +18,7 @@ type Props = {
 }
 
 export function MessageThread({ messages, streamingText, streaming, onDelete, onRegenerate, onEditResend, showTimestamps = false, searchQuery = '', autoScroll = true, onMultiDelete, onQuote }: Props) {
+  const { speak, isSpeaking, isSupported: ttsSupported, currentText: ttsCurrent } = useTTS()
   const bottomRef = useRef<HTMLDivElement>(null)
   const matchRefs = useRef<Array<HTMLDivElement | null>>([])
   const [matchIdx, setMatchIdx] = useState(0)
@@ -178,6 +180,9 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
               onQuote={onQuote}
               reactions={reactions[msg.id] ?? {}}
               onToggleReaction={(emoji) => toggleReaction(msg.id, emoji)}
+              ttsSupported={ttsSupported}
+              onSpeak={speak}
+              isSpeakingThis={isSpeaking && ttsCurrent === msg.content}
             />
             </div>
           </div>
@@ -215,7 +220,10 @@ function MessageBubble({
   isSelected,
   onQuote,
   reactions,
-  onToggleReaction
+  onToggleReaction,
+  ttsSupported,
+  onSpeak,
+  isSpeakingThis
 }: {
   message: Message
   isStreaming?: boolean
@@ -229,6 +237,9 @@ function MessageBubble({
   onQuote?: (message: Message) => void
   reactions?: Record<string, number>
   onToggleReaction?: (emoji: string) => void
+  ttsSupported?: boolean
+  onSpeak?: (text: string) => void
+  isSpeakingThis?: boolean
 }) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
@@ -401,6 +412,15 @@ function MessageBubble({
                   className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
                 >
                   ✎ Edit
+                </button>
+              )}
+              {!isUser && ttsSupported && onSpeak && (
+                <button
+                  onClick={() => onSpeak(message.content)}
+                  className={`bg-transparent border border-[#3f3f46] cursor-pointer text-[11px] px-2 py-0.5 rounded ${isSpeakingThis ? 'text-[#60a5fa]' : 'text-[#71717a]'}`}
+                  title={isSpeakingThis ? 'Stop reading' : 'Read aloud'}
+                >
+                  {isSpeakingThis ? '🔊' : '🔈'} TTS
                 </button>
               )}
               {onRegenerate && (

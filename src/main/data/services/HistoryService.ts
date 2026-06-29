@@ -105,4 +105,46 @@ export class HistoryService {
   }
 }
 
+  async searchMessages(query: string, limit = 20): Promise<Array<{
+    messageId: string
+    content: string
+    role: string
+    topicId: string
+    topicTitle: string
+    assistantName: string
+    createdAt: number
+  }>> {
+    if (!query.trim()) return []
+    const db = getDb()
+    const pattern = `%${query.toLowerCase()}%`
+
+    const rows = await db
+      .select({
+        messageId: message.id,
+        content: message.content,
+        role: message.role,
+        topicId: message.topicId,
+        topicTitle: topic.title,
+        assistantName: assistant.name,
+        createdAt: message.createdAt
+      })
+      .from(message)
+      .leftJoin(topic, eq(topic.id, message.topicId))
+      .leftJoin(assistant, eq(assistant.id, topic.assistantId))
+      .where(sql`lower(${message.content}) LIKE ${pattern}`)
+      .orderBy(desc(message.createdAt))
+      .limit(limit)
+
+    return rows.map((r) => ({
+      messageId: r.messageId,
+      content: r.content,
+      role: r.role,
+      topicId: r.topicId,
+      topicTitle: r.topicTitle ?? 'Untitled',
+      assistantName: r.assistantName ?? 'Unknown',
+      createdAt: r.createdAt
+    }))
+  }
+}
+
 export const historyService = new HistoryService()
