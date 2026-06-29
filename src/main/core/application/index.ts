@@ -1,6 +1,7 @@
 import { BrowserWindow, app } from 'electron'
 import { MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT } from '@shared/config/constant'
 import { loggerService } from '@logger'
+import { WindowStateManager } from '../window/WindowStateManager'
 
 const logger = loggerService.withContext('Application')
 
@@ -32,9 +33,14 @@ class Application {
     // out/main/index.js and out/preload/index.js are always siblings under out/
     const preloadPath = `${__dirname}/../preload/index.js`
 
+    const windowState = new WindowStateManager('main', { width: 1280, height: 800 })
+    const state = windowState.get()
+
     this.mainWindow = new BrowserWindow({
-      width: 1200,
-      height: 800,
+      width: state.width,
+      height: state.height,
+      x: state.x,
+      y: state.y,
       minWidth: MIN_WINDOW_WIDTH,
       minHeight: MIN_WINDOW_HEIGHT,
       titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
@@ -52,6 +58,9 @@ class Application {
     } else {
       await this.mainWindow.loadFile(`${__dirname}/../renderer/index.html`)
     }
+
+    windowState.track(this.mainWindow)
+    if (state.isMaximized) this.mainWindow.maximize()
 
     this.mainWindow.on('closed', () => {
       this.mainWindow = null

@@ -1,4 +1,5 @@
 import { app, BrowserWindow, globalShortcut } from 'electron'
+import path from 'path'
 import { application } from './core/application'
 import { createTray, destroyTray } from './services/TrayService'
 import { buildAndSetAppMenu } from './services/AppMenuService'
@@ -6,6 +7,17 @@ import { quickAssistantWindow } from './core/window/QuickAssistantWindow'
 import { selectionAssistantWindow } from './core/window/SelectionAssistantWindow'
 import { selectionService } from './services/selection/SelectionService'
 import { updaterService } from './services/UpdaterService'
+import { shortcutService } from './services/ShortcutService'
+import { deepLinkService } from './services/DeepLinkService'
+
+// Register cherry:// deep link protocol
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('cherry', process.execPath, [path.resolve(process.argv[1])])
+  }
+} else {
+  app.setAsDefaultProtocolClient('cherry')
+}
 
 // Enforce single instance
 const gotLock = app.requestSingleInstanceLock()
@@ -28,7 +40,11 @@ app.whenReady().then(async () => {
   // Auto-updater
   updaterService.init()
   const mainWin = BrowserWindow.getAllWindows()[0]
-  if (mainWin) updaterService.setMainWindow(mainWin)
+  if (mainWin) {
+    updaterService.setMainWindow(mainWin)
+    shortcutService.registerAll(mainWin)
+    deepLinkService.setMainWindow(mainWin)
+  }
   if (app.isPackaged) {
     setTimeout(() => updaterService.checkForUpdates(), 5000)
   }
@@ -63,12 +79,21 @@ app.on('window-all-closed', () => {
 app.on('will-quit', () => {
   quickAssistantWindow.unregisterShortcut()
   selectionService.unregisterShortcut()
+  shortcutService.unregisterAll()
 })
 
 app.on('before-quit', () => {
   destroyTray()
 })
 
-app.on('second-instance', () => {
+app.on('second-instance', (_event, argv) => {
   application.focusMainWindow()
+  // On Windows, deep links are passed via argv on second-instance
+  const url = argv.find((arg) => arg.startsWith('cherry://'))
+  if (url) deepLinkService.handle(url)
+})
+
+app.on('open-url', (event, url) => {
+  event.preventDefault()
+  deepLinkService.handle(url)
 })

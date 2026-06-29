@@ -153,7 +153,18 @@ export const IpcChannel = {
   SELECTION_ASSISTANT_HIDE: 'selection-assistant:hide',
 
   // OCR
-  OCR_EXTRACT: 'ocr:extract'
+  OCR_EXTRACT: 'ocr:extract',
+
+  // Keyboard Shortcuts (main → renderer)
+  SHORTCUT_NEW_TOPIC: 'shortcut:new-topic',
+  SHORTCUT_COMMAND_PALETTE: 'shortcut:command-palette',
+  SHORTCUT_SETTINGS: 'shortcut:settings',
+  SHORTCUT_FIND: 'shortcut:find',
+
+  // Deep Link (main → renderer)
+  DEEP_LINK: 'deep-link',
+  DEEP_LINK_OPEN_TOPIC: 'deep-link:open-topic',
+  DEEP_LINK_OPEN_SETTINGS: 'deep-link:open-settings'
 } as const
 
 export type IpcChannelKey = keyof typeof IpcChannel
