@@ -137,6 +137,15 @@ export function registerIpcHandlers(): void {
     return messageService.delete(id)
   })
 
+  ipcMain.handle(IpcChannel.MESSAGES_GET_BRANCHES, async (_event, parentId: string) => {
+    return messageService.getBranches(parentId)
+  })
+
+  ipcMain.handle(IpcChannel.MESSAGES_SET_ACTIVE_BRANCH, async (_event, { parentId, branchIndex }: { parentId: string; branchIndex: number }) => {
+    // Active branch is tracked client-side; this IPC is a hook for future persistence
+    return { parentId, branchIndex }
+  })
+
   // ── Notes ───────────────────────────────────────────────────────────────
   ipcMain.handle(IpcChannel.NOTES_LIST, async () => noteService.list())
 
@@ -405,52 +414,10 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle(IpcChannel.BACKUP_IMPORT, async () => {
-    const { dialog } = await import('electron')
-    const { readFile } = await import('fs/promises')
-
-    const result = await dialog.showOpenDialog({
-      filters: [{ name: 'JSON Backup', extensions: ['json'] }],
-      properties: ['openFile']
-    })
-    if (result.canceled || !result.filePaths[0]) return { success: false, reason: 'Cancelled' }
-
-    try {
-      const raw = await readFile(result.filePaths[0], 'utf8')
-      const backup = JSON.parse(raw) as {
-        version: number
-        providers?: unknown[]
-        assistants?: unknown[]
-        topics?: unknown[]
-        messages?: unknown[]
-        notes?: unknown[]
-      }
-      if (backup.version !== 1) return { success: false, reason: 'Unsupported backup version' }
-
-      // Import: upsert each entity
-      const db = getDb()
-      for (const p of backup.providers ?? []) await providerService.upsertProvider(p as Parameters<typeof providerService.upsertProvider>[0])
-      for (const a of backup.assistants ?? []) await assistantService.upsert(a as Parameters<typeof assistantService.upsert>[0])
-      for (const t of backup.topics ?? []) {
-        const row = t as { id: string; assistantId: string; title: string; isPinned?: boolean; createdAt: number; updatedAt: number }
-        await db.insert(topicSchema).values({
-          id: row.id, assistantId: row.assistantId, title: row.title,
-          isPinned: row.isPinned ?? false, createdAt: row.createdAt, updatedAt: row.updatedAt
-        }).onConflictDoNothing()
-      }
-      for (const m of backup.messages ?? []) {
-        const row = m as { id: string; topicId: string; role: 'user' | 'assistant' | 'system'; content: string; modelId?: string; providerId?: string; usage?: unknown; fileIds?: string[]; createdAt: number; updatedAt: number }
-        await db.insert(messageSchema).values({
-          id: row.id, topicId: row.topicId, role: row.role, content: row.content,
-          modelId: row.modelId, providerId: row.providerId, usage: row.usage as string ?? null,
-          fileIds: row.fileIds ?? [], createdAt: row.createdAt, updatedAt: row.updatedAt
-        }).onConflictDoNothing()
-      }
-      for (const n of backup.notes ?? []) await noteService.create(n as Parameters<typeof noteService.create>[0])
-
-      return { success: true }
-    } catch (err) {
-      return { success: false, reason: String(err) }
-    }
+    const result = await backupService.import()
+    if (!result.success && result.error === 'Cancelled') return { success: false, reason: 'Cancelled' }
+    if (!result.success) return { success: false, reason: result.error }
+    return { success: true }
   })
 
   // ── Notifications ────────────────────────────────────────────────────────────

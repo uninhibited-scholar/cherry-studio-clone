@@ -132,6 +132,8 @@ function rowToMessage(row: typeof message.$inferSelect): Message {
     providerId: row.providerId ?? undefined,
     usage: (row.usage as Message['usage']) ?? undefined,
     fileIds: (row.fileIds as string[]) ?? [],
+    parentId: row.parentId ?? undefined,
+    branchIndex: row.branchIndex ?? 0,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt
   }

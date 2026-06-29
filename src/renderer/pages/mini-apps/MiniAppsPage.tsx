@@ -7,23 +7,39 @@ type MiniApp = {
   url: string
   icon: string
   description: string
+  category: string
   isCustom?: boolean
 }
 
 const BUILTIN_APPS: MiniApp[] = [
-  { id: 'chatgpt',     name: 'ChatGPT',      url: 'https://chat.openai.com',         icon: '🤖', description: 'OpenAI ChatGPT' },
-  { id: 'claude',      name: 'Claude',       url: 'https://claude.ai',               icon: '✨', description: 'Anthropic Claude' },
-  { id: 'gemini',      name: 'Gemini',       url: 'https://gemini.google.com',        icon: '💎', description: 'Google Gemini' },
-  { id: 'perplexity',  name: 'Perplexity',   url: 'https://www.perplexity.ai',       icon: '🔍', description: 'AI-powered search' },
-  { id: 'poe',         name: 'Poe',          url: 'https://poe.com',                 icon: '🦋', description: 'Quora Poe' },
-  { id: 'copilot',     name: 'Copilot',      url: 'https://copilot.microsoft.com',   icon: '🪟', description: 'Microsoft Copilot' },
-  { id: 'mistral',     name: 'Le Chat',      url: 'https://chat.mistral.ai',         icon: '🌊', description: 'Mistral AI chat' },
-  { id: 'cohere',      name: 'Cohere',       url: 'https://coral.cohere.com',        icon: '🐚', description: 'Cohere Coral' },
-  { id: 'huggingchat', name: 'HuggingChat',  url: 'https://huggingface.co/chat',     icon: '🤗', description: 'Hugging Face chat' },
-  { id: 'you',         name: 'You.com',      url: 'https://you.com',                 icon: '🎯', description: 'AI search engine' },
-  { id: 'groq',        name: 'Groq',         url: 'https://groq.com',                icon: '⚡', description: 'Fast LLM inference' },
-  { id: 'together',    name: 'Together AI',  url: 'https://api.together.ai/playground', icon: '🤝', description: 'Together AI playground' },
+  { id: 'chatgpt',      name: 'ChatGPT',      url: 'https://chat.openai.com',            icon: '🤖', description: 'OpenAI ChatGPT',          category: 'AI' },
+  { id: 'claude',       name: 'Claude',       url: 'https://claude.ai',                  icon: '✨', description: 'Anthropic Claude',         category: 'AI' },
+  { id: 'gemini',       name: 'Gemini',       url: 'https://gemini.google.com',           icon: '💎', description: 'Google Gemini',            category: 'AI' },
+  { id: 'perplexity',   name: 'Perplexity',   url: 'https://www.perplexity.ai',          icon: '🔍', description: 'AI-powered search',        category: 'AI' },
+  { id: 'poe',          name: 'Poe',          url: 'https://poe.com',                    icon: '🦋', description: 'Quora Poe',                category: 'AI' },
+  { id: 'copilot',      name: 'Copilot',      url: 'https://copilot.microsoft.com',      icon: '🪟', description: 'Microsoft Copilot',        category: 'AI' },
+  { id: 'mistral',      name: 'Le Chat',      url: 'https://chat.mistral.ai',            icon: '🌊', description: 'Mistral AI chat',          category: 'AI' },
+  { id: 'cohere',       name: 'Cohere',       url: 'https://coral.cohere.com',           icon: '🐚', description: 'Cohere Coral',             category: 'AI' },
+  { id: 'huggingchat',  name: 'HuggingChat',  url: 'https://huggingface.co/chat',        icon: '🤗', description: 'Hugging Face chat',        category: 'AI' },
+  { id: 'you',          name: 'You.com',      url: 'https://you.com',                    icon: '🎯', description: 'AI search engine',         category: 'AI' },
+  { id: 'groq',         name: 'Groq',         url: 'https://groq.com',                   icon: '⚡', description: 'Fast LLM inference',       category: 'AI' },
+  { id: 'together',     name: 'Together AI',  url: 'https://api.together.ai/playground', icon: '🤝', description: 'Together AI playground',   category: 'AI' },
+  { id: 'excalidraw',   name: 'Excalidraw',   url: 'https://excalidraw.com',             icon: '✏️', description: 'Virtual whiteboard',       category: 'Productivity' },
+  { id: 'carbon',       name: 'Carbon',       url: 'https://carbon.now.sh',              icon: '💻', description: 'Beautiful code images',    category: 'Dev Tools' },
+  { id: 'regex101',     name: 'Regex101',     url: 'https://regex101.com',               icon: '🔍', description: 'Regex tester & debugger',  category: 'Dev Tools' },
+  { id: 'jsonhero',     name: 'JSON Hero',    url: 'https://jsonhero.io',                icon: '📊', description: 'JSON explorer',            category: 'Dev Tools' },
+  { id: 'tldr',         name: 'TLDR Pages',   url: 'https://tldr.ostera.io',             icon: '📖', description: 'Simplified man pages',     category: 'Dev Tools' },
+  { id: 'squoosh',      name: 'Squoosh',      url: 'https://squoosh.app',                icon: '🖼️', description: 'Image compression',        category: 'Media' },
+  { id: 'caniuse',      name: 'Can I Use',    url: 'https://caniuse.com',                icon: '🌐', description: 'Browser support tables',   category: 'Dev Tools' },
+  { id: 'bundlephobia', name: 'Bundlephobia', url: 'https://bundlephobia.com',           icon: '📦', description: 'npm package size',         category: 'Dev Tools' },
+  { id: 'coolors',      name: 'Coolors',      url: 'https://coolors.co',                 icon: '🎨', description: 'Color palette generator', category: 'Design' },
+  { id: 'type-scale',   name: 'Type Scale',   url: 'https://typescale.com',              icon: '📝', description: 'Typography scale tool',   category: 'Design' },
+  { id: 'haikei',       name: 'Haikei',       url: 'https://haikei.app',                 icon: '🌊', description: 'SVG background generator',category: 'Design' },
+  { id: 'mathway',      name: 'Mathway',      url: 'https://www.mathway.com',            icon: '🧮', description: 'Math problem solver',     category: 'Education' },
+  { id: 'wolframalpha', name: 'WolframAlpha', url: 'https://www.wolframalpha.com',       icon: '🔬', description: 'Computational knowledge', category: 'Education' },
 ]
+
+const ALL_CATEGORIES = ['All', 'AI', 'Productivity', 'Dev Tools', 'Design', 'Media', 'Education']
 
 const STORAGE_KEY = 'cherry-clone:mini-apps:custom'
 
