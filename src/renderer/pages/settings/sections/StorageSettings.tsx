@@ -79,11 +79,11 @@ export function StorageSettings(): React.ReactElement {
   )
 }
 
-const btnCls = 'bg-none border border-[#3f3f46] rounded-[6px] text-[#a1a1aa] cursor-pointer text-[12px] px-3 py-1 shrink-0'
+const btnCls = 'bg-none border border-[rgba(240,171,252,0.15)] rounded-[6px] text-[#a1a1aa] cursor-pointer text-[12px] px-3 py-1 shrink-0'
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 px-[14px] py-[10px] bg-[#18181b] rounded-lg border border-[#27272a]">
+    <div className="flex items-center gap-3 px-[14px] py-[10px] bg-[rgba(255,255,255,0.04)] rounded-lg border border-[rgba(240,171,252,0.10)]">
       <span className="text-[13px] text-[#71717a] w-[130px] shrink-0">{label}</span>
       {children}
     </div>

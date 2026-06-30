@@ -66,7 +66,7 @@ export function GeneralSettings(): React.ReactElement {
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const rowCls = 'mb-5 px-4 py-[14px] bg-[#18181b] rounded-[10px] border border-[#27272a]'
+  const rowCls = 'mb-5 px-4 py-[14px] bg-[rgba(255,255,255,0.04)] rounded-[10px] border border-[rgba(240,171,252,0.10)]'
   const labelCls = 'text-[13px] text-[#e4e4e7] flex items-center gap-[10px] cursor-pointer'
   const sublabelCls = 'text-[11px] text-[#71717a] mt-[2px]'
 
@@ -95,7 +95,7 @@ export function GeneralSettings(): React.ReactElement {
             <button
               key={t}
               onClick={() => update('theme', t)}
-              className={`px-[14px] py-[6px] rounded-[6px] cursor-pointer text-[12px] capitalize ${prefs.theme === t ? 'border-2 border-[#2563eb] bg-[rgba(37,99,235,0.1)] text-[#60a5fa]' : 'border border-[#3f3f46] bg-[#27272a] text-[#a1a1aa]'}`}
+              className={`px-[14px] py-[6px] rounded-[6px] cursor-pointer text-[12px] capitalize ${prefs.theme === t ? 'border-2 border-[#2563eb] bg-[rgba(37,99,235,0.1)] text-[#60a5fa]' : 'border border-[rgba(240,171,252,0.15)] bg-[#27272a] text-[#a1a1aa]'}`}
             >
               {t === 'dark' ? '🌙' : '☀️'} {t}
             </button>
@@ -110,7 +110,7 @@ export function GeneralSettings(): React.ReactElement {
             <button
               key={lang}
               onClick={() => update('language', lang)}
-              className={`px-[14px] py-[6px] rounded-[6px] cursor-pointer text-[12px] ${prefs.language === lang ? 'border-2 border-[#2563eb] bg-[rgba(37,99,235,0.1)] text-[#60a5fa]' : 'border border-[#3f3f46] bg-[#27272a] text-[#a1a1aa]'}`}
+              className={`px-[14px] py-[6px] rounded-[6px] cursor-pointer text-[12px] ${prefs.language === lang ? 'border-2 border-[#2563eb] bg-[rgba(37,99,235,0.1)] text-[#60a5fa]' : 'border border-[rgba(240,171,252,0.15)] bg-[#27272a] text-[#a1a1aa]'}`}
             >
               {lang === 'en' ? '🇬🇧 English' : '🇨🇳 中文'}
             </button>
@@ -176,7 +176,7 @@ export function GeneralSettings(): React.ReactElement {
             value={prefs.proxyUrl}
             onChange={(e) => update('proxyUrl', e.target.value)}
             placeholder="http://proxy.example.com:8080"
-            className="mt-2 w-full bg-[#27272a] border border-[#3f3f46] rounded-[6px] text-[#fafafa] text-[12px] px-[10px] py-[6px] outline-none box-border"
+            className="mt-2 w-full bg-[#27272a] border border-[rgba(240,171,252,0.15)] rounded-[6px] text-[#fafafa] text-[12px] px-[10px] py-[6px] outline-none box-border"
           />
         )}
       </div>

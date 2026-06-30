@@ -77,7 +77,7 @@ export function NotesPage(): React.ReactElement {
   const formatDate = (ts: number) => new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 
   return (
-    <div className="flex h-full bg-[#09090b] text-[#fafafa]">
+    <div className="flex h-full bg-[rgba(10,0,20,0.60)] text-[#fafafa]">
       {/* Sidebar */}
       <aside className="w-[240px] border-r border-[#27272a] flex flex-col shrink-0">
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#27272a]">
@@ -96,7 +96,7 @@ export function NotesPage(): React.ReactElement {
             value={noteSearch}
             onChange={(e) => setNoteSearch(e.target.value)}
             placeholder="Search notes…"
-            className="w-full box-border bg-[#18181b] border border-[#27272a] rounded-md text-[#fafafa] text-[12px] outline-none px-[10px] py-[5px]"
+            className="w-full box-border bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-md text-[#fafafa] text-[12px] outline-none px-[10px] py-[5px]"
           />
         </div>
 

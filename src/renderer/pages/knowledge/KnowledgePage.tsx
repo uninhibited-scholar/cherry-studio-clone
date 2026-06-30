@@ -116,7 +116,7 @@ export function KnowledgePage(): React.ReactElement {
   const formatDate = (ts: number) => new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
 
   return (
-    <div className="flex h-full bg-[#09090b] text-[#fafafa]">
+    <div className="flex h-full bg-[rgba(10,0,20,0.60)] text-[#fafafa]">
       {/* ── Base list panel ── */}
       <aside className="w-[240px] border-r border-[#27272a] flex flex-col shrink-0">
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#27272a]">
@@ -131,20 +131,20 @@ export function KnowledgePage(): React.ReactElement {
         </div>
 
         {showAddBase && (
-          <div className="px-4 py-3 border-b border-[#27272a] bg-[#18181b]">
+          <div className="px-4 py-3 border-b border-[#27272a] bg-[rgba(255,255,255,0.04)]">
             <input
               autoFocus
               value={newBaseName}
               onChange={(e) => setNewBaseName(e.target.value)}
               placeholder="Base name"
               onKeyDown={(e) => { if (e.key === 'Enter') handleCreateBase(); if (e.key === 'Escape') setShowAddBase(false) }}
-              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
+              className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
             />
             <input
               value={newBaseDesc}
               onChange={(e) => setNewBaseDesc(e.target.value)}
               placeholder="Description (optional)"
-              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border mt-[6px]"
+              className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border mt-[6px]"
             />
             <div className="flex gap-[6px] mt-2">
               <button onClick={handleCreateBase} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-3 py-[6px] whitespace-nowrap">Create</button>
@@ -187,7 +187,7 @@ export function KnowledgePage(): React.ReactElement {
               </div>
               <div className="flex gap-[6px]">
                 <button onClick={() => setShowAddDoc(true)} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-3 py-[6px] whitespace-nowrap">+ Add Document</button>
-                <button onClick={handleImportFile} className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#a1a1aa] cursor-pointer text-[12px] font-semibold px-3 py-[6px] whitespace-nowrap">↑ Import Files</button>
+                <button onClick={handleImportFile} className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#a1a1aa] cursor-pointer text-[12px] font-semibold px-3 py-[6px] whitespace-nowrap">↑ Import Files</button>
               </div>
             </div>
 
@@ -197,7 +197,7 @@ export function KnowledgePage(): React.ReactElement {
                 onChange={(e) => { setSearchQuery(e.target.value); if (!e.target.value) setSearchResults(null) }}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSearch() }}
                 placeholder="Search documents…"
-                className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] flex-1 box-border"
+                className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] flex-1 box-border"
               />
               <button onClick={handleSearch} className="bg-[#27272a] border-none rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-3 py-[6px] whitespace-nowrap">Search</button>
               {searchResults !== null && (
@@ -212,19 +212,19 @@ export function KnowledgePage(): React.ReactElement {
           </div>
 
           {showAddDoc && (
-            <div className="px-6 py-4 border-b border-[#27272a] bg-[#18181b] shrink-0">
+            <div className="px-6 py-4 border-b border-[#27272a] bg-[rgba(255,255,255,0.04)] shrink-0">
               <div className="flex gap-2 mb-2">
                 <input
                   autoFocus
                   value={addDocName}
                   onChange={(e) => setAddDocName(e.target.value)}
                   placeholder="Document name"
-                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] flex-1 box-border"
+                  className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] flex-1 box-border"
                 />
                 <select
                   value={addDocType}
                   onChange={(e) => setAddDocType(e.target.value as 'text' | 'markdown')}
-                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-[120px]"
+                  className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-[120px]"
                 >
                   <option value="text">Plain text</option>
                   <option value="markdown">Markdown</option>
@@ -235,7 +235,7 @@ export function KnowledgePage(): React.ReactElement {
                 onChange={(e) => setAddDocContent(e.target.value)}
                 placeholder="Paste document content here…"
                 rows={6}
-                className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] resize-y font-mono w-full box-border"
+                className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] resize-y font-mono w-full box-border"
               />
               <div className="flex gap-[6px] mt-2">
                 <button onClick={handleAddDoc} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-3 py-[6px] whitespace-nowrap">Add</button>
@@ -331,7 +331,7 @@ function DocCard({
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`mx-4 my-[6px] px-4 py-3 rounded-lg border border-[#27272a] cursor-pointer ${hovered ? 'bg-[#18181b]' : 'bg-[#111113]'}`}
+      className={`mx-4 my-[6px] px-4 py-3 rounded-lg border border-[rgba(240,171,252,0.10)] cursor-pointer ${hovered ? 'bg-[rgba(255,255,255,0.04)]' : 'bg-[#111113]'}`}
       onClick={() => setExpanded((p) => !p)}
     >
       <div className="flex items-center gap-2">
@@ -353,7 +353,7 @@ function DocCard({
         </button>
       </div>
       {expanded && (
-        <pre className="mt-[10px] p-[10px] bg-[#09090b] rounded-md text-[12px] text-[#a1a1aa] whitespace-pre-wrap break-words max-h-[300px] overflow-y-auto font-mono">
+        <pre className="mt-[10px] p-[10px] bg-[rgba(10,0,20,0.60)] rounded-md text-[12px] text-[#a1a1aa] whitespace-pre-wrap break-words max-h-[300px] overflow-y-auto font-mono">
           {preview}{doc.content.length > 200 ? `\n\n…(${(doc.content.length - 200).toLocaleString()} more chars)` : ''}
         </pre>
       )}

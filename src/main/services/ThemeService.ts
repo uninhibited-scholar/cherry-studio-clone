@@ -14,7 +14,7 @@ interface ThemeConfig {
 
 class ThemeService {
   private configPath: string
-  private theme: ThemeSetting = 'system'
+  private theme: ThemeSetting = 'dark'
 
   constructor() {
     this.configPath = join(app.getPath('userData'), 'theme.json')

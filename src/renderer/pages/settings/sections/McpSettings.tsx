@@ -72,7 +72,7 @@ export function McpSettings(): React.ReactElement {
 
       {/* Editor */}
       {editing && (
-        <div className="bg-[#18181b] border border-[#3f3f46] rounded-[10px] p-5 mb-5">
+        <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-[10px] p-5 mb-5">
           <h3 className="mt-0 mb-4 text-[14px]">{isNew ? 'New MCP Server' : 'Edit Server'}</h3>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -194,7 +194,7 @@ function ServerCard({
       {expanded && tools && tools.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {tools.map((tool) => (
-            <div key={tool.name} className="bg-[#18181b] border border-[#27272a] rounded-[6px] px-[10px] py-[6px]">
+            <div key={tool.name} className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[6px] px-[10px] py-[6px]">
               <p className="m-0 text-[12px] font-semibold text-[#fafafa]">{tool.name}</p>
               {tool.description && <p className="mt-[2px] mb-0 text-[11px] text-[#71717a]">{tool.description}</p>}
             </div>
@@ -207,8 +207,8 @@ function ServerCard({
 
 const labelCls = 'block text-[11px] text-[#71717a] mb-1'
 
-const inputCls = 'bg-[#09090b] border border-[#3f3f46] rounded-[6px] text-[#fafafa] text-[13px] outline-none px-[10px] py-[7px] w-full box-border'
+const inputCls = 'bg-[rgba(10,0,20,0.60)] border border-[rgba(240,171,252,0.15)] rounded-[6px] text-[#fafafa] text-[13px] outline-none px-[10px] py-[7px] w-full box-border'
 
 const btnPrimaryCls = 'bg-[#2563eb] border-none rounded-[6px] text-white cursor-pointer text-[12px] font-semibold px-[14px] py-[6px]'
 
-const btnSecondaryCls = 'bg-transparent border border-[#3f3f46] rounded-[6px] text-[#a1a1aa] cursor-pointer text-[12px] px-3 py-[5px]'
+const btnSecondaryCls = 'bg-transparent border border-[rgba(240,171,252,0.15)] rounded-[6px] text-[#a1a1aa] cursor-pointer text-[12px] px-3 py-[5px]'

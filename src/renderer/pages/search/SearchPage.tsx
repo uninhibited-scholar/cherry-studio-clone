@@ -62,9 +62,9 @@ export function SearchPage(): React.ReactElement {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#09090b] overflow-hidden">
+    <div className="flex flex-col h-full bg-[rgba(10,0,20,0.60)] overflow-hidden">
       {/* Search bar */}
-      <div className="px-6 py-5 border-b border-b-[#27272a] shrink-0">
+      <div className="px-6 py-5 border-b border-b-[rgba(240,171,252,0.08)] shrink-0">
         <h1 className="text-[#fafafa] text-[18px] font-semibold mb-4">Global Message Search</h1>
         <div className="flex gap-3">
           <input
@@ -73,7 +73,7 @@ export function SearchPage(): React.ReactElement {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') doSearch(query) }}
             placeholder="Search across all messages…"
-            className="flex-1 bg-[#18181b] border border-[#3f3f46] rounded-lg text-[#fafafa] px-4 py-2.5 text-sm outline-none focus:border-[#2563eb]"
+            className="flex-1 bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-lg text-[#fafafa] px-4 py-2.5 text-sm outline-none focus:border-[#2563eb]"
           />
           <button
             onClick={() => doSearch(query)}
@@ -108,7 +108,7 @@ export function SearchPage(): React.ReactElement {
                 <button
                   key={msg.messageId}
                   onClick={() => navigate(`/chat?topicId=${topicId}&messageId=${msg.messageId}`)}
-                  className="text-left bg-[#18181b] border border-[#27272a] rounded-lg px-4 py-3 cursor-pointer hover:border-[#3f3f46] transition-colors"
+                  className="text-left bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-lg px-4 py-3 cursor-pointer hover:border-[#3f3f46] transition-colors"
                 >
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${msg.role === 'user' ? 'bg-[#1d3461] text-[#60a5fa]' : 'bg-[#1a1a2e] text-[#a78bfa]'}`}>

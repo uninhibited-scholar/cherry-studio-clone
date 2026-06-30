@@ -130,13 +130,13 @@ export function ProvidersSettings() {
       <div className="mb-5 p-3 bg-[rgba(96,165,250,0.05)] border border-[#2563eb] rounded-lg">
         <p className="text-[#60a5fa] text-[12px] font-semibold mb-2">💡 Running Local Models?</p>
         <p className="text-[#a1a1aa] text-[12px] mb-2 leading-relaxed">
-          Use <strong>Ollama</strong> to run models locally. <a href="https://ollama.com" target="_blank" rel="noopener noreferrer" className="text-[#60a5fa] underline">Install Ollama</a>, run <code className="bg-[#09090b] px-[6px] py-[2px] rounded text-[11px]">ollama pull llama2</code>, then add as provider with API host <code className="bg-[#09090b] px-[6px] py-[2px] rounded text-[11px]">http://localhost:11434</code>
+          Use <strong>Ollama</strong> to run models locally. <a href="https://ollama.com" target="_blank" rel="noopener noreferrer" className="text-[#60a5fa] underline">Install Ollama</a>, run <code className="bg-[rgba(10,0,20,0.60)] px-[6px] py-[2px] rounded text-[11px]">ollama pull llama2</code>, then add as provider with API host <code className="bg-[rgba(10,0,20,0.60)] px-[6px] py-[2px] rounded text-[11px]">http://localhost:11434</code>
         </p>
       </div>
 
       {/* Model Presets Section */}
       {presets.length > 0 && (
-        <div className="mb-6 p-3 bg-[#111113] rounded-lg border border-[#27272a]">
+        <div className="mb-6 p-3 bg-[#111113] rounded-lg border border-[rgba(240,171,252,0.10)]">
           <p className="text-[#a1a1aa] text-[12px] mb-[10px] font-semibold">⚡ Quick Model Presets</p>
           <div className="flex gap-2 flex-wrap">
             {presets.map((preset) => {
@@ -159,7 +159,7 @@ export function ProvidersSettings() {
       )}
 
       {/* Save New Preset */}
-      <div className="mb-5 p-3 bg-[#111113] rounded-lg border border-[#27272a]">
+      <div className="mb-5 p-3 bg-[#111113] rounded-lg border border-[rgba(240,171,252,0.10)]">
         <p className="text-[#a1a1aa] text-[12px] mb-[10px] font-semibold">💾 Save Current Selection as Preset</p>
         <div className="flex gap-2 mb-[10px]">
           <select
@@ -215,7 +215,7 @@ export function ProvidersSettings() {
               <button
                 key={b.name}
                 onClick={() => addBuiltinProvider(b)}
-                className="px-[14px] py-[6px] rounded-lg border border-[#3f3f46] bg-transparent text-[#a1a1aa] cursor-pointer text-[12px]"
+                className="px-[14px] py-[6px] rounded-lg border border-[rgba(240,171,252,0.15)] bg-transparent text-[#a1a1aa] cursor-pointer text-[12px]"
               >
                 + {b.name}
               </button>
@@ -227,7 +227,7 @@ export function ProvidersSettings() {
       {/* Provider list */}
       <div className="flex flex-col gap-[10px]">
         {providers.map((p) => (
-          <div key={p.id} className="border border-[#27272a] rounded-[10px] overflow-hidden">
+          <div key={p.id} className="border border-[rgba(240,171,252,0.10)] rounded-[10px] overflow-hidden">
             {/* Header */}
             <div
               className="flex items-center px-4 py-3 cursor-pointer gap-[10px]"
@@ -243,7 +243,7 @@ export function ProvidersSettings() {
               <button
                 onClick={(e) => { e.stopPropagation(); testProvider(p) }}
                 disabled={testStatus[p.id] === 'testing'}
-                className="bg-none border border-[#3f3f46] rounded text-[#71717a] cursor-pointer text-[11px] px-2 py-[2px]"
+                className="bg-none border border-[rgba(240,171,252,0.15)] rounded text-[#71717a] cursor-pointer text-[11px] px-2 py-[2px]"
               >
                 {testStatus[p.id] === 'testing' ? '…' : 'Test'}
               </button>
@@ -328,6 +328,6 @@ export function ProvidersSettings() {
   )
 }
 
-const inputCls = 'bg-[#27272a] border border-[#3f3f46] rounded-lg px-3 py-2 text-[#fafafa] text-[13px] outline-none'
+const inputCls = 'bg-[#27272a] border border-[rgba(240,171,252,0.15)] rounded-lg px-3 py-2 text-[#fafafa] text-[13px] outline-none'
 
 const btnCls = 'px-[14px] py-2 rounded-lg border-none bg-[#2563eb] text-[#fafafa] text-[13px] cursor-pointer whitespace-nowrap'

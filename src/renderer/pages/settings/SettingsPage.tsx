@@ -23,8 +23,8 @@ export function SettingsPage(): React.ReactElement {
   const [active, setActive] = useState('general')
 
   return (
-    <div className="flex h-full bg-[#09090b] text-[#fafafa]">
-      <aside className="w-[200px] border-r border-[#27272a] px-2 py-4 shrink-0">
+    <div className="flex h-full text-[#fafafa]" style={{ background: 'transparent' }}>
+      <aside className="w-[200px] px-2 py-4 shrink-0" style={{ borderRight: '1px solid rgba(240,171,252,0.09)', background: 'rgba(255,255,255,0.025)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
         <p className="text-[11px] text-[#71717a] font-semibold tracking-widest px-2 mb-2">
           SETTINGS
         </p>
@@ -91,42 +91,42 @@ function PerformanceSettings() {
 
       <div className="grid grid-cols-3 gap-4 mb-6">
         {/* Total API Calls */}
-        <div className="bg-[#18181b] border border-[#27272a] rounded-[10px] p-4">
+        <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[10px] p-4">
           <p className="text-[#a1a1aa] text-[12px] mb-2">Total API Calls</p>
           <div className="text-[28px] font-semibold text-[#60a5fa]">{stats.totalCalls}</div>
           <p className="text-[11px] text-[#52525b] mt-2">API requests sent</p>
         </div>
 
         {/* Total Tokens */}
-        <div className="bg-[#18181b] border border-[#27272a] rounded-[10px] p-4">
+        <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[10px] p-4">
           <p className="text-[#a1a1aa] text-[12px] mb-2">Total Tokens Used</p>
           <div className="text-[28px] font-semibold text-[#4ade80]">{(stats.totalTokens / 1000).toFixed(1)}K</div>
           <p className="text-[11px] text-[#52525b] mt-2">Input + Output tokens</p>
         </div>
 
         {/* Avg Response Time */}
-        <div className="bg-[#18181b] border border-[#27272a] rounded-[10px] p-4">
+        <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[10px] p-4">
           <p className="text-[#a1a1aa] text-[12px] mb-2">Avg Response Time</p>
           <div className="text-[28px] font-semibold text-[#fbbf24]">{stats.avgTime.toFixed(0)}ms</div>
           <p className="text-[11px] text-[#52525b] mt-2">Average latency</p>
         </div>
 
         {/* Total Time */}
-        <div className="bg-[#18181b] border border-[#27272a] rounded-[10px] p-4">
+        <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[10px] p-4">
           <p className="text-[#a1a1aa] text-[12px] mb-2">Total API Time</p>
           <div className="text-[28px] font-semibold text-[#a78bfa]">{(stats.totalTime / 1000).toFixed(1)}s</div>
           <p className="text-[11px] text-[#52525b] mt-2">Cumulative wait time</p>
         </div>
 
         {/* Estimated Cost */}
-        <div className="bg-[#18181b] border border-[#27272a] rounded-[10px] p-4">
+        <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[10px] p-4">
           <p className="text-[#a1a1aa] text-[12px] mb-2">Est. Cost</p>
           <div className="text-[28px] font-semibold text-[#f87171]">${stats.estimatedCost.toFixed(3)}</div>
           <p className="text-[11px] text-[#52525b] mt-2">Rough API cost estimate</p>
         </div>
 
         {/* Efficiency */}
-        <div className="bg-[#18181b] border border-[#27272a] rounded-[10px] p-4">
+        <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[10px] p-4">
           <p className="text-[#a1a1aa] text-[12px] mb-2">Efficiency</p>
           <div className="text-[28px] font-semibold text-[#06b6d4]">
             {stats.totalCalls > 0 ? (stats.totalTokens / stats.totalCalls).toFixed(0) : 0}
@@ -135,7 +135,7 @@ function PerformanceSettings() {
         </div>
       </div>
 
-      <div className="bg-[#18181b] border border-[#27272a] rounded-[10px] p-4 mb-5">
+      <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[10px] p-4 mb-5">
         <h3 className="text-[#fafafa] text-[14px] mb-3">💡 Notes</h3>
         <ul className="text-[#a1a1aa] text-[12px] m-0 pl-5 leading-[1.8]">
           <li>Statistics are calculated locally on your device.</li>
@@ -184,7 +184,7 @@ function KeyboardSettings() {
       </p>
       <div className="flex flex-col gap-3">
         {Object.entries(shortcuts).map(([action, keys]) => (
-          <div key={action} className="flex items-center gap-3 px-3 py-[10px] bg-[#111113] rounded-lg border border-[#27272a]">
+          <div key={action} className="flex items-center gap-3 px-3 py-[10px] bg-[#111113] rounded-lg border border-[rgba(240,171,252,0.10)]">
             <span className="text-[#a1a1aa] text-[13px] min-w-[150px] capitalize">
               {action.replace(/-/g, ' ')}
             </span>
@@ -192,7 +192,7 @@ function KeyboardSettings() {
               value={keys as string}
               onChange={(e) => updateShortcut(action, e.target.value)}
               placeholder="e.g. Cmd+K"
-              className="flex-1 bg-[#27272a] border border-[#3f3f46] rounded-[6px] text-[#fafafa] text-[12px] px-[10px] py-[6px] outline-none"
+              className="flex-1 bg-[#27272a] border border-[rgba(240,171,252,0.15)] rounded-[6px] text-[#fafafa] text-[12px] px-[10px] py-[6px] outline-none"
             />
             <span className="text-[11px] text-[#52525b]">Custom</span>
           </div>
@@ -240,7 +240,7 @@ function AboutSection() {
         <button
           onClick={checkUpdate}
           disabled={checking}
-          className="px-[14px] py-[6px] rounded-[6px] border border-[#3f3f46] bg-[#27272a] text-[#a1a1aa] cursor-pointer text-[12px]"
+          className="px-[14px] py-[6px] rounded-[6px] border border-[rgba(240,171,252,0.15)] bg-[#27272a] text-[#a1a1aa] cursor-pointer text-[12px]"
         >
           {checking ? 'Checking…' : 'Check for Updates'}
         </button>
@@ -258,7 +258,7 @@ function AboutSection() {
       <div className="flex flex-col gap-[6px]">
         {SHORTCUTS.map(({ keys, label }) => (
           <div key={keys} className="flex items-center gap-4">
-            <kbd className="bg-[#27272a] border border-[#3f3f46] rounded-[5px] text-[#fafafa] text-[12px] min-w-[120px] px-[10px] py-[3px] text-center font-mono">
+            <kbd className="bg-[#27272a] border border-[rgba(240,171,252,0.15)] rounded-[5px] text-[#fafafa] text-[12px] min-w-[120px] px-[10px] py-[3px] text-center font-mono">
               {keys}
             </kbd>
             <span className="text-[#71717a] text-[13px]">{label}</span>

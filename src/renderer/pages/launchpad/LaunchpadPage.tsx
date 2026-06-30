@@ -18,7 +18,7 @@ export function LaunchpadPage(): React.ReactElement {
   const navigate = useNavigate()
 
   return (
-    <div className="h-full bg-[#09090b] flex flex-col items-center justify-center p-10 overflow-auto">
+    <div className="h-full bg-[rgba(10,0,20,0.60)] flex flex-col items-center justify-center p-10 overflow-auto">
       <h1 className="text-[#fafafa] text-[28px] font-bold mb-2">🍒 Cherry Studio</h1>
       <p className="text-[#71717a] text-[14px] mb-12">Quick launch</p>
 

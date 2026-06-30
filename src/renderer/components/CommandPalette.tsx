@@ -51,7 +51,7 @@ export function CommandPalette({ commands, isOpen, onClose }: Props) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#18181b] rounded-xl border border-[#27272a] w-[90%] max-w-[500px] shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
+        className="bg-[rgba(255,255,255,0.04)] rounded-xl border border-[rgba(240,171,252,0.10)] w-[90%] max-w-[500px] shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
       >
         <div className="px-4 py-3 border-b border-[#27272a]">
           <input

@@ -81,14 +81,14 @@ export function PaintingsPage(): React.ReactElement {
   const formatDate = (ts: number) => new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 
   return (
-    <div className="flex h-full bg-[#09090b] text-[#fafafa] overflow-hidden">
+    <div className="flex h-full bg-[rgba(10,0,20,0.60)] text-[#fafafa] overflow-hidden">
       {/* ── Left: generation panel ── */}
       <aside className="w-[280px] border-r border-[#27272a] flex flex-col shrink-0 overflow-y-auto">
         <div className="p-4 border-b border-[#27272a]">
           <h2 className="m-0 mb-3 text-[14px] font-bold">🎨 Paintings</h2>
           <div className="flex gap-[6px] mb-3">
-            <button onClick={() => setShowSketchPad(false)} className={`flex-1 py-[6px] text-[11px] border border-[#3f3f46] rounded cursor-pointer ${!showSketchPad ? 'bg-[#2563eb] text-white' : 'bg-transparent text-[#a1a1aa]'}`}>Generate</button>
-            <button onClick={() => setShowSketchPad(true)} className={`flex-1 py-[6px] text-[11px] border border-[#3f3f46] rounded cursor-pointer ${showSketchPad ? 'bg-[#2563eb] text-white' : 'bg-transparent text-[#a1a1aa]'}`}>Sketch</button>
+            <button onClick={() => setShowSketchPad(false)} className={`flex-1 py-[6px] text-[11px] border border-[rgba(240,171,252,0.15)] rounded cursor-pointer ${!showSketchPad ? 'bg-[#2563eb] text-white' : 'bg-transparent text-[#a1a1aa]'}`}>Generate</button>
+            <button onClick={() => setShowSketchPad(true)} className={`flex-1 py-[6px] text-[11px] border border-[rgba(240,171,252,0.15)] rounded cursor-pointer ${showSketchPad ? 'bg-[#2563eb] text-white' : 'bg-transparent text-[#a1a1aa]'}`}>Sketch</button>
           </div>
 
           {/* Provider */}
@@ -96,7 +96,7 @@ export function PaintingsPage(): React.ReactElement {
           <select
             value={selectedProviderId}
             onChange={(e) => setSelectedProviderId(e.target.value)}
-            className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border cursor-pointer"
+            className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border cursor-pointer"
           >
             {providers.length === 0 && <option value="">No providers configured</option>}
             {providers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -104,7 +104,7 @@ export function PaintingsPage(): React.ReactElement {
 
           {/* Model */}
           <label className="block text-[11px] text-[#71717a] mb-1 mt-[10px]">Model</label>
-          <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border cursor-pointer">
+          <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border cursor-pointer">
             {models.length === 0 && <option value="">—</option>}
             {models.map((m) => <option key={m.id} value={m.name}>{m.name}</option>)}
             {/* allow typing custom model */}
@@ -113,12 +113,12 @@ export function PaintingsPage(): React.ReactElement {
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
             placeholder="or type model name…"
-            className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border mt-1"
+            className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border mt-1"
           />
 
           {/* Size */}
           <label className="block text-[11px] text-[#71717a] mb-1 mt-[10px]">Size</label>
-          <select value={size} onChange={(e) => setSize(e.target.value as Size)} className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border cursor-pointer">
+          <select value={size} onChange={(e) => setSize(e.target.value as Size)} className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border cursor-pointer">
             {SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
 
@@ -129,7 +129,7 @@ export function PaintingsPage(): React.ReactElement {
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Describe the image you want to generate…"
             rows={5}
-            className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border resize-y"
+            className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border resize-y"
           />
 
           {/* Negative prompt */}
@@ -139,7 +139,7 @@ export function PaintingsPage(): React.ReactElement {
             onChange={(e) => setNegativePrompt(e.target.value)}
             placeholder="What to avoid (optional)…"
             rows={2}
-            className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border resize-y"
+            className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[12px] outline-none px-2 py-[6px] w-full box-border resize-y"
           />
 
           {!showSketchPad && (
@@ -309,12 +309,12 @@ function SketchPadUI({
         onMouseMove={draw}
         onMouseUp={stopDrawing}
         onMouseLeave={stopDrawing}
-        className="w-full border border-[#3f3f46] rounded-lg bg-[#18181b] cursor-crosshair mb-3 block"
+        className="w-full border border-[rgba(240,171,252,0.15)] rounded-lg bg-[rgba(255,255,255,0.04)] cursor-crosshair mb-3 block"
         style={{ height: 240 }}
       />
 
       <div className="flex gap-[6px] mb-3">
-        <button onClick={clearCanvas} className="flex-1 py-[6px] text-[11px] border border-[#3f3f46] rounded bg-transparent text-[#a1a1aa] cursor-pointer">🗑 Clear</button>
+        <button onClick={clearCanvas} className="flex-1 py-[6px] text-[11px] border border-[rgba(240,171,252,0.15)] rounded bg-transparent text-[#a1a1aa] cursor-pointer">🗑 Clear</button>
         <button onClick={saveSketch} className="flex-1 py-[6px] text-[11px] border-none rounded bg-[#2563eb] text-white cursor-pointer">💾 Save</button>
       </div>
 
@@ -324,7 +324,7 @@ function SketchPadUI({
           <div className="flex flex-col gap-1 max-h-[200px] overflow-y-auto">
             {sketches.map((sketch) => (
               <div key={sketch.id} className="flex gap-[6px] items-center">
-                <img src={sketch.dataUrl} alt="sketch" className="w-10 h-10 rounded border border-[#27272a]" />
+                <img src={sketch.dataUrl} alt="sketch" className="w-10 h-10 rounded border border-[rgba(240,171,252,0.10)]" />
                 <div className="flex-1 text-[10px] text-[#71717a]">{new Date(sketch.savedAt).toLocaleTimeString()}</div>
                 <button onClick={() => onDeleteSketch(sketch.id)} className="bg-transparent border-none text-[#f87171] cursor-pointer text-[12px]">✕</button>
               </div>
@@ -356,7 +356,7 @@ function PaintingCard({
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="mb-3 rounded-lg overflow-hidden relative border border-[#27272a]"
+      className="mb-3 rounded-lg overflow-hidden relative border border-[rgba(240,171,252,0.10)]"
       style={{ breakInside: 'avoid' }}
     >
       <img

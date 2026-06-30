@@ -73,24 +73,24 @@ export function TranslatePage(): React.ReactElement {
   }
 
   return (
-    <div className="flex h-full bg-[#09090b] text-[#fafafa]">
+    <div className="flex h-full bg-[rgba(10,0,20,0.60)] text-[#fafafa]">
       {/* Main panel */}
       <div className="flex-1 flex flex-col p-6 gap-3">
         {/* Controls */}
         <div className="flex items-center gap-[10px] flex-wrap">
-          <select value={sourceLang} onChange={(e) => setSourceLang(e.target.value as LangCode)} className="bg-[#18181b] border border-[#3f3f46] rounded-lg px-[10px] py-[6px] text-[#fafafa] text-[13px] outline-none">
+          <select value={sourceLang} onChange={(e) => setSourceLang(e.target.value as LangCode)} className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-lg px-[10px] py-[6px] text-[#fafafa] text-[13px] outline-none">
             {LANG_OPTIONS.map(([c, l]) => <option key={c} value={c}>{l}</option>)}
           </select>
-          <button onClick={swap} disabled={sourceLang === 'auto'} title="Swap" className={`px-3 py-1 rounded-lg border border-[#3f3f46] bg-transparent text-[#fafafa] text-[18px] cursor-pointer ${sourceLang === 'auto' ? 'opacity-40' : ''}`}>⇄</button>
-          <select value={targetLang} onChange={(e) => setTargetLang(e.target.value as LangCode)} className="bg-[#18181b] border border-[#3f3f46] rounded-lg px-[10px] py-[6px] text-[#fafafa] text-[13px] outline-none">
+          <button onClick={swap} disabled={sourceLang === 'auto'} title="Swap" className={`px-3 py-1 rounded-lg border border-[rgba(240,171,252,0.15)] bg-transparent text-[#fafafa] text-[18px] cursor-pointer ${sourceLang === 'auto' ? 'opacity-40' : ''}`}>⇄</button>
+          <select value={targetLang} onChange={(e) => setTargetLang(e.target.value as LangCode)} className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-lg px-[10px] py-[6px] text-[#fafafa] text-[13px] outline-none">
             {LANG_OPTIONS.filter(([c]) => c !== 'auto').map(([c, l]) => <option key={c} value={c}>{l}</option>)}
           </select>
           <div className="flex-1" />
-          <select value={selectedProvider} onChange={(e) => setSelectedProvider(e.target.value)} className="bg-[#18181b] border border-[#3f3f46] rounded-lg px-[10px] py-[6px] text-[#fafafa] text-[13px] outline-none max-w-[150px]">
+          <select value={selectedProvider} onChange={(e) => setSelectedProvider(e.target.value)} className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-lg px-[10px] py-[6px] text-[#fafafa] text-[13px] outline-none max-w-[150px]">
             {providers.length === 0 && <option value="">No providers</option>}
             {providers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
-          <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="bg-[#18181b] border border-[#3f3f46] rounded-lg px-[10px] py-[6px] text-[#fafafa] text-[13px] outline-none max-w-[200px]">
+          <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-lg px-[10px] py-[6px] text-[#fafafa] text-[13px] outline-none max-w-[200px]">
             {models.length === 0 && <option value="">No models</option>}
             {models.map((m) => <option key={m.id} value={m.id}>{m.displayName ?? m.name}</option>)}
           </select>
@@ -104,21 +104,21 @@ export function TranslatePage(): React.ReactElement {
               onChange={(e) => setSourceText(e.target.value)}
               placeholder="Enter text to translate…"
               onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) translate() }}
-              className="flex-1 bg-[#18181b] border border-[#27272a] rounded-[10px] p-4 text-[#fafafa] text-[14px] outline-none font-[inherit] leading-[1.7] resize-none"
+              className="flex-1 bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[10px] p-4 text-[#fafafa] text-[14px] outline-none font-[inherit] leading-[1.7] resize-none"
             />
             <div className="flex gap-2">
               <button onClick={translate} disabled={!sourceText.trim() || translating || !selectedProvider} className={`px-[18px] py-2 rounded-lg border-none bg-[#2563eb] text-[#fafafa] text-[13px] cursor-pointer ${!sourceText.trim() || translating ? 'opacity-50' : ''}`}>
                 {translating ? 'Translating…' : 'Translate (⌘↵)'}
               </button>
-              <button onClick={() => { setSourceText(''); setTargetText('') }} className="px-[18px] py-2 rounded-lg bg-transparent border border-[#3f3f46] text-[#fafafa] text-[13px] cursor-pointer">Clear</button>
+              <button onClick={() => { setSourceText(''); setTargetText('') }} className="px-[18px] py-2 rounded-lg bg-transparent border border-[rgba(240,171,252,0.15)] text-[#fafafa] text-[13px] cursor-pointer">Clear</button>
             </div>
           </div>
 
           <div className="flex-1 flex flex-col gap-2">
-            <div className={`flex-1 bg-[#18181b] border border-[#27272a] rounded-[10px] p-4 text-[14px] outline-none font-[inherit] leading-[1.7] overflow-y-auto whitespace-pre-wrap break-words ${targetText ? 'text-[#fafafa]' : 'text-[#52525b]'}`}>
+            <div className={`flex-1 bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[10px] p-4 text-[14px] outline-none font-[inherit] leading-[1.7] overflow-y-auto whitespace-pre-wrap break-words ${targetText ? 'text-[#fafafa]' : 'text-[#52525b]'}`}>
               {targetText || (translating ? <span className="text-[#71717a]">Translating…</span> : 'Translation will appear here')}
             </div>
-            <button onClick={() => navigator.clipboard.writeText(targetText)} disabled={!targetText} className={`px-[18px] py-2 rounded-lg bg-transparent border border-[#3f3f46] text-[#fafafa] text-[13px] cursor-pointer self-start ${targetText ? '' : 'opacity-40'}`}>
+            <button onClick={() => navigator.clipboard.writeText(targetText)} disabled={!targetText} className={`px-[18px] py-2 rounded-lg bg-transparent border border-[rgba(240,171,252,0.15)] text-[#fafafa] text-[13px] cursor-pointer self-start ${targetText ? '' : 'opacity-40'}`}>
               Copy
             </button>
           </div>

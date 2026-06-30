@@ -44,7 +44,7 @@ export function BackupSettings(): React.ReactElement {
       </p>
 
       <div className="flex flex-col gap-4">
-        <div className="bg-[#18181b] border border-[#27272a] rounded-[10px] px-6 py-5">
+        <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[10px] px-6 py-5">
           <p className="text-[#fafafa] font-medium mb-[6px]">Export Backup</p>
           <p className="text-[#71717a] text-[12px] mb-4">
             All your data will be saved to a single JSON file you can keep as a snapshot or transfer to another machine.
@@ -58,7 +58,7 @@ export function BackupSettings(): React.ReactElement {
           </button>
         </div>
 
-        <div className="bg-[#18181b] border border-[#27272a] rounded-[10px] px-6 py-5">
+        <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[10px] px-6 py-5">
           <p className="text-[#fafafa] font-medium mb-[6px]">Restore from Backup</p>
           <p className="text-[#71717a] text-[12px] mb-[6px]">
             Imports providers, assistants, and notes from a previously exported JSON file. Existing data is not erased.
@@ -69,7 +69,7 @@ export function BackupSettings(): React.ReactElement {
           <button
             onClick={handleImport}
             disabled={importing}
-            className={`px-5 py-[9px] rounded-[6px] border border-[#3f3f46] bg-[#18181b] text-[#fafafa] cursor-pointer text-[13px] font-medium ${importing ? 'opacity-60' : ''}`}
+            className={`px-5 py-[9px] rounded-[6px] border border-[rgba(240,171,252,0.15)] bg-[rgba(255,255,255,0.04)] text-[#fafafa] cursor-pointer text-[13px] font-medium ${importing ? 'opacity-60' : ''}`}
           >
             {importing ? 'Importing…' : '↑ Import Backup…'}
           </button>

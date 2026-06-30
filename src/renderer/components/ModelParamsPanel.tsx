@@ -65,12 +65,12 @@ export function ModelParamsPanel({ assistant, onUpdate }: Props): React.ReactEle
   }
 
   return (
-    <div className="bg-[#18181b] border-b border-b-[#27272a] px-4 py-3">
+    <div className="bg-[rgba(255,255,255,0.04)] border-b border-b-[rgba(240,171,252,0.08)] px-4 py-3">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xs font-semibold text-[#fafafa]">Model Parameters</span>
         <button
           onClick={() => update({ temperature: 1, topP: undefined, frequencyPenalty: undefined, presencePenalty: undefined, maxTokens: undefined })}
-          className="ml-auto text-xs bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer px-2 py-0.5 rounded"
+          className="ml-auto text-xs bg-transparent border border-[rgba(240,171,252,0.15)] text-[#71717a] cursor-pointer px-2 py-0.5 rounded"
         >
           Reset all
         </button>
@@ -124,7 +124,7 @@ export function ModelParamsPanel({ assistant, onUpdate }: Props): React.ReactEle
               const n = parseInt(e.target.value)
               update({ maxTokens: isNaN(n) || n <= 0 ? undefined : n })
             }}
-            className="w-24 bg-[#27272a] border border-[#3f3f46] rounded text-[#fafafa] text-xs px-2 py-1 outline-none"
+            className="w-24 bg-[#27272a] border border-[rgba(240,171,252,0.15)] rounded text-[#fafafa] text-xs px-2 py-1 outline-none"
           />
         </div>
       </div>

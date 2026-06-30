@@ -61,7 +61,7 @@ export function CreateAssistantModal({ open, onClose, onCreated }: Props) {
       <form
         onSubmit={handleSubmit}
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#18181b] border border-[#3f3f46] rounded-xl p-6 w-[440px] flex flex-col gap-[14px]"
+        className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-xl p-6 w-[440px] flex flex-col gap-[14px]"
       >
         <h2 className="text-[#fafafa] m-0 text-[16px]">New Assistant</h2>
 
@@ -147,4 +147,4 @@ export function CreateAssistantModal({ open, onClose, onCreated }: Props) {
   )
 }
 
-const inputCls = 'bg-[#27272a] border border-[#3f3f46] rounded-lg px-3 py-2 text-[#fafafa] text-[13px] outline-none w-full box-border'
+const inputCls = 'bg-[#27272a] border border-[rgba(240,171,252,0.15)] rounded-lg px-3 py-2 text-[#fafafa] text-[13px] outline-none w-full box-border'

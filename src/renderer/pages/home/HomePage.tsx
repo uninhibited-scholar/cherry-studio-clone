@@ -333,7 +333,7 @@ export function HomePage(): React.ReactElement {
   return (
     <>
       <CommandPalette commands={commands} isOpen={cmdPaletteOpen} onClose={() => setCmdPaletteOpen(false)} />
-      <div className="flex h-full bg-[#09090b]">
+      <div className="flex h-full" style={{ background: 'transparent' }}>
       <div style={{ width: sidebarWidth }} className="shrink-0 flex">
         <AssistantSidebar
           assistants={assistants}
@@ -359,7 +359,7 @@ export function HomePage(): React.ReactElement {
       {/* Chat panel */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <div className="h-12 border-b border-b-[#27272a] flex items-center px-4 gap-2.5 shrink-0">
+        <div className="h-12 flex items-center px-4 gap-2.5 shrink-0" style={{ borderBottom: '1px solid rgba(240,171,252,0.08)', background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
           {selectedAssistant ? (
             <>
               <span className="text-lg">{selectedAssistant.emoji ?? '🤖'}</span>
@@ -377,12 +377,12 @@ export function HomePage(): React.ReactElement {
                 <div className="relative">
                   <button
                     onClick={() => setShowModelMenu((v) => !v)}
-                    className={`ml-1 text-xs border border-[#27272a] rounded px-1.5 py-px cursor-pointer ${showModelMenu ? 'bg-[#2563eb] text-white' : 'bg-[#18181b] text-[#3f3f46]'}`}
+                    className={`ml-1 text-xs border rounded px-1.5 py-px cursor-pointer ${showModelMenu ? 'border-[rgba(147,51,234,0.5)] bg-[rgba(147,51,234,0.25)] text-white' : 'border-[rgba(240,171,252,0.15)] bg-[rgba(255,255,255,0.05)] text-[#a1a1aa]'}`}
                   >
                     {selectedAssistant.modelId?.includes('/') ? selectedAssistant.modelId.split('/').slice(1).join('/') : selectedAssistant.modelId} ▼
                   </button>
                   {showModelMenu && (
-                    <div className="absolute top-6 left-0 bg-[#18181b] border border-[#27272a] rounded z-[100] min-w-[200px] max-h-[300px] overflow-y-auto shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+                    <div className="absolute top-6 left-0 bg-[rgba(15,5,30,0.90)] border border-[rgba(240,171,252,0.12)] backdrop-blur-xl rounded z-[100] min-w-[200px] max-h-[300px] overflow-y-auto shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
                       {availableModels.map((m) => (
                         <div
                           key={m.id}
@@ -391,7 +391,7 @@ export function HomePage(): React.ReactElement {
                             setSelectedAssistant({ ...selectedAssistant, modelId: m.id })
                             setShowModelMenu(false)
                           }}
-                          className={`px-3 py-2 text-xs cursor-pointer border-b border-b-[#27272a] ${selectedAssistant.modelId === m.id ? 'text-[#60a5fa] bg-[rgba(96,165,250,0.1)]' : 'text-[#a1a1aa] bg-transparent'}`}
+                          className={`px-3 py-2 text-xs cursor-pointer border-b border-b-[rgba(240,171,252,0.08)] ${selectedAssistant.modelId === m.id ? 'text-[#60a5fa] bg-[rgba(96,165,250,0.1)]' : 'text-[#a1a1aa] bg-transparent'}`}
                         >
                           {selectedAssistant.modelId === m.id ? '✓' : ' '} {m.displayName || m.name}
                         </div>
@@ -412,14 +412,14 @@ export function HomePage(): React.ReactElement {
                 onChange={(e) => setMsgSearch(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Escape') { setShowMsgSearch(false); setMsgSearch('') } }}
                 placeholder="Search messages…"
-                className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-xs outline-none px-2.5 py-1 w-[200px]"
+                className="bg-[rgba(255,255,255,0.06)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-xs outline-none px-2.5 py-1 w-[200px]"
               />
             )}
             {selectedAssistant && (
               <button
                 onClick={() => setShowModelParams((v) => !v)}
                 title="Model parameters"
-                className={`border border-[#3f3f46] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${showModelParams ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
+                className={`border border-[rgba(240,171,252,0.15)] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${showModelParams ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
               >
                 ⚙️
               </button>
@@ -429,14 +429,14 @@ export function HomePage(): React.ReactElement {
                 <button
                   onClick={() => setSysPromptEdit((v) => !v)}
                   title="Edit system prompt for this conversation"
-                  className={`border border-[#3f3f46] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${sysPromptEdit ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
+                  className={`border border-[rgba(240,171,252,0.15)] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${sysPromptEdit ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
                 >
                   📝
                 </button>
                 <button
                   onClick={() => { setShowMsgSearch((v) => !v); if (showMsgSearch) setMsgSearch('') }}
                   title="Search messages"
-                  className={`border border-[#3f3f46] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${showMsgSearch ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
+                  className={`border border-[rgba(240,171,252,0.15)] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${showMsgSearch ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
                 >
                   🔍
                 </button>
@@ -450,7 +450,7 @@ export function HomePage(): React.ReactElement {
                 <button
                   onClick={() => setShowStats((v) => !v)}
                   title="Toggle statistics"
-                  className={`border border-[#3f3f46] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${showStats ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
+                  className={`border border-[rgba(240,171,252,0.15)] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${showStats ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
                 >
                   📊 {stats.totalMessages}
                 </button>
@@ -458,7 +458,7 @@ export function HomePage(): React.ReactElement {
                   onClick={generateSummary}
                   disabled={generatingSummary || messages.length === 0}
                   title="Generate AI summary of this conversation"
-                  className={`bg-transparent border border-[#3f3f46] rounded-md text-sm px-2.5 py-[3px] ${generatingSummary ? 'text-[#60a5fa] cursor-wait' : 'text-[#a1a1aa] cursor-pointer'} ${generatingSummary || messages.length === 0 ? 'opacity-50' : 'opacity-100'}`}
+                  className={`bg-transparent border border-[rgba(240,171,252,0.15)] rounded-md text-sm px-2.5 py-[3px] ${generatingSummary ? 'text-[#60a5fa] cursor-wait' : 'text-[#a1a1aa] cursor-pointer'} ${generatingSummary || messages.length === 0 ? 'opacity-50' : 'opacity-100'}`}
                 >
                   {generatingSummary ? '✨ …' : '✨ Summary'}
                 </button>
@@ -468,7 +468,7 @@ export function HomePage(): React.ReactElement {
               <button
                 title="Import topic from JSON file"
                 onClick={importTopic}
-                className="bg-transparent border border-[#3f3f46] rounded-md text-[#a1a1aa] cursor-pointer text-sm px-2.5 py-[3px]"
+                className="bg-transparent border border-[rgba(240,171,252,0.15)] rounded-md text-[#a1a1aa] cursor-pointer text-sm px-2.5 py-[3px]"
               >
                 ↑ Import
               </button>
@@ -479,14 +479,14 @@ export function HomePage(): React.ReactElement {
                   <button
                     title="Share and export this conversation"
                     onClick={() => setShowSharePanel((v) => !v)}
-                    className={`border border-[#3f3f46] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${showSharePanel ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
+                    className={`border border-[rgba(240,171,252,0.15)] rounded-md cursor-pointer text-sm px-2.5 py-[3px] ${showSharePanel ? 'bg-[rgba(37,99,235,0.15)] text-[#60a5fa]' : 'bg-transparent text-[#a1a1aa]'}`}
                   >
                     📤 Share
                   </button>
                   {showSharePanel && (
-                    <div className="absolute top-8 right-0 bg-[#18181b] border border-[#27272a] rounded-lg z-[100] min-w-[180px] shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-                      <button onClick={() => { exportAsFormat('json'); setShowSharePanel(false) }} className="block w-full text-left px-3 py-2 text-xs bg-transparent border-0 border-b border-b-[#27272a] text-[#a1a1aa] cursor-pointer">📄 Export as JSON</button>
-                      <button onClick={() => { exportAsFormat('markdown'); setShowSharePanel(false) }} className="block w-full text-left px-3 py-2 text-xs bg-transparent border-0 border-b border-b-[#27272a] text-[#a1a1aa] cursor-pointer">📝 Export as Markdown</button>
+                    <div className="absolute top-8 right-0 bg-[rgba(15,5,30,0.90)] border border-[rgba(240,171,252,0.12)] backdrop-blur-xl rounded-lg z-[100] min-w-[180px] shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+                      <button onClick={() => { exportAsFormat('json'); setShowSharePanel(false) }} className="block w-full text-left px-3 py-2 text-xs bg-transparent border-0 border-b border-b-[rgba(240,171,252,0.08)] text-[#a1a1aa] cursor-pointer">📄 Export as JSON</button>
+                      <button onClick={() => { exportAsFormat('markdown'); setShowSharePanel(false) }} className="block w-full text-left px-3 py-2 text-xs bg-transparent border-0 border-b border-b-[rgba(240,171,252,0.08)] text-[#a1a1aa] cursor-pointer">📝 Export as Markdown</button>
                       <button onClick={() => { exportAsFormat('html'); setShowSharePanel(false) }} className="block w-full text-left px-3 py-2 text-xs bg-transparent border-0 text-[#a1a1aa] cursor-pointer">🌐 Export as HTML</button>
                     </div>
                   )}
@@ -510,7 +510,7 @@ export function HomePage(): React.ReactElement {
         {selectedTopic ? (
           <>
             {topicSummary && selectedTopic && (
-              <div className="bg-[#18181b] border-b border-b-[#27272a] px-4 py-3">
+              <div className="bg-[rgba(255,255,255,0.04)] border-b border-b-[rgba(240,171,252,0.08)] px-4 py-3">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs font-semibold text-[#fafafa]">✨ AI Summary</span>
                   <button onClick={() => setTopicSummary('')} className="ml-auto text-xs bg-transparent border-0 text-[#52525b] cursor-pointer">Close</button>
@@ -520,7 +520,7 @@ export function HomePage(): React.ReactElement {
             )}
 
             {showStats && stats && selectedTopic && (
-              <div className="bg-[#18181b] border-b border-b-[#27272a] px-4 py-3">
+              <div className="bg-[rgba(255,255,255,0.04)] border-b border-b-[rgba(240,171,252,0.08)] px-4 py-3">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs font-semibold text-[#fafafa]">📊 Conversation Statistics</span>
                   <button onClick={() => setShowStats(false)} className="ml-auto text-xs bg-transparent border-0 text-[#52525b] cursor-pointer">Close</button>
@@ -557,7 +557,7 @@ export function HomePage(): React.ReactElement {
               />
             )}
             {sysPromptEdit && selectedAssistant && (
-              <div className="bg-[#18181b] border-b border-b-[#27272a] px-4 py-3">
+              <div className="bg-[rgba(255,255,255,0.04)] border-b border-b-[rgba(240,171,252,0.08)] px-4 py-3">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs font-semibold text-[#fafafa]">System Prompt</span>
                   <button
@@ -573,7 +573,7 @@ export function HomePage(): React.ReactElement {
                       }
                     }}
                     title="Save this system prompt to Library"
-                    className="ml-auto text-xs bg-transparent border border-[#3f3f46] text-[#a1a1aa] cursor-pointer px-2 py-0.5 rounded"
+                    className="ml-auto text-xs bg-transparent border border-[rgba(240,171,252,0.15)] text-[#a1a1aa] cursor-pointer px-2 py-0.5 rounded"
                   >
                     💾 Save
                   </button>
@@ -584,7 +584,7 @@ export function HomePage(): React.ReactElement {
                   onChange={(e) => setTempSysPrompt(e.target.value)}
                   placeholder="System prompt (affects this conversation only)"
                   rows={3}
-                  className="w-full bg-[#27272a] border border-[#3f3f46] rounded-md text-[#fafafa] px-3 py-2 font-mono text-xs outline-none resize-y"
+                  className="w-full bg-[#27272a] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] px-3 py-2 font-mono text-xs outline-none resize-y"
                 />
               </div>
             )}

@@ -25,7 +25,7 @@ export function WebSearchSettings(): React.ReactElement {
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const inputCls = 'bg-[#18181b] border border-[#3f3f46] rounded-[6px] text-[#fafafa] px-[10px] py-[6px] text-[13px] w-full box-border'
+  const inputCls = 'bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-[6px] text-[#fafafa] px-[10px] py-[6px] text-[13px] w-full box-border'
   const labelCls = 'text-[12px] text-[#a1a1aa] mb-1 block'
 
   return (

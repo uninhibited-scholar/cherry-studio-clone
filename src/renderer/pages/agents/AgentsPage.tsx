@@ -69,7 +69,7 @@ export function AgentsPage(): React.ReactElement {
     : allModels
 
   return (
-    <div className="flex h-full bg-[#09090b] text-[#fafafa]">
+    <div className="flex h-full bg-[rgba(10,0,20,0.60)] text-[#fafafa]">
       {/* ── Agent list ── */}
       <aside className="w-[260px] border-r border-[#27272a] flex flex-col shrink-0">
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#27272a]">
@@ -123,7 +123,7 @@ export function AgentsPage(): React.ReactElement {
                 <select
                   value={editing.emoji ?? '🤖'}
                   onChange={(e) => setEditing((p) => ({ ...p, emoji: e.target.value }))}
-                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[18px] outline-none px-[10px] py-[6px] w-16 text-center"
+                  className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[18px] outline-none px-[10px] py-[6px] w-16 text-center"
                 >
                   {EMOJI_OPTIONS.map((e) => <option key={e} value={e}>{e}</option>)}
                 </select>
@@ -134,7 +134,7 @@ export function AgentsPage(): React.ReactElement {
                   value={editing.name ?? ''}
                   onChange={(e) => setEditing((p) => ({ ...p, name: e.target.value }))}
                   placeholder="Agent name"
-                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
+                  className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
                 />
               </div>
             </div>
@@ -145,7 +145,7 @@ export function AgentsPage(): React.ReactElement {
               value={editing.description ?? ''}
               onChange={(e) => setEditing((p) => ({ ...p, description: e.target.value }))}
               placeholder="Short description of this agent's purpose"
-              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border mb-4"
+              className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border mb-4"
             />
 
             {/* System Prompt */}
@@ -155,7 +155,7 @@ export function AgentsPage(): React.ReactElement {
               onChange={(e) => setEditing((p) => ({ ...p, prompt: e.target.value }))}
               placeholder="You are a helpful assistant that…"
               rows={8}
-              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border mb-4 resize-y font-mono"
+              className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border mb-4 resize-y font-mono"
             />
 
             {/* Provider + Model */}
@@ -165,7 +165,7 @@ export function AgentsPage(): React.ReactElement {
                 <select
                   value={editing.providerId ?? ''}
                   onChange={(e) => setEditing((p) => ({ ...p, providerId: e.target.value, modelId: undefined }))}
-                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
+                  className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
                 >
                   <option value="">— any —</option>
                   {providers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -176,7 +176,7 @@ export function AgentsPage(): React.ReactElement {
                 <select
                   value={editing.modelId ?? ''}
                   onChange={(e) => setEditing((p) => ({ ...p, modelId: e.target.value }))}
-                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
+                  className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
                 >
                   <option value="">— any —</option>
                   {modelsForProvider.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
@@ -203,7 +203,7 @@ export function AgentsPage(): React.ReactElement {
               value={editing.maxTokens ?? ''}
               onChange={(e) => setEditing((p) => ({ ...p, maxTokens: e.target.value ? parseInt(e.target.value) : undefined }))}
               placeholder="Unlimited"
-              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border mb-4"
+              className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border mb-4"
             />
           </div>
         </div>

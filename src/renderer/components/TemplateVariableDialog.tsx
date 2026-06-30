@@ -33,7 +33,7 @@ export function TemplateVariableDialog({ template, onFill, onClose }: Props): Re
       style={{ background: 'rgba(0,0,0,0.6)' }}
       onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="bg-[#18181b] border border-[#3f3f46] rounded-xl p-6 w-[420px] max-w-[90vw] shadow-2xl">
+      <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-xl p-6 w-[420px] max-w-[90vw] shadow-2xl">
         <h3 className="m-0 mb-4 text-[15px] font-semibold text-[#fafafa]">Fill Template Variables</h3>
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col gap-3">
@@ -50,7 +50,7 @@ export function TemplateVariableDialog({ template, onFill, onClose }: Props): Re
                   value={values[v.name] ?? ''}
                   onChange={(e) => setValues((prev) => ({ ...prev, [v.name]: e.target.value }))}
                   placeholder={v.defaultValue ?? `Enter ${v.name}…`}
-                  className="w-full bg-[#09090b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-3 py-[7px] box-border focus:border-[#2563eb]"
+                  className="w-full bg-[rgba(10,0,20,0.60)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-3 py-[7px] box-border focus:border-[#2563eb]"
                 />
               </div>
             ))}
@@ -65,7 +65,7 @@ export function TemplateVariableDialog({ template, onFill, onClose }: Props): Re
             <button
               type="button"
               onClick={onClose}
-              className="bg-transparent border border-[#3f3f46] rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-4 py-2"
+              className="bg-transparent border border-[rgba(240,171,252,0.15)] rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-4 py-2"
             >
               Cancel
             </button>

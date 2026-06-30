@@ -62,12 +62,12 @@ export function LibraryPage(): React.ReactElement {
     : allTemplates
 
   return (
-    <div className="flex flex-col h-full bg-[#09090b] text-[#fafafa]">
+    <div className="flex flex-col h-full bg-[rgba(10,0,20,0.60)] text-[#fafafa]">
       {/* Header */}
       <div className="px-6 py-4 border-b border-[#27272a] shrink-0">
         <div className="flex items-center gap-3 mb-3">
           <h2 className="m-0 text-[15px] font-bold flex-none">📖 Prompt Library</h2>
-          <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter prompts…" className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full" />
+          <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter prompts…" className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full" />
           <button
             onClick={() => {
               const data = JSON.stringify(saved, null, 2)
@@ -115,15 +115,15 @@ export function LibraryPage(): React.ReactElement {
 
       {/* Add prompt form */}
       {showAdd && (
-        <div className="px-6 py-4 border-b border-[#27272a] bg-[#18181b] shrink-0">
+        <div className="px-6 py-4 border-b border-[#27272a] bg-[rgba(255,255,255,0.04)] shrink-0">
           <div className="flex gap-2 mb-2">
-            <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Prompt name" className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] flex-1" autoFocus />
-            <input value={newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="Category" className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-[140px]" />
+            <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Prompt name" className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] flex-1" autoFocus />
+            <input value={newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="Category" className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-[140px]" />
           </div>
-          <textarea value={newContent} onChange={(e) => setNewContent(e.target.value)} placeholder="System prompt content…" rows={5} className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] resize-y font-mono w-full box-border" />
+          <textarea value={newContent} onChange={(e) => setNewContent(e.target.value)} placeholder="System prompt content…" rows={5} className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] resize-y font-mono w-full box-border" />
           <div className="flex gap-2 mt-2">
             <button onClick={handleSave} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-[14px] py-[6px]">Save</button>
-            <button onClick={() => { setShowAdd(false); setNewName(''); setNewContent('') }} className="bg-transparent border border-[#3f3f46] rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-[10px] py-[5px]">Cancel</button>
+            <button onClick={() => { setShowAdd(false); setNewName(''); setNewContent('') }} className="bg-transparent border border-[rgba(240,171,252,0.15)] rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-[10px] py-[5px]">Cancel</button>
           </div>
         </div>
       )}
@@ -173,7 +173,7 @@ function PromptCard({
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`border border-[#27272a] rounded-[10px] p-[14px] flex flex-col gap-2 ${hovered ? 'bg-[#18181b]' : 'bg-[#111113]'}`}
+      className={`border border-[rgba(240,171,252,0.10)] rounded-[10px] p-[14px] flex flex-col gap-2 ${hovered ? 'bg-[rgba(255,255,255,0.04)]' : 'bg-[#111113]'}`}
     >
       <div className="flex items-start gap-2">
         <div className="flex-1 overflow-hidden">
@@ -181,8 +181,8 @@ function PromptCard({
           <span className="text-[10px] text-[#52525b] bg-[#27272a] rounded px-[6px] py-[1px] inline-block mt-[3px]">{template.category}</span>
         </div>
         <div className="flex gap-1 shrink-0">
-          <button onClick={onCopy} className="bg-transparent border border-[#3f3f46] rounded-md text-[#a1a1aa] cursor-pointer text-[11px] px-[10px] py-[5px]">{isCopied ? '✓ Copied' : 'Copy'}</button>
-          {onDelete && <button onClick={onDelete} className="bg-transparent border border-[#3f3f46] rounded-md text-[#f87171] cursor-pointer text-[11px] px-[10px] py-[5px]">Del</button>}
+          <button onClick={onCopy} className="bg-transparent border border-[rgba(240,171,252,0.15)] rounded-md text-[#a1a1aa] cursor-pointer text-[11px] px-[10px] py-[5px]">{isCopied ? '✓ Copied' : 'Copy'}</button>
+          {onDelete && <button onClick={onDelete} className="bg-transparent border border-[rgba(240,171,252,0.15)] rounded-md text-[#f87171] cursor-pointer text-[11px] px-[10px] py-[5px]">Del</button>}
         </div>
       </div>
       <p

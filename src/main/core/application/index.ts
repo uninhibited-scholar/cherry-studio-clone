@@ -1,4 +1,5 @@
-import { BrowserWindow, app } from 'electron'
+import { BrowserWindow, app, nativeImage } from 'electron'
+import { join } from 'path'
 import { MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT } from '@shared/config/constant'
 import { loggerService } from '@logger'
 import { WindowStateManager } from '../window/WindowStateManager'
@@ -36,6 +37,12 @@ class Application {
     const windowState = new WindowStateManager('main', { width: 1280, height: 800 })
     const state = windowState.get()
 
+    const iconPath = join(app.getAppPath(), 'resources', 'icons',
+      process.platform === 'win32' ? 'icon.ico' :
+      process.platform === 'darwin' ? 'icon.icns' : 'icon.png'
+    )
+    const icon = nativeImage.createFromPath(iconPath)
+
     this.mainWindow = new BrowserWindow({
       width: state.width,
       height: state.height,
@@ -43,6 +50,7 @@ class Application {
       y: state.y,
       minWidth: MIN_WINDOW_WIDTH,
       minHeight: MIN_WINDOW_HEIGHT,
+      icon: icon.isEmpty() ? undefined : icon,
       titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
       webPreferences: {
         preload: preloadPath,
@@ -54,7 +62,10 @@ class Application {
 
     if (process.env.ELECTRON_RENDERER_URL) {
       await this.mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
-      this.mainWindow.webContents.openDevTools({ mode: 'detach' })
+      // DevTools only when explicitly requested
+      if (process.env.OPEN_DEVTOOLS === '1') {
+        this.mainWindow.webContents.openDevTools({ mode: 'detach' })
+      }
     } else {
       await this.mainWindow.loadFile(`${__dirname}/../renderer/index.html`)
     }

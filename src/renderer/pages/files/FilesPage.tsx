@@ -54,7 +54,7 @@ export function FilesPage(): React.ReactElement {
   )
 
   return (
-    <div className="flex h-full bg-[#09090b] text-[#fafafa]">
+    <div className="flex h-full bg-[rgba(10,0,20,0.60)] text-[#fafafa]">
       {/* Sidebar: knowledge bases */}
       <aside className="w-[200px] border-r border-[#27272a] px-2 py-4 flex flex-col gap-[2px] shrink-0 overflow-y-auto">
         <p className="text-[11px] text-[#71717a] font-semibold tracking-[1px] px-2 mb-2">
@@ -85,7 +85,7 @@ export function FilesPage(): React.ReactElement {
             {filtered.length} document{filtered.length !== 1 ? 's' : ''}
           </span>
           <input
-            className="bg-[#18181b] border border-[#3f3f46] rounded-lg text-[#fafafa] px-3 py-[7px] text-[13px] outline-none ml-auto w-[240px]"
+            className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-lg text-[#fafafa] px-3 py-[7px] text-[13px] outline-none ml-auto w-[240px]"
             placeholder="Search documents…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -105,7 +105,7 @@ export function FilesPage(): React.ReactElement {
                 return (
                   <div
                     key={doc.id}
-                    className="bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-[14px]"
+                    className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-[10px] px-4 py-[14px]"
                   >
                     <div className="flex items-baseline gap-[10px] mb-[6px]">
                       <span className="text-[14px] font-medium text-[#fafafa]">📄 {doc.title}</span>

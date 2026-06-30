@@ -96,7 +96,7 @@ export function HistoryPage(): React.ReactElement {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#09090b] text-[#fafafa]">
+    <div className="flex flex-col h-full bg-[rgba(10,0,20,0.60)] text-[#fafafa]">
       {/* Header */}
       <div className="px-6 py-4 border-b border-[#27272a] shrink-0">
         <h2 className="m-0 mb-3 text-[15px] font-bold">🕐 Conversation History</h2>
@@ -106,7 +106,7 @@ export function HistoryPage(): React.ReactElement {
             onChange={(e) => { setFilters({ ...filters, query: e.target.value }); if (!e.target.value) setResults(null) }}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSearch() }}
             placeholder="Search across all conversations…"
-            className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] flex-1"
+            className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] flex-1"
           />
           <button onClick={handleSearch} className="bg-[#27272a] border-none rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-[14px] py-[6px] whitespace-nowrap">Search</button>
           <button onClick={() => setShowFilters((v) => !v)} title="Advanced filters" className="bg-[#27272a] border-none rounded-md text-[#a1a1aa] cursor-pointer text-[12px] px-[14px] py-[6px] whitespace-nowrap">⚙️ {showFilters ? 'Hide' : 'Show'}</button>
@@ -117,7 +117,7 @@ export function HistoryPage(): React.ReactElement {
 
         {/* Advanced Filters */}
         {showFilters && (
-          <div className="bg-[#18181b] border border-[#27272a] rounded-lg p-3 mb-3">
+          <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.10)] rounded-lg p-3 mb-3">
             <div className="grid gap-3 mb-3" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
               {/* Date From */}
               <div>
@@ -126,7 +126,7 @@ export function HistoryPage(): React.ReactElement {
                   type="date"
                   value={filters.dateFrom}
                   onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full"
+                  className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full"
                 />
               </div>
 
@@ -137,7 +137,7 @@ export function HistoryPage(): React.ReactElement {
                   type="date"
                   value={filters.dateTo}
                   onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full"
+                  className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full"
                 />
               </div>
 
@@ -148,7 +148,7 @@ export function HistoryPage(): React.ReactElement {
                   type="number"
                   value={filters.minLength}
                   onChange={(e) => setFilters({ ...filters, minLength: Number(e.target.value) })}
-                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full"
+                  className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full"
                   placeholder="0"
                 />
               </div>
@@ -160,14 +160,14 @@ export function HistoryPage(): React.ReactElement {
                   type="number"
                   value={filters.maxLength}
                   onChange={(e) => setFilters({ ...filters, maxLength: Number(e.target.value) })}
-                  className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full"
+                  className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full"
                   placeholder="10000"
                 />
               </div>
             </div>
             <button
               onClick={() => setFilters({ query: '', dateFrom: '', dateTo: '', minLength: 0, maxLength: 10000, starred: null })}
-              className="text-[12px] px-2 py-1 bg-transparent border border-[#3f3f46] rounded text-[#a1a1aa] cursor-pointer"
+              className="text-[12px] px-2 py-1 bg-transparent border border-[rgba(240,171,252,0.15)] rounded text-[#a1a1aa] cursor-pointer"
             >
               Reset Filters
             </button>

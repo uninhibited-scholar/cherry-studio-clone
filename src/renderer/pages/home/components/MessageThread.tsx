@@ -147,7 +147,7 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
 
       {/* In-thread search nav */}
       {q && matchedIds.length > 0 && (
-        <div className="sticky top-0 z-10 bg-[rgba(9,9,11,0.9)] px-4 py-1 flex items-center gap-2 border-b border-b-[#27272a]">
+        <div className="sticky top-0 z-10 bg-[rgba(9,9,11,0.9)] px-4 py-1 flex items-center gap-2 border-b border-b-[rgba(240,171,252,0.08)]">
           <span className="text-xs text-[#71717a]">{matchedIds.length} result{matchedIds.length > 1 ? 's' : ''}</span>
           <button onClick={() => setMatchIdx((i) => Math.max(0, i - 1))} disabled={matchIdx === 0} className={navBtnClass}>↑</button>
           <span className="text-xs text-[#a1a1aa]">{matchIdx + 1} / {matchedIds.length}</span>
@@ -155,7 +155,7 @@ export function MessageThread({ messages, streamingText, streaming, onDelete, on
         </div>
       )}
       {q && matchedIds.length === 0 && (
-        <div className="px-4 py-1.5 text-xs text-[#71717a] bg-[rgba(9,9,11,0.9)] border-b border-b-[#27272a]">No results</div>
+        <div className="px-4 py-1.5 text-xs text-[#71717a] bg-[rgba(9,9,11,0.9)] border-b border-b-[rgba(240,171,252,0.08)]">No results</div>
       )}
       {(() => {
         // Build sibling groups: parentId → sorted list of message ids in order
@@ -246,7 +246,7 @@ function formatTime(ts: number) {
   return new Date(ts).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
 }
 
-const navBtnClass = 'bg-transparent border border-[#3f3f46] rounded text-[#a1a1aa] cursor-pointer text-xs px-[7px] py-[1px]'
+const navBtnClass = 'bg-transparent border border-[rgba(240,171,252,0.15)] rounded text-[#a1a1aa] cursor-pointer text-xs px-[7px] py-[1px]'
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '🔥', '👀', '🎉']
 
@@ -343,8 +343,14 @@ function MessageBubble({
     >
       <div className={`flex items-start gap-2.5 max-w-[80%] ${isUser ? 'w-auto' : 'w-full'}`}>
         {!isUser && (
-          <div className="w-7 h-7 rounded-md bg-[#3f3f46] flex items-center justify-center text-sm shrink-0 mt-0.5">
-            🤖
+          <div
+            className="w-7 h-7 rounded-xl flex items-center justify-center text-sm shrink-0 mt-0.5"
+            style={{
+              background: 'linear-gradient(135deg, #3d0f6e, #9333ea)',
+              boxShadow: '0 0 10px rgba(196,132,252,0.30)',
+            }}
+          >
+            🌸
           </div>
         )}
         <div className={isUser ? undefined : 'flex-1'}>
@@ -356,14 +362,14 @@ function MessageBubble({
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   rows={3}
-                  className="w-full bg-[#18181b] border border-[#3f3f46] rounded-lg text-[#fafafa] text-sm leading-[1.6] outline-none px-3 py-2 resize-y font-[inherit] box-border"
+                  className="w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-lg text-[#fafafa] text-sm leading-[1.6] outline-none px-3 py-2 resize-y font-[inherit] box-border"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onEditResend?.(message.id, editValue.trim()); setEditing(false) }
                     if (e.key === 'Escape') { setEditing(false); setEditValue(message.content) }
                   }}
                 />
                 <div className="flex gap-1.5 mt-1.5 justify-end">
-                  <button onClick={() => { setEditing(false); setEditValue(message.content) }} className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-xs px-2.5 py-[3px] rounded">Cancel</button>
+                  <button onClick={() => { setEditing(false); setEditValue(message.content) }} className="bg-transparent border border-[rgba(240,171,252,0.15)] text-[#71717a] cursor-pointer text-xs px-2.5 py-[3px] rounded">Cancel</button>
                   <button onClick={() => {
                     if (editValue.trim() !== message.content) {
                       const newHistory = [...editHistory, { content: message.content, editedAt: Date.now() }]
@@ -376,15 +382,30 @@ function MessageBubble({
                 </div>
               </div>
             ) : (
-            <div className="px-[14px] py-[10px] rounded-[16px_16px_4px_16px] bg-[#2563eb] text-[#fafafa] text-[length:var(--chat-font-size,14px)] leading-[1.6] whitespace-pre-wrap break-words">
+            <div
+              className="px-[14px] py-[10px] text-[#fafafa] text-[length:var(--chat-font-size,14px)] leading-[1.6] whitespace-pre-wrap break-words"
+              style={{
+                borderRadius: '18px 18px 4px 18px',
+                background: 'linear-gradient(135deg, rgba(124,58,237,0.75), rgba(217,70,239,0.55))',
+                border: '1px solid rgba(196,132,252,0.25)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+              }}
+            >
               {message.content}
             </div>
             )
           ) : (
-            <div className="text-[#e4e4e7] text-sm">
+            <div
+              className="text-sm"
+              style={{ color: 'rgba(250,250,250,0.90)' }}
+            >
               <MarkdownContent content={message.content || (isStreaming ? '…' : '')} />
               {isStreaming && (
-                <span className="inline-block w-2 h-3.5 bg-[#a1a1aa] rounded-sm ml-0.5 align-text-bottom" style={{ animation: 'blink 1s step-end infinite' }} />
+                <span
+                  className="inline-block w-[3px] h-3.5 rounded-sm ml-0.5 align-text-bottom"
+                  style={{ background: 'linear-gradient(180deg,#c084fc,#e879f9)', animation: 'blink 1s step-end infinite' }}
+                />
               )}
             </div>
           )}
@@ -394,13 +415,13 @@ function MessageBubble({
             <div className={`flex gap-1 mt-1 ${isUser ? 'justify-end' : 'justify-start'}`}>
               <button
                 onClick={toggleStar}
-                className={`bg-transparent border border-[#3f3f46] cursor-pointer text-[11px] px-2 py-0.5 rounded ${starred ? 'text-[#fbbf24]' : 'text-[#71717a]'}`}
+                className={`bg-transparent border border-[rgba(240,171,252,0.15)] cursor-pointer text-[11px] px-2 py-0.5 rounded ${starred ? 'text-[#fbbf24]' : 'text-[#71717a]'}`}
               >
                 {starred ? '★' : '☆'} Star
               </button>
               <button
                 onClick={copy}
-                className={`bg-transparent border border-[#3f3f46] cursor-pointer text-[11px] px-2 py-0.5 rounded ${copied ? 'text-[#4ade80]' : 'text-[#71717a]'}`}
+                className={`bg-transparent border border-[rgba(240,171,252,0.15)] cursor-pointer text-[11px] px-2 py-0.5 rounded ${copied ? 'text-[#4ade80]' : 'text-[#71717a]'}`}
               >
                 {copied ? '✓' : '⎘ Copy'}
               </button>
@@ -415,13 +436,13 @@ function MessageBubble({
                   a.click()
                   URL.revokeObjectURL(url)
                 }}
-                className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
+                className="bg-transparent border border-[rgba(240,171,252,0.15)] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
               >
                 ↓ MD
               </button>
               <button
                 onClick={generateShareLink}
-                className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
+                className="bg-transparent border border-[rgba(240,171,252,0.15)] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
                 title="Copy shareable link"
               >
                 🔗 Share
@@ -429,7 +450,7 @@ function MessageBubble({
               {onQuote && (
                 <button
                   onClick={() => onQuote(message)}
-                  className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
+                  className="bg-transparent border border-[rgba(240,171,252,0.15)] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
                 >
                   💬 Quote
                 </button>
@@ -437,21 +458,21 @@ function MessageBubble({
               {editHistory.length > 0 && (
                 <button
                   onClick={() => setShowHistory((v) => !v)}
-                  className="bg-transparent border border-[#3f3f46] text-[#a78bfa] cursor-pointer text-[11px] px-2 py-0.5 rounded"
+                  className="bg-transparent border border-[rgba(240,171,252,0.15)] text-[#a78bfa] cursor-pointer text-[11px] px-2 py-0.5 rounded"
                 >
                   📝 History ({editHistory.length})
                 </button>
               )}
               <button
                 onClick={() => setShowTagInput((v) => !v)}
-                className={`bg-transparent border border-[#3f3f46] cursor-pointer text-[11px] px-2 py-0.5 rounded ${tags.length > 0 ? 'text-[#60a5fa]' : 'text-[#71717a]'}`}
+                className={`bg-transparent border border-[rgba(240,171,252,0.15)] cursor-pointer text-[11px] px-2 py-0.5 rounded ${tags.length > 0 ? 'text-[#60a5fa]' : 'text-[#71717a]'}`}
               >
                 🏷️ Tag{tags.length > 0 ? `(${tags.length})` : ''}
               </button>
               {onEditResend && !editing && (
                 <button
                   onClick={() => { setEditing(true); setEditValue(message.content) }}
-                  className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
+                  className="bg-transparent border border-[rgba(240,171,252,0.15)] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
                 >
                   ✎ Edit
                 </button>
@@ -459,7 +480,7 @@ function MessageBubble({
               {!isUser && ttsSupported && onSpeak && (
                 <button
                   onClick={() => onSpeak(message.content)}
-                  className={`bg-transparent border border-[#3f3f46] cursor-pointer text-[11px] px-2 py-0.5 rounded ${isSpeakingThis ? 'text-[#60a5fa]' : 'text-[#71717a]'}`}
+                  className={`bg-transparent border border-[rgba(240,171,252,0.15)] cursor-pointer text-[11px] px-2 py-0.5 rounded ${isSpeakingThis ? 'text-[#60a5fa]' : 'text-[#71717a]'}`}
                   title={isSpeakingThis ? 'Stop reading' : 'Read aloud'}
                 >
                   {isSpeakingThis ? '🔊' : '🔈'} TTS
@@ -468,7 +489,7 @@ function MessageBubble({
               {onRegenerate && (
                 <button
                   onClick={onRegenerate}
-                  className="bg-transparent border border-[#3f3f46] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
+                  className="bg-transparent border border-[rgba(240,171,252,0.15)] text-[#71717a] cursor-pointer text-[11px] px-2 py-0.5 rounded"
                 >
                   ↺ Regenerate
                 </button>
@@ -478,7 +499,7 @@ function MessageBubble({
                   onClick={() => canDelete && onDelete(message.id)}
                   disabled={!canDelete}
                   title={canDelete ? 'Delete this message' : `Delete unavailable (${deleteTimeRemaining}s remaining)`}
-                  className={`bg-transparent border border-[#3f3f46] cursor-pointer text-[11px] px-2 py-0.5 rounded ${canDelete ? 'text-[#f87171] opacity-100' : 'text-[#52525b] cursor-not-allowed opacity-50'}`}
+                  className={`bg-transparent border border-[rgba(240,171,252,0.15)] cursor-pointer text-[11px] px-2 py-0.5 rounded ${canDelete ? 'text-[#f87171] opacity-100' : 'text-[#52525b] cursor-not-allowed opacity-50'}`}
                 >
                   ✕ {canDelete ? 'Delete' : `${deleteTimeRemaining}s`}
                 </button>
@@ -505,7 +526,7 @@ function MessageBubble({
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') addTag(newTag); if (e.key === 'Escape') { setShowTagInput(false); setNewTag('') } }}
                 placeholder="Add tag…"
-                className="flex-1 text-[11px] px-2 py-1 bg-[#27272a] border border-[#3f3f46] rounded text-[#fafafa] outline-none"
+                className="flex-1 text-[11px] px-2 py-1 bg-[#27272a] border border-[rgba(240,171,252,0.15)] rounded text-[#fafafa] outline-none"
                 autoFocus
               />
               <button onClick={() => addTag(newTag)} className="text-[11px] px-2.5 py-1 bg-[#2563eb] border-0 rounded text-white cursor-pointer">Add</button>
@@ -514,7 +535,7 @@ function MessageBubble({
 
           {/* Edit History */}
           {showHistory && editHistory.length > 0 && (
-            <div className="mt-2 p-2 bg-[#18181b] rounded-md border border-[#27272a]">
+            <div className="mt-2 p-2 bg-[rgba(255,255,255,0.04)] rounded-md border border-[rgba(240,171,252,0.10)]">
               <p className="text-[11px] text-[#a1a1aa] m-0 mb-1.5 font-semibold">Edit History ({editHistory.length})</p>
               <div className="flex flex-col gap-1 max-h-[200px] overflow-y-auto">
                 {editHistory.map((edit, idx) => (

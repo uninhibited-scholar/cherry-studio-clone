@@ -140,7 +140,12 @@ export function AssistantSidebar({
           e.preventDefault()
           setContextMenu({ x: e.clientX, y: e.clientY, assistantId: a.id })
         }}
-        className={`flex items-center gap-2 w-full px-2 py-1.5 rounded-md border-0 cursor-pointer text-sm text-left overflow-hidden ${selectedAssistantId === a.id ? 'bg-white/[0.08] text-[#fafafa]' : 'bg-transparent text-[#a1a1aa]'}`}
+        className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg border-0 cursor-pointer text-sm text-left overflow-hidden transition-all duration-150"
+        style={
+          selectedAssistantId === a.id
+            ? { background: 'rgba(147,51,234,0.18)', color: '#fafafa', boxShadow: '0 0 0 1px rgba(196,132,252,0.20)' }
+            : { background: 'transparent', color: '#a1a1aa' }
+        }
       >
         <span className="text-base">{a.emoji ?? '🤖'}</span>
         <span className="overflow-hidden text-ellipsis whitespace-nowrap">{a.name}</span>
@@ -149,19 +154,23 @@ export function AssistantSidebar({
   }
 
   return (
-    <aside className="w-full flex flex-col border-r border-r-[#27272a] bg-[#09090b] overflow-hidden">
+    <aside className="w-full flex flex-col overflow-hidden" style={{ borderRight: '1px solid rgba(240,171,252,0.09)', background: 'rgba(255,255,255,0.025)', backdropFilter: 'blur(20px) saturate(1.4)', WebkitBackdropFilter: 'blur(20px) saturate(1.4)' }}>
       {/* Search */}
       <div className="px-2 pt-2">
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search…"
-          className="w-full bg-[#18181b] border border-[#27272a] rounded-md text-[#fafafa] text-xs outline-none px-2.5 py-[5px]"
+          className="w-full text-[#fafafa] text-xs outline-none px-2.5 py-[5px] rounded-lg"
+          style={{
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(196,132,252,0.14)',
+          }}
         />
       </div>
 
       {/* Assistants */}
-      <div className="px-2 pt-2 pb-1 border-b border-b-[#27272a]">
+      <div className="px-2 pt-2 pb-1 border-b border-b-[rgba(240,171,252,0.08)]">
         <div className="flex items-center justify-between mb-1.5">
           <span className="text-xs text-[#71717a] font-semibold tracking-widest">ASSISTANTS</span>
           <button
@@ -221,7 +230,7 @@ export function AssistantSidebar({
               onChange={(e) => setNewGroupName(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') createGroup(); if (e.key === 'Escape') { setShowNewGroup(false); setNewGroupName('') } }}
               placeholder="Group name…"
-              className="flex-1 bg-[#18181b] border border-[#3f3f46] rounded text-[#fafafa] text-xs outline-none px-2 py-[4px]"
+              className="flex-1 bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded text-[#fafafa] text-xs outline-none px-2 py-[4px]"
             />
             <button onClick={createGroup} className="bg-[#2563eb] border-none rounded text-white text-xs cursor-pointer px-2 py-[4px]">+</button>
           </div>
@@ -260,7 +269,12 @@ export function AssistantSidebar({
                 key={t.id}
                 onMouseEnter={() => setHoveredTopic(t.id)}
                 onMouseLeave={() => setHoveredTopic(null)}
-                className={`flex items-center rounded-md ${selectedTopicId === t.id ? 'bg-white/[0.08]' : 'bg-transparent'}`}
+                className="flex items-center rounded-lg transition-all duration-100"
+                style={
+                  selectedTopicId === t.id
+                    ? { background: 'rgba(147,51,234,0.14)', boxShadow: '0 0 0 1px rgba(196,132,252,0.16)' }
+                    : { background: 'transparent' }
+                }
               >
                 {editingTopicId === t.id ? (
                   <input
@@ -272,7 +286,7 @@ export function AssistantSidebar({
                       if (e.key === 'Enter') commitEdit(t.id)
                       if (e.key === 'Escape') cancelEdit()
                     }}
-                    className="flex-1 px-2 py-[5px] border border-[#3f3f46] rounded bg-[#18181b] text-[#fafafa] text-xs outline-none"
+                    className="flex-1 px-2 py-[5px] border border-[rgba(240,171,252,0.15)] rounded bg-[rgba(255,255,255,0.04)] text-[#fafafa] text-xs outline-none"
                   />
                 ) : (
                   <button
@@ -301,7 +315,7 @@ export function AssistantSidebar({
       {/* Context menu: Move to group */}
       {contextMenu && (
         <div
-          className="fixed z-50 bg-[#18181b] border border-[#3f3f46] rounded-lg py-1 shadow-2xl min-w-[160px]"
+          className="fixed z-50 bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-lg py-1 shadow-2xl min-w-[160px]"
           style={{ top: contextMenu.y, left: contextMenu.x }}
           onMouseDown={(e) => e.stopPropagation()}
         >

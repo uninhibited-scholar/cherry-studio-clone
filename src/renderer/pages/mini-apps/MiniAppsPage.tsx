@@ -101,7 +101,7 @@ export function MiniAppsPage(): React.ReactElement {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#09090b] text-[#fafafa]">
+    <div className="flex flex-col h-full bg-[rgba(10,0,20,0.60)] text-[#fafafa]">
       {/* Header */}
       <div className="px-6 py-4 border-b border-[#27272a] flex items-center gap-3 shrink-0">
         <h2 className="m-0 text-[15px] font-bold flex-none">🧩 Mini Apps</h2>
@@ -109,7 +109,7 @@ export function MiniAppsPage(): React.ReactElement {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Filter apps…"
-          className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
+          className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
         />
         <button onClick={() => setShowAdd(true)} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-[14px] py-[6px] whitespace-nowrap shrink-0">+ Add</button>
       </div>
@@ -129,13 +129,13 @@ export function MiniAppsPage(): React.ReactElement {
 
       {/* Add custom app form */}
       {showAdd && (
-        <div className="px-6 py-[14px] border-b border-[#27272a] bg-[#18181b] flex gap-[10px] items-end shrink-0">
+        <div className="px-6 py-[14px] border-b border-[#27272a] bg-[rgba(255,255,255,0.04)] flex gap-[10px] items-end shrink-0">
           <div>
             <label className="block text-[11px] text-[#71717a] mb-1">Icon</label>
             <input
               value={newIcon}
               onChange={(e) => setNewIcon(e.target.value)}
-              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[20px] outline-none px-[6px] py-1 w-[52px] text-center box-border"
+              className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[20px] outline-none px-[6px] py-1 w-[52px] text-center box-border"
               maxLength={2}
             />
           </div>
@@ -146,7 +146,7 @@ export function MiniAppsPage(): React.ReactElement {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="My App"
-              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
+              className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
             />
           </div>
           <div className="flex-[0_0_110px]">
@@ -155,7 +155,7 @@ export function MiniAppsPage(): React.ReactElement {
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
               placeholder="Custom"
-              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
+              className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
             />
           </div>
           <div className="flex-1">
@@ -165,7 +165,7 @@ export function MiniAppsPage(): React.ReactElement {
               onChange={(e) => setNewUrl(e.target.value)}
               placeholder="https://example.com"
               onKeyDown={(e) => { if (e.key === 'Enter') handleAddCustom(); if (e.key === 'Escape') setShowAdd(false) }}
-              className="bg-[#18181b] border border-[#3f3f46] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
+              className="bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-md text-[#fafafa] text-[13px] outline-none px-[10px] py-[6px] w-full box-border"
             />
           </div>
           <button onClick={handleAddCustom} className="bg-[#2563eb] border-none rounded-md text-white cursor-pointer text-[12px] font-semibold px-[14px] py-[6px] whitespace-nowrap shrink-0">Add</button>
@@ -214,7 +214,7 @@ function AppCard({
       onClick={onOpen}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`rounded-xl border cursor-pointer flex flex-col items-center gap-2 p-4 transition-all duration-[120ms] relative select-none ${hovered ? 'border-[#3f3f46] bg-[#18181b]' : 'border-[#27272a] bg-[#111113]'}`}
+      className={`rounded-xl border cursor-pointer flex flex-col items-center gap-2 p-4 transition-all duration-[120ms] relative select-none ${hovered ? 'border-[#3f3f46] bg-[rgba(255,255,255,0.04)]' : 'border-[#27272a] bg-[#111113]'}`}
     >
       <span className="text-[36px] leading-none">{app.icon}</span>
       <p className="m-0 text-[13px] font-semibold text-[#fafafa] text-center">{app.name}</p>
