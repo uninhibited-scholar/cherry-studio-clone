@@ -54,7 +54,7 @@ app.whenReady().then(async () => {
 
   // Register zoom shortcuts
   const registerZoomShortcuts = () => {
-    globalShortcut.register('CommandOrControl+Equal', () => {
+    globalShortcut.register('CommandOrControl+=', () => {
       const win = BrowserWindow.getFocusedWindow()
       if (win) win.webContents.zoomFactor = Math.min(2, win.webContents.zoomFactor + 0.1)
     })

@@ -8,7 +8,7 @@ import { parseVariables } from '@shared/utils/promptTemplate'
 import { TemplateVariableDialog } from '@renderer/components/TemplateVariableDialog'
 
 type Props = {
-  onSend: (text: string, options: { webSearch: boolean }) => void
+  onSend: (text: string, options: { webSearch: boolean; images?: Array<{name: string; dataUrl: string}> }) => void
   onAbort: () => void
   streaming: boolean
   disabled: boolean
@@ -23,6 +23,8 @@ type Props = {
 
 export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowledgeBaseId, onSelectKnowledgeBase, mcpTools, setMcpTools, sendOnEnter = true, draftText = '', onDraftChange }: Props) {
   const [text, setText] = useState(draftText)
+  const [attachments, setAttachments] = useState<Array<{name: string; type: 'image'|'text'; dataUrl?: string; text?: string}>>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { isListening, startListening, stopListening, isSupported: voiceSupported } = useVoiceInput((transcript) => {
     setText((prev) => prev ? `${prev} ${transcript}` : transcript)
@@ -105,11 +107,21 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
 
   const handleSend = useCallback(() => {
     const trimmed = text.trim()
-    if (!trimmed || disabled) return
-    onSend(trimmed, { webSearch: webSearchEnabled })
+    if (!trimmed && attachments.length === 0) return
+    if (disabled) return
+
+    let fullText = trimmed
+    const textFiles = attachments.filter(a => a.type === 'text')
+    if (textFiles.length > 0) {
+      fullText += '\n\n' + textFiles.map(a => `[File: ${a.name}]\n${a.text}`).join('\n\n')
+    }
+    const imageAttachments = attachments.filter(a => a.type === 'image').map(a => ({ name: a.name, dataUrl: a.dataUrl! }))
+
+    onSend(fullText, { webSearch: webSearchEnabled, images: imageAttachments.length > 0 ? imageAttachments : undefined })
     setText('')
+    setAttachments([])
     if (textareaRef.current) textareaRef.current.style.height = 'auto'
-  }, [text, disabled, onSend, webSearchEnabled])
+  }, [text, attachments, disabled, onSend, webSearchEnabled])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -164,11 +176,19 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
 
   const selectedKb = knowledgeBases.find((kb) => kb.id === selectedKnowledgeBaseId)
 
-  const pickerClass = 'absolute bottom-full left-0 mb-1.5 bg-[#18181b] border border-[#3f3f46] rounded-lg p-1.5 min-w-[240px] max-w-[340px] z-50 max-h-[320px] overflow-y-auto'
-  const pickerShadow = { boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }
+  const pickerClass = 'absolute bottom-full left-0 mb-1.5 bg-[rgba(255,255,255,0.04)] border border-[rgba(240,171,252,0.15)] rounded-lg p-1.5 min-w-[240px] max-w-[340px] z-50 max-h-[320px] overflow-y-auto'
+  const pickerShadow = { boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(196,132,252,0.12)' }
 
   return (
-    <div className="border-t border-t-[#27272a] px-4 py-3 bg-[#09090b]">
+    <div
+      className="px-4 py-3"
+      style={{
+        borderTop: '1px solid rgba(196,132,252,0.10)',
+        background: 'rgba(10,0,20,0.55)',
+        backdropFilter: 'blur(24px) saturate(1.5)',
+        WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
+      }}
+    >
       {variableDialogTemplate && (
         <TemplateVariableDialog
           template={variableDialogTemplate.content}
@@ -225,6 +245,41 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
           )}
         </div>
 
+        {/* File attachment */}
+        <>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*,.txt,.md,.json,.csv,.xml,.yaml,.yml"
+            style={{ display: 'none' }}
+            onChange={async (e) => {
+              const files = Array.from(e.target.files || [])
+              const loaded = await Promise.all(files.map(async (f) => {
+                if (f.type.startsWith('image/')) {
+                  return new Promise<{name:string;type:'image';dataUrl:string}>((res) => {
+                    const r = new FileReader()
+                    r.onload = () => res({ name: f.name, type: 'image', dataUrl: r.result as string })
+                    r.readAsDataURL(f)
+                  })
+                } else {
+                  const text = await f.text()
+                  return { name: f.name, type: 'text' as const, text }
+                }
+              }))
+              setAttachments(prev => [...prev, ...loaded])
+              e.target.value = ''
+            }}
+          />
+          <ToolToggle
+            active={attachments.length > 0}
+            onClick={() => fileInputRef.current?.click()}
+            icon="📎"
+            label={attachments.length > 0 ? `${attachments.length} file${attachments.length>1?'s':''}` : 'Attach'}
+            tooltip="Attach images or text files"
+          />
+        </>
+
         {/* MCP tools picker */}
         {allMcpTools.length > 0 && (
           <div className="relative" ref={mcpRef}>
@@ -252,9 +307,31 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
         )}
       </div>
 
+      {/* Attachments preview */}
+      {attachments.length > 0 && (
+        <div className="flex gap-2 flex-wrap mb-2">
+          {attachments.map((a, i) => (
+            <div key={i} className="relative flex items-center gap-1.5 bg-[rgba(255,255,255,0.06)] border border-[rgba(196,132,252,0.2)] rounded-lg px-2 py-1">
+              {a.type === 'image' ? (
+                <img src={a.dataUrl} alt={a.name} className="h-10 w-10 object-cover rounded" />
+              ) : (
+                <span className="text-xs">📄</span>
+              )}
+              <span className="text-[11px] text-[#a1a1aa] max-w-[100px] overflow-hidden text-ellipsis whitespace-nowrap">{a.name}</span>
+              <button onClick={() => setAttachments(prev => prev.filter((_, j) => j !== i))} className="text-[#52525b] hover:text-[#ef4444] text-xs border-0 bg-transparent cursor-pointer leading-none ml-0.5">✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Input row */}
       <div
-        className="flex items-end gap-2 bg-[#18181b] border border-[#3f3f46] rounded-xl px-3 py-2"
+        className="flex items-end gap-2 rounded-2xl px-3 py-2"
+        style={{
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(196,132,252,0.20)',
+          boxShadow: '0 0 0 3px rgba(147,51,234,0.07), inset 0 1px 0 rgba(255,255,255,0.05)',
+        }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={async (e) => {
           e.preventDefault()
@@ -294,9 +371,13 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
         )}
         <button
           onClick={streaming ? onAbort : handleSend}
-          disabled={!streaming && (disabled || !text.trim())}
+          disabled={!streaming && (disabled || (!text.trim() && attachments.length === 0))}
           title={streaming ? 'Stop' : 'Send'}
-          className={`w-8 h-8 rounded-lg border-0 flex items-center justify-center shrink-0 text-sm text-white transition-[opacity,background] duration-150 ${streaming ? 'bg-[#dc2626]' : 'bg-[#2563eb]'} ${!streaming && (disabled || !text.trim()) ? 'opacity-40 cursor-default' : 'cursor-pointer'}`}
+          className={`w-8 h-8 rounded-xl border-0 flex items-center justify-center shrink-0 text-sm text-white transition-all duration-150 ${!streaming && (disabled || !text.trim()) ? 'opacity-35 cursor-default' : 'cursor-pointer'}`}
+          style={{
+            background: streaming ? '#dc2626' : 'linear-gradient(135deg, #7c3aed, #d946ef)',
+            boxShadow: (!streaming && (disabled || (!text.trim() && attachments.length === 0))) ? 'none' : '0 0 12px rgba(196,132,252,0.40)',
+          }}
         >
           {streaming ? '⏹' : '↑'}
         </button>
@@ -310,7 +391,7 @@ export function InputBar({ onSend, onAbort, streaming, disabled, selectedKnowled
               key={idx}
               onClick={() => updateText(reply)}
               title={`Quick reply: ${reply}`}
-              className="text-[11px] px-2.5 py-1 rounded-md border border-[#3f3f46] bg-transparent text-[#a1a1aa] cursor-pointer transition-all duration-150 hover:bg-[rgba(37,99,235,0.1)] hover:text-[#60a5fa]"
+              className="text-[11px] px-2.5 py-1 rounded-md border border-[rgba(240,171,252,0.15)] bg-transparent text-[#a1a1aa] cursor-pointer transition-all duration-150 hover:bg-[rgba(37,99,235,0.1)] hover:text-[#60a5fa]"
             >
               {reply.length > 20 ? reply.slice(0, 17) + '…' : reply}
             </button>

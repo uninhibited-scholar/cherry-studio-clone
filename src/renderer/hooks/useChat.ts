@@ -107,7 +107,7 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
   )
 
   const sendMessage = useCallback(
-    async (userText: string, options: { webSearch?: boolean } = {}) => {
+    async (userText: string, options: { webSearch?: boolean; images?: Array<{name: string; dataUrl: string}> } = {}) => {
       if (!topicId || !assistant || streaming) return
       if (!assistant.providerId || !assistant.modelId) {
         alert('Configure a provider and model in the assistant settings first.')
@@ -155,10 +155,20 @@ export function useChat(topicId: string | null, assistant: Assistant | null) {
       })) as Message
       setMessages((prev) => [...prev, userMsg])
 
-      const history = [...messages, userMsg].map((m, i, arr) => ({
-        role: m.role as 'user' | 'assistant' | 'system',
-        content: i === arr.length - 1 && contextPrefix ? contextPrefix + m.content : m.content
-      }))
+      const history = [...messages, userMsg].map((m, i, arr) => {
+        const isLast = i === arr.length - 1
+        const textContent = isLast && contextPrefix ? contextPrefix + m.content : m.content
+        if (isLast && options.images && options.images.length > 0) {
+          return {
+            role: m.role as 'user' | 'assistant' | 'system',
+            content: [
+              { type: 'text' as const, text: textContent },
+              ...options.images.map(img => ({ type: 'image' as const, image: img.dataUrl }))
+            ]
+          }
+        }
+        return { role: m.role as 'user' | 'assistant' | 'system', content: textContent }
+      })
 
       const requestId = `req-${Date.now()}-${Math.random().toString(36).slice(2)}`
       requestIdRef.current = requestId
